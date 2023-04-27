@@ -1,7 +1,7 @@
 # shopt
 Shear Optimization with Shopt.jl, a julia library for empirical point spread function characterizations
 
-To run 'shopt.jl'
+To run `shopt.jl`
 Run julia shopt.jl [eventually the fits file you want to run] [configdir] [outdir] [datadir]
 
 Dependencies:
