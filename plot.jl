@@ -39,7 +39,7 @@ function error_plot(learnedParameters::Array{T, 1}, trueParameters::Array{T, 1},
   savefig(joinpath("outdir", replace(Title*".png", r"\s+" => "")))
 end
 
-function plot_all()
+function plot_hm()
   hm = generate_heatmap(star, "I(u,v) Model", amin, amax)
   savefig(hm, joinpath("outdir", "intensityHeatmap.png"))
   hm2 = generate_heatmap(costSquaredError, "SquaredError(u,v)", csemin, csemax)
@@ -50,5 +50,10 @@ function plot_all()
   savefig(hm4, joinpath("outdir", "residuals.png"))
   hm5 = generate_heatmap(chiSquare, "ChiSquare", csmin, csmax)
   savefig(hm5, joinpath("outdir", "chiSquare.png"))
+  hm6 = generate_heatmap(pg, "Pixel Grid", amin, amax)
+  savefig(hm6, joinpath("outdir", "pg.png"))
+  hm7 = generate_heatmap((star - pg).^2, "Pixel Grid Squared Error", rpgmin, rpgmax)
+  savefig(hm7, joinpath("outdir", "pgSE.png"))
   savefig(plot(hm, hm3, hm5, hm2, hm4, layout = (2,3),size = (900,400)), joinpath("outdir", "EllipticalGaussianResults.png"))
+  savefig(plot(hm, hm6, hm7, layout = (1,3),size = (900,400)), joinpath("outdir", "pixelGrid.png"))
 end

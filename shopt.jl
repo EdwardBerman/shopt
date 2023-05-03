@@ -1,8 +1,5 @@
 using Base: initarray!
 using BenchmarkTools
-using Manopt
-using ManifoldsBase
-using Manifolds
 using Plots
 using ForwardDiff
 using LinearAlgebra
@@ -13,10 +10,13 @@ using SpecialFunctions
 using Optim
 using IterativeSolvers
 using QuadGK
+using Manifolds
+using ManifoldsBase
 
 include("plot.jl")
-include("optArgs.jl")
+include("analyticCGD.jl")
 include("radialProfiles.jl")
+include("pixelGridGD.jl")
 
 print("Insert [s, g1, g2]")
 
@@ -74,10 +74,6 @@ starData[6,6] = 1
 
 shearManifold = Euclidean(3)
 
-#stopping_criterion = StopWhenAny(StopAfterIteration(10000),StopWhenGradientNormLess(1e-12))
-#stopping_criterion = StopWhenGradientNormLess(1e-12)
-#stopping_criterion = StopAfterIteration(1000)
-
 itr = 20
 A_data = zeros(itr)
 s_data = zeros(itr)
@@ -86,13 +82,23 @@ g2_data = zeros(itr)
 e1_data = zeros(itr)
 e2_data = zeros(itr)
 
+
 @time begin
   for i in 1:itr
     initial_guess = rand(shearManifold)
     print("\n initial guess [s, e1, e2] \n", initial_guess)
     
-    x_cg = optimize(cost, g!, initial_guess, ConjugateGradient())
-    println(x_cg)
+    x_cg = optimize(cost, g!, initial_guess, ConjugateGradient(),Optim.Options(store_trace=true))
+    trace = Optim.trace(x_cg)
+    trace_err = []
+    trace_time = []
+    for i in 1:length(trace)
+      append!(trace_err, parse(Float64, split(string(trace[i]))[2]))
+      append!(trace_time, parse(Float64, split(string(trace[i]))[end]))
+    end
+    loss_time = plot(trace_time, trace_err)
+    savefig(loss_time, joinpath("outdir", "lossTime.png"))
+    
     s_data[i] = x_cg.minimizer[1]^2
     e1_guess = x_cg.minimizer[2]
     e2_guess = x_cg.minimizer[3]
@@ -161,9 +167,15 @@ function remove_outliers(data::AbstractVector{T}; k::Float64=1.5) where T<:Real
     return nonOutliers
 end
 
-#Plotting
+pg = optimize(pgCost, pg_g!, zeros(100), GradientDescent())
+print(pg)
+pg = reshape(pg.minimizer, (10, 10))
+
+
+#Plotting Error True Vs Learned
 error_plot([s, g1, g2], [mean(s_data), mean(g1_data), mean(g2_data)], [std(s_data)/sqrt(itr), std(g1_data)/sqrt(itr), std(g2_data)/sqrt(itr)], "Learned vs True Parameters")
 
+# Plotting Heatmaps
 s_data = remove_outliers(s_data)
 g1_data = remove_outliers(g1_data)
 g2_data = remove_outliers(g2_data)
@@ -205,8 +217,10 @@ rmin = minimum(Residuals)
 rmax = maximum(Residuals)
 csemin = minimum(costSquaredError)
 csemax = maximum(costSquaredError)
+rpgmin = minimum((star - pg).^2)
+rpgmax = maximum((star - pg).^2)
 
-plot_all()
+plot_hm()
 
 ns = size(s_data, 1)
 ng1 = size(g1_data, 1)
@@ -214,7 +228,10 @@ ng2 = size(g2_data, 1)
 
 error_plot([s, g1, g2], [mean(s_data), mean(g1_data), mean(g2_data)], [std(s_data)/sqrt(ns), std(g1_data)/sqrt(ng1), std(g2_data)/sqrt(ng2)], "Learned vs True Parameters Outliers Removed")
 
-dof = 78 #9 x 9 x 3 - 3
-p = ccdf(Chisq(dof), sum(chiSquare))
+dof = 97 #10 x 10 - 3
+print("\n", sum(chiSquare), "\n")
+p = 1 - cdf(Chisq(dof), sum(chiSquare))#ccdf = 1 - cdf
 #print(Chisq(dof), sum(chiSquare), "\n")
 print("p-value \n", p, "\n")
+
+
