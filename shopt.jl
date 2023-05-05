@@ -83,22 +83,41 @@ e1_data = zeros(itr)
 e2_data = zeros(itr)
 
 
+ltPlots = []
+
 @time begin
   for i in 1:itr
     initial_guess = rand(shearManifold)
     print("\n initial guess [s, e1, e2] \n", initial_guess)
-    
-    x_cg = optimize(cost, g!, initial_guess, ConjugateGradient(),Optim.Options(store_trace=true))
-    trace = Optim.trace(x_cg)
-    trace_err = []
-    trace_time = []
-    for i in 1:length(trace)
-      append!(trace_err, parse(Float64, split(string(trace[i]))[2]))
-      append!(trace_time, parse(Float64, split(string(trace[i]))[end]))
+     
+    it = []
+    loss = []
+
+    function cb(opt_state:: Optim.OptimizationState)
+      push!(it, opt_state.iteration)
+      push!(loss, opt_state.value)
+      return false  
     end
-    loss_time = plot(trace_time, trace_err)
-    savefig(loss_time, joinpath("outdir", "lossTime.png"))
-    
+    x_cg = optimize(cost, 
+                    g!, 
+                    initial_guess, 
+                    ConjugateGradient(),
+                    Optim.Options(callback = cb))#store_trace=true
+
+    loss_time = plot(it, 
+                     loss, 
+                     title="Analytic Profile Loss Vs Iteration", 
+                     xlabel="Iteration", 
+                     ylabel="Loss",
+                     label="Star $itr Model")
+    push!(ltPlots, loss_time)
+
+    if "$itr" == "20"
+      savefig(ltPlots, joinpath("outdir", "lossTime.png")) 
+    end
+
+
+
     s_data[i] = x_cg.minimizer[1]^2
     e1_guess = x_cg.minimizer[2]
     e2_guess = x_cg.minimizer[3]
