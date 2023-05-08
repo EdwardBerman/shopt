@@ -54,6 +54,6 @@ function plot_hm()
   savefig(hm6, joinpath("outdir", "pg.png"))
   hm7 = generate_heatmap((star - pg).^2, "Pixel Grid Squared Error", rpgmin, rpgmax)
   savefig(hm7, joinpath("outdir", "pgSE.png"))
-  savefig(plot(hm, hm3, hm5, hm2, hm4, layout = (2,3),size = (900,400)), joinpath("outdir", "EllipticalGaussianResults.png"))
+  savefig(plot(hm, hm3, hm5, hm2, hm4, layout = (2,3),size = (900,400)), joinpath("outdir", "ellipticalGaussianResults.png"))
   savefig(plot(hm, hm6, hm7, layout = (1,3),size = (900,400)), joinpath("outdir", "pixelGrid.png"))
 end
