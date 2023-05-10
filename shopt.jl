@@ -1,3 +1,4 @@
+println("Handling Imports")
 using Base: initarray!
 using BenchmarkTools
 using Plots
@@ -16,84 +17,21 @@ using ManifoldsBase
 include("plot.jl")
 include("analyticCGD.jl")
 include("radialProfiles.jl")
-include("pixelGridGD.jl")
+include("pixelGridCGD.jl")
 include("dataPreprocessing.jl")
 include("outliers.jl")
-#=
-print("Insert [s, g1, g2]")
-
-print("\n s = ")
-s = readline()
-s = parse(Float64, s)
-
-print("\n g1 = ")
-g1 = readline()
-g1 = parse(Float64, g1)
-
-print("\n g2 = ")
-g2 = readline()
-g2 = parse(Float64, g2)
-
-print("\n noise = ")
-noise = readline()
-noise = parse(Float64, noise)
-
-star = zeros(10, 10)
-star[5,5] = 1
-star[5,6] = 1
-star[6,5] = 1
-star[6,6] = 1
-
-norm = zeros(10, 10)
-norm[5,5] = 1
-norm[5,6] = 1
-norm[6,5] = 1
-norm[6,6] = 1
-
-for u in 1:10
-  for v in 1:10
-    norm[u,v] = EGaussian(1, u, v, g1, g2, s)
-  end
-end
-
-A = 1/sum(norm)
-print("A = ", A, "\n")
-
-for u in 1:10
-  for v in 1:10
-    star[u,v] = EGaussian(A, u, v, g1, g2, s)
-    star[u,v] = star[u,v] + rand(Normal(-noise*star[u,v], star[u,v]*noise))
-  end
-end
-=#
 
 println("Processing Data for Fit")
 star, r, c = dataprocessing()
+
+for u in 1:r
+  for v in 1:c
+    star[u,v] = star[u,v] + rand(Normal(-0.1*star[u,v], star[u,v]*0.1))
+  end
+end
+
  
 starData = zeros(r, c)
-if isodd(r) & isodd(c)
-  starData[div(r,2)+1, div(c,2)+1] = 1
-end
-if isodd(r) & isodd(c)
-  starData[median([1:1:r;]), median([1:1:c;])] = 1
-end
-if iseven(r) & iseven(c)
-  starData[r÷2, c÷2] = 1
-  starData[(r÷2) + 1, c÷2] = 1
-  starData[r÷2, (c÷2) + 1] = 1
-  starData[(r÷2) + 1, (c÷2) + 1] = 1
-end
-if isodd(r) & iseven(c)
-  starData[median([1:1:r;]), median([1:1:c;]) - 0.5] = 1
-  starData[median([1:1:r;]), median([1:1:c;]) + 0.5] = 1
-end
-if iseven(r) & isodd(c)
-  starData[median([1:1:r;]) - 0.5, median([1:1:c;])] = 1
-  starData[median([1:1:r;]) + 0.5, median([1:1:c;])] = 1
-end
-
-
-
 shearManifold = Euclidean(3)
 
 itr = 5
@@ -105,11 +43,12 @@ g2_data = zeros(itr)
 
 ltPlots = []
 
+println("Analytic Profile Fit for Model Star")
 @time begin
   for i in 1:itr
-    print("Iteration $i")
+    println("\t Iteration $i")
     initial_guess = rand(shearManifold)
-    print("\n initial guess [σ, e1, e2] \n", initial_guess)
+    println("\t initial guess [σ, e1, e2]: ", initial_guess)
      
     it = []
     loss = []
@@ -156,25 +95,22 @@ ltPlots = []
       end
     end
     A_data[i] = 1/sum(norm_data)
-    print("\n", "A: ", A_data[i], "   s: ", s_data[i]^2, "   g1: ", g1_data[i], "   g2: ", g2_data[i], "\n \n \n")
+    println("\t Found A: ", A_data[i], "\t s: ", s_data[i]^2, "\t g1: ", g1_data[i], "\t g2: ", g2_data[i])
 
   end
 end
 
-for j in 1:itr
-  print("\n    A: ", A_data[j], "\n   s: ", s_data[j], "\n   g1: ", g1_data[j], "\n   g2: ", g2_data[j], "\n \n \n" )
-end
-
-print("Outliers in s: ", detect_outliers(s_data), "\n")
+println("\t \t Outliers in s: ", detect_outliers(s_data))
 ns = length(detect_outliers(s_data))
 ng1 = length(detect_outliers(g1_data))
 ng2 = length(detect_outliers(g2_data))
 
-print("Number of outliers in s: ", ns[1], "\n")
-print("Number of outliers in g1: ", ng1[1], "\n")
-print("Number of outliers in g2: ", ng2[1], "\n")
+println("\t \t Number of outliers in s: ", ns[1])
+println("\t \t Number of outliers in g1: ", ng1[1])
+println("\t \t Number of outliers in g2: ", ng2[1])
 
-pg = optimize(pgCost, pg_g!, zeros(r*c), GradientDescent())
+println("Pixel Grid Fit")
+pg = optimize(pgCost, pg_g!, zeros(r*c), ConjugateGradient())
 print(pg)
 pg = reshape(pg.minimizer, (r, c))
 
@@ -183,7 +119,7 @@ pg = reshape(pg.minimizer, (r, c))
 ###error_plot([s, g1, g2], [mean(s_data), mean(g1_data), mean(g2_data)], [std(s_data)/sqrt(itr), std(g1_data)/sqrt(itr), std(g2_data)/sqrt(itr)], "Learned vs True Parameters")
 
 # Plotting Heatmaps
-print("\n Plotting \n")
+print("\nPlotting \n")
 s_data = remove_outliers(s_data)
 g1_data = remove_outliers(g1_data)
 g2_data = remove_outliers(g2_data)
@@ -237,10 +173,9 @@ ng2 = size(g2_data, 1)
 
 ###error_plot([s, g1, g2], [mean(s_data), mean(g1_data), mean(g2_data)], [std(s_data)/sqrt(ns), std(g1_data)/sqrt(ng1), std(g2_data)/sqrt(ng2)], "Learned vs True Parameters Outliers Removed")
 
-dof = 97 #10 x 10 - 3
-print("\n", sum(chiSquare), "\n")
+dof = r*c - 3
 p = 1 - cdf(Chisq(dof), sum(chiSquare))#ccdf = 1 - cdf
 #print(Chisq(dof), sum(chiSquare), "\n")
-print("p-value \n", p, "\n")
+print("p-value: ", p, "\n")
 
 

@@ -6,6 +6,7 @@ function generate_heatmap(data::Array{T, 2}, t, cbmin, cbmax) where T<:Real
              xlabel="u",
  
              ylabel="v",
+             c=:log,
              clims=(cbmin, cbmax),  # set the color limits
              title= t,
              xlims=(0.5, size(data, 2) + 0.5),  # set the x-axis limits to include the full cells

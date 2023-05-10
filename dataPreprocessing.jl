@@ -1,4 +1,5 @@
 using PyCall
+using Noise
 
 function dataprocessing()
   py"""
@@ -8,10 +9,10 @@ function dataprocessing()
   a = psf[1].data
   """
   julia_array = convert(Array{Float64,2}, py"a")
+  #julia_array = poisson(julia_array)
   rows, cols = size(julia_array)
   return julia_array, rows, cols
 end
-data, r, c = dataprocessing()
 
 
 
