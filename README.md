@@ -7,4 +7,5 @@ Run ```julia shopt.jl [eventually the fits file you want to run] [configdir] [ou
 Dependencies:
   Julia: Plots, ForwardDiff, LinearAlgebra, Random, Distributions, SpecialFunctions, Optim, IterativeSolvers, QuadGK, PyCall
   Python: Astropy, treecorr
-  
+
+Known Issues: Need to take stamps of images to focus on the actual PSF, Some plots have issues with colorbars 

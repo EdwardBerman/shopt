@@ -18,7 +18,7 @@ include("analyticCGD.jl")
 include("radialProfiles.jl")
 include("pixelGridGD.jl")
 include("dataPreprocessing.jl")
-
+include("outliers.jl")
 #=
 print("Insert [s, g1, g2]")
 
@@ -69,7 +69,7 @@ end
 
 println("Processing Data for Fit")
 star, r, c = dataprocessing()
-
+ 
 starData = zeros(r, c)
 if isodd(r) & isodd(c)
   starData[div(r,2)+1, div(c,2)+1] = 1
@@ -109,7 +109,7 @@ ltPlots = []
   for i in 1:itr
     print("Iteration $i")
     initial_guess = rand(shearManifold)
-    print("\n initial guess [s, e1, e2] \n", initial_guess)
+    print("\n initial guess [σ, e1, e2] \n", initial_guess)
      
     it = []
     loss = []
@@ -183,17 +183,6 @@ for j in 1:itr
   print("\n    A: ", A_data[j], "\n   s: ", s_data[j], "\n   g1: ", g1_data[j], "\n   g2: ", g2_data[j], "\n \n \n" )
 end
 
-function detect_outliers(data::AbstractVector{T}; k::Float64=1.5) where T<:Real
-    q1 = quantile(data, 0.25)
-    q3 = quantile(data, 0.75)
-    iqr = q3 - q1
-    lower_fence = q1 - k * iqr
-    upper_fence = q3 + k * iqr
-    filter = (data .< lower_fence) .| (data .> upper_fence)
-    outliers = data[filter]
-    return outliers
-end
-
 print("Outliers in s: ", detect_outliers(s_data), "\n")
 ns = length(detect_outliers(s_data))
 ng1 = length(detect_outliers(g1_data))
@@ -202,17 +191,6 @@ ng2 = length(detect_outliers(g2_data))
 print("Number of outliers in s: ", ns[1], "\n")
 print("Number of outliers in g1: ", ng1[1], "\n")
 print("Number of outliers in g2: ", ng2[1], "\n")
-
-function remove_outliers(data::AbstractVector{T}; k::Float64=1.5) where T<:Real
-    q1 = quantile(data, 0.25)
-    q3 = quantile(data, 0.75)
-    iqr = q3 - q1
-    lower_fence = q1 - k * iqr
-    upper_fence = q3 + k * iqr
-    filter = (data .> lower_fence) .& (data .< upper_fence)
-    nonOutliers = data[filter]
-    return nonOutliers
-end
 
 pg = optimize(pgCost, pg_g!, zeros(r*c), GradientDescent())
 print(pg)
