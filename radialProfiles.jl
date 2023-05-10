@@ -1,7 +1,7 @@
-function EGaussian(A, u, v, g1, g2, s)
-  squareRadiusFactor = ([(1 + g1) g2; g2 (1 - g1)]*[(u - 5.5); (v- 5.5)])'*([(1 + g1) g2; g2 (1 - g1)]*[(u-5.5);(v-5.5)])
+function EGaussian(u, v, g1, g2, s, uc, vc)
+  squareRadiusFactor = ([(1 + g1) g2; g2 (1 - g1)]*[(u - uc); (v- vc)])'*([(1 + g1) g2; g2 (1 - g1)]*[(u-uc);(v-vc)])
   matrixScalar = s^2/(1 - g1^2 - g2^2)
-  return A*exp(-(matrixScalar*squareRadiusFactor))
+  return exp(-(matrixScalar*squareRadiusFactor))
 end
 
 function Fkolmogorov(A, k, λ)

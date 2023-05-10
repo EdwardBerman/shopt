@@ -17,7 +17,9 @@ include("plot.jl")
 include("analyticCGD.jl")
 include("radialProfiles.jl")
 include("pixelGridGD.jl")
+include("dataPreprocessing.jl")
 
+#=
 print("Insert [s, g1, g2]")
 
 print("\n s = ")
@@ -63,13 +65,33 @@ for u in 1:10
     star[u,v] = star[u,v] + rand(Normal(-noise*star[u,v], star[u,v]*noise))
   end
 end
+=#
 
+println("Processing Data for Fit")
+star, r, c = dataprocessing()
 
-starData = zeros(10, 10)
-starData[5,5] = 1
-starData[5,6] = 1
-starData[6,5] = 1
-starData[6,6] = 1
+starData = zeros(r, c)
+if isodd(r) & isodd(c)
+  starData[div(r,2)+1, div(c,2)+1] = 1
+end
+if isodd(r) & isodd(c)
+  starData[median([1:1:r;]), median([1:1:c;])] = 1
+end
+if iseven(r) & iseven(c)
+  starData[r÷2, c÷2] = 1
+  starData[(r÷2) + 1, c÷2] = 1
+  starData[r÷2, (c÷2) + 1] = 1
+  starData[(r÷2) + 1, (c÷2) + 1] = 1
+end
+if isodd(r) & iseven(c)
+  starData[median([1:1:r;]), median([1:1:c;]) - 0.5] = 1
+  starData[median([1:1:r;]), median([1:1:c;]) + 0.5] = 1
+end
+if iseven(r) & isodd(c)
+  starData[median([1:1:r;]) - 0.5, median([1:1:c;])] = 1
+  starData[median([1:1:r;]) + 0.5, median([1:1:c;])] = 1
+end
+
 
 
 shearManifold = Euclidean(3)
@@ -79,8 +101,6 @@ A_data = zeros(itr)
 s_data = zeros(itr)
 g1_data = zeros(itr)
 g2_data = zeros(itr)
-e1_data = zeros(itr)
-e2_data = zeros(itr)
 
 
 ltPlots = []
@@ -98,6 +118,7 @@ ltPlots = []
       push!(loss, opt_state.value)
       return false  
     end
+    print("Iteration $i")
     x_cg = optimize(cost, 
                     g!, 
                     initial_guess, 
@@ -111,11 +132,11 @@ ltPlots = []
                      ylabel="Loss",
                      label="Star $itr Model")
     push!(ltPlots, loss_time)
-
+    #=
     if "$itr" == "20"
       savefig(ltPlots, joinpath("outdir", "lossTime.png")) 
     end
-
+    =#
 
 
     s_data[i] = x_cg.minimizer[1]^2
@@ -128,26 +149,33 @@ ltPlots = []
     g1_data[i] = e1_guess/ratioData            
     g2_data[i] = e2_guess/ratioData  
     
-    norm_data = zeros(10,10)
-    norm_data[5,5] = 1
-    norm_data[5,6] = 1
-    norm_data[6,5] = 1
-    norm_data[6,6] = 1
+    norm_data = zeros(r,c)
+    if isodd(r) & isodd(c)
+      norm_data[median([1:1:r;]), median([1:1:c;])] = 1
+    end
+    if iseven(r) & iseven(c)
+      norm_data[r÷2, c÷2] = 1
+      norm_data[(r÷2) + 1, c÷2] = 1
+      norm_data[r÷2, (c÷2) + 1] = 1
+      norm_data[(r÷2) + 1, (c÷2) + 1] = 1
+    end
+    if isodd(r) & iseven(c)
+      norm_data[median([1:1:r;]), median([1:1:c;]) - 0.5] = 1
+      norm_data[median([1:1:r;]), median([1:1:c;]) + 0.5] = 1
+    end
+    if iseven(r) & isodd(c)
+      norm_data[median([1:1:r;]) - 0.5, median([1:1:c;])] = 1
+      norm_data[median([1:1:r;]) + 0.5, median([1:1:c;])] = 1
+    end
 
-    for u in 1:10
-      for v in 1:10
-        norm_data[u,v] = EGaussian(1, u, v, g1_data[i], g2_data[i], s_data[i])
+    for u in 1:r
+      for v in 1:c
+        norm_data[u,v] = EGaussian(u, v, g1_data[i], g2_data[i], s_data[i])
       end
     end
     A_data[i] = 1/sum(norm_data)
     print("\n", "A: ", A_data[i], "   s: ", s_data[i]^2, "   g1: ", g1_data[i], "   g2: ", g2_data[i], "\n \n \n")
 
-    temp = zeros(10, 10)
-    for u in 1:10
-      for v in 1:10
-        temp[u,v] = EGaussian(A_data[i], u, v, g1_data[i], g2_data[i], s_data[i])
-      end
-    end
   end
 end
 
@@ -186,20 +214,20 @@ function remove_outliers(data::AbstractVector{T}; k::Float64=1.5) where T<:Real
     return nonOutliers
 end
 
-pg = optimize(pgCost, pg_g!, zeros(100), GradientDescent())
+pg = optimize(pgCost, pg_g!, zeros(r*c), GradientDescent())
 print(pg)
-pg = reshape(pg.minimizer, (10, 10))
+pg = reshape(pg.minimizer, (r, c))
 
 
 #Plotting Error True Vs Learned
-error_plot([s, g1, g2], [mean(s_data), mean(g1_data), mean(g2_data)], [std(s_data)/sqrt(itr), std(g1_data)/sqrt(itr), std(g2_data)/sqrt(itr)], "Learned vs True Parameters")
+###error_plot([s, g1, g2], [mean(s_data), mean(g1_data), mean(g2_data)], [std(s_data)/sqrt(itr), std(g1_data)/sqrt(itr), std(g2_data)/sqrt(itr)], "Learned vs True Parameters")
 
 # Plotting Heatmaps
 s_data = remove_outliers(s_data)
 g1_data = remove_outliers(g1_data)
 g2_data = remove_outliers(g2_data)
 
-norm2 = zeros(10, 10)
+norm2 = zeros(r, c)
 norm2[5,5] = 1
 norm2[5,6] = 1
 norm2[6,5] = 1
@@ -207,15 +235,15 @@ norm2[6,6] = 1
 
 for u in 1:10
   for v in 1:10
-    norm2[u,v] = EGaussian(1, u, v, mean(g1_data), mean(g2_data), mean(s_data))
+    norm2[u,v] = EGaussian(u, v, mean(g1_data), mean(g2_data), mean(s_data))
   end
 end
 
 A_data = 1/sum(norm2)
 
-for u in 1:10
-  for v in 1:10
-    starData[u,v] = EGaussian(A_data, u, v, mean(g1_data), mean(g2_data), mean(s_data))
+for u in 1:r
+  for v in 1:c
+    starData[u,v] = A_data*EGaussian(u, v, mean(g1_data), mean(g2_data), mean(s_data))
   end
 end
 
@@ -245,7 +273,7 @@ ns = size(s_data, 1)
 ng1 = size(g1_data, 1)
 ng2 = size(g2_data, 1)
 
-error_plot([s, g1, g2], [mean(s_data), mean(g1_data), mean(g2_data)], [std(s_data)/sqrt(ns), std(g1_data)/sqrt(ng1), std(g2_data)/sqrt(ng2)], "Learned vs True Parameters Outliers Removed")
+###error_plot([s, g1, g2], [mean(s_data), mean(g1_data), mean(g2_data)], [std(s_data)/sqrt(ns), std(g1_data)/sqrt(ng1), std(g2_data)/sqrt(ng2)], "Learned vs True Parameters Outliers Removed")
 
 dof = 97 #10 x 10 - 3
 print("\n", sum(chiSquare), "\n")
