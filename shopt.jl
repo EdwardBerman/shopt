@@ -107,6 +107,7 @@ ltPlots = []
 
 @time begin
   for i in 1:itr
+    print("Iteration $i")
     initial_guess = rand(shearManifold)
     print("\n initial guess [s, e1, e2] \n", initial_guess)
      
@@ -118,7 +119,6 @@ ltPlots = []
       push!(loss, opt_state.value)
       return false  
     end
-    print("Iteration $i")
     x_cg = optimize(cost, 
                     g!, 
                     initial_guess, 
@@ -133,7 +133,7 @@ ltPlots = []
                      label="Star $itr Model")
     push!(ltPlots, loss_time)
     #=
-    if "$itr" == "20"
+    if "$i" == "20"
       savefig(ltPlots, joinpath("outdir", "lossTime.png")) 
     end
     =#
@@ -170,7 +170,7 @@ ltPlots = []
 
     for u in 1:r
       for v in 1:c
-        norm_data[u,v] = EGaussian(u, v, g1_data[i], g2_data[i], s_data[i])
+        norm_data[u,v] = EGaussian(u, v, g1_data[i], g2_data[i], s_data[i], r/2, c/2)
       end
     end
     A_data[i] = 1/sum(norm_data)
@@ -235,7 +235,7 @@ norm2[6,6] = 1
 
 for u in 1:10
   for v in 1:10
-    norm2[u,v] = EGaussian(u, v, mean(g1_data), mean(g2_data), mean(s_data))
+    norm2[u,v] = EGaussian(u, v, mean(g1_data), mean(g2_data), mean(s_data), r/2, c/2)
   end
 end
 
@@ -243,7 +243,7 @@ A_data = 1/sum(norm2)
 
 for u in 1:r
   for v in 1:c
-    starData[u,v] = A_data*EGaussian(u, v, mean(g1_data), mean(g2_data), mean(s_data))
+    starData[u,v] = A_data*EGaussian(u, v, mean(g1_data), mean(g2_data), mean(s_data),r/2, c/2)
   end
 end
 

@@ -1,6 +1,6 @@
 include("radialProfiles.jl")
 
-function cost(params) 
+function cost(params; r = r, c= c, star = star, radial = EGaussian) 
   Totalcost = 0
   σ = params[1]
   s_guess = σ^2
@@ -11,42 +11,27 @@ function cost(params)
   ratio = ellipticity/normG
   g1_guess = e1_guess/ratio
   g2_guess = e2_guess/ratio
-  
 
-  normGuess = zeros(r,c)
+  sum = 0
+  for u in 1:r
+    for v in 1:c
+      try
+        sum +=  radial(u,v, g1_guess, g2_guess, s_guess, r/2,c/2)
+      catch
+        sum += 0
+      end
+    end
+  end
+  A_guess = 1/sum
   
-  if isodd(r) & isodd(c)
-    normGuess[(r÷2) + 1, (c÷2)+1] = 1
-  end
-  if iseven(r) & iseven(c)
-    normGuess[r÷2, c÷2] = 1
-    normGuess[(r÷2) + 1, c÷2] = 1
-    normGuess[r÷2, (c÷2) + 1] = 1
-    normGuess[(r÷2) + 1, (c÷2) + 1] = 1
-  end
-  if isodd(r) & iseven(c)
-    normGuess[(r÷2) + 1, c÷2] = 1
-    normGuess[(r÷2) + 1, (c÷2) + 1] = 1
-  end
-  if iseven(r) & isodd(c)
-    normGuess[median([1:1:r;]) - 0.5, median([1:1:c;])] = 1
-    normGuess[median([1:1:r;]) + 0.5, median([1:1:c;])] = 1
-  end
-  try
-    sum = 0
-    for u in 1:r
-      for v in 1:c
-        sum +=  EGaussian(u,v, g1_guess, g2_guess, s_guess, r/2,c/2)
+  for u in 1:r
+    for v in 1:c
+      try
+        Totalcost += 0.5*(A_guess*radial(u, v, g1_guess, g2_guess, s_guess, r/2, c/2) - star[u, v])^2
+      catch
+        Totalcost += 0
       end
     end
-    A_guess = 1/sum
-    for u in 1:r
-      for v in 1:c
-        Totalcost +=0.5*( A_guess*EGaussian(u,v, g1_guess, g2_guess, s_guess, r/2,c/2) - star[u,v])^2
-      end
-    end
-  catch MethodError
-    Totalcost = 0
   end
   return Totalcost
 end
