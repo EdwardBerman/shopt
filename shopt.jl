@@ -96,7 +96,7 @@ end
 
 shearManifold = Euclidean(3)
 
-itr = 20
+itr = 5
 A_data = zeros(itr)
 s_data = zeros(itr)
 g1_data = zeros(itr)
@@ -150,24 +150,6 @@ ltPlots = []
     g2_data[i] = e2_guess/ratioData  
     
     norm_data = zeros(r,c)
-    if isodd(r) & isodd(c)
-      norm_data[median([1:1:r;]), median([1:1:c;])] = 1
-    end
-    if iseven(r) & iseven(c)
-      norm_data[r÷2, c÷2] = 1
-      norm_data[(r÷2) + 1, c÷2] = 1
-      norm_data[r÷2, (c÷2) + 1] = 1
-      norm_data[(r÷2) + 1, (c÷2) + 1] = 1
-    end
-    if isodd(r) & iseven(c)
-      norm_data[median([1:1:r;]), median([1:1:c;]) - 0.5] = 1
-      norm_data[median([1:1:r;]), median([1:1:c;]) + 0.5] = 1
-    end
-    if iseven(r) & isodd(c)
-      norm_data[median([1:1:r;]) - 0.5, median([1:1:c;])] = 1
-      norm_data[median([1:1:r;]) + 0.5, median([1:1:c;])] = 1
-    end
-
     for u in 1:r
       for v in 1:c
         norm_data[u,v] = EGaussian(u, v, g1_data[i], g2_data[i], s_data[i], r/2, c/2)
@@ -201,9 +183,12 @@ pg = reshape(pg.minimizer, (r, c))
 ###error_plot([s, g1, g2], [mean(s_data), mean(g1_data), mean(g2_data)], [std(s_data)/sqrt(itr), std(g1_data)/sqrt(itr), std(g2_data)/sqrt(itr)], "Learned vs True Parameters")
 
 # Plotting Heatmaps
+print("\n Plotting \n")
 s_data = remove_outliers(s_data)
 g1_data = remove_outliers(g1_data)
 g2_data = remove_outliers(g2_data)
+
+hist(g1_data, g2_data)
 
 norm2 = zeros(r, c)
 norm2[5,5] = 1
@@ -211,25 +196,24 @@ norm2[5,6] = 1
 norm2[6,5] = 1
 norm2[6,6] = 1
 
-for u in 1:10
-  for v in 1:10
+for u in 1:r
+  for v in 1:c
     norm2[u,v] = EGaussian(u, v, mean(g1_data), mean(g2_data), mean(s_data), r/2, c/2)
   end
 end
-
 A_data = 1/sum(norm2)
 
 for u in 1:r
   for v in 1:c
-    starData[u,v] = A_data*EGaussian(u, v, mean(g1_data), mean(g2_data), mean(s_data),r/2, c/2)
+    starData[u,v] = A_data*norm2[u,v]
   end
 end
 
 Residuals = star - starData
 costSquaredError = Residuals.^2 
-chiSquare = zeros(10, 10)
-for u in 1:10
-  for v in 1:10
+chiSquare = zeros(r, c)
+for u in 1:r
+  for v in 1:c
     chiSquare[u,v] = costSquaredError[u,v]/var(vec(star)) 
   end
 end
