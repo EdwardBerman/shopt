@@ -25,10 +25,10 @@ Known Issues: Need to take stamps of images to focus on the actual PSF, Some plo
 Tourists Guide to this program
 
 shopt.jl 
-: A runner script for all functions in this software
+> A runner script for all functions in this software
 
 dataPreprocessing.jl
-: A wrapper for python code to handle fits files and dedicated file to deal with data cleaning and adding noise to test robustness of the software
+> A wrapper for python code to handle fits files and dedicated file to deal with data cleaning and adding noise to test robustness of the software
 
 plot.jl 
-: A dedicated file to handle all plotting
+> A dedicated file to handle all plotting
