@@ -23,7 +23,7 @@ Run ```julia shopt.jl [eventually the fits file you want to run] [configdir] [ou
 | PyCall           |          |   
 ### Set Up
 
-Tourists Guide to this program:
+## Program Architecture
 
 shopt.jl 
 > A runner script for all functions in this software
