@@ -1,6 +1,6 @@
 # shopt
 ## About
-Shear Optimization with Shopt.jl, a julia library for empirical point spread function characterizations
+Shear Optimization with Shopt.jl, a julia library for empirical point spread function characterizations. We aim to improve upon the current state of Point Spread Function Modeling by using Julia to leverage performance gains, use a different mathematical formulation than the literature to provide more robust analytic fits, and add features such as wavelets and shapelets. At this projects conclusion we will compare to existing software such as PIFF and PSFex. Work done under [McCleary's Group](https://github.com/mcclearyj).
 
 ## Running
 ### Command
