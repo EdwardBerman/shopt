@@ -33,6 +33,9 @@ dataPreprocessing.jl
 plot.jl 
 > A dedicated file to handle all plotting
 
+radialProfiles.jl 
+> Contains analytic profiles such as a Gaussian Fit and a kolmogorov fit
+
 analyticCGD.jl 
 > Provides the necessary arguments (cost function and gradient) to the optimize function for analytic fits 
 
