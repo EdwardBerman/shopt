@@ -11,9 +11,8 @@ using SpecialFunctions
 using Optim
 using IterativeSolvers
 using QuadGK
-using Manifolds
-using ManifoldsBase
 
+println("Importing Files")
 include("plot.jl")
 include("analyticCGD.jl")
 include("radialProfiles.jl")
@@ -32,9 +31,8 @@ end
 
  
 starData = zeros(r, c)
-shearManifold = Euclidean(3)
 
-itr = 5
+itr = 6
 A_data = zeros(itr)
 s_data = zeros(itr)
 g1_data = zeros(itr)
@@ -46,8 +44,8 @@ ltPlots = []
 println("Analytic Profile Fit for Model Star")
 @time begin
   for i in 1:itr
-    println("\t Iteration $i")
-    initial_guess = rand(shearManifold)
+    println("\t Star $i")
+    initial_guess = rand(3)
     println("\t initial guess [σ, e1, e2]: ", initial_guess)
      
     it = []
@@ -66,16 +64,27 @@ println("Analytic Profile Fit for Model Star")
 
     loss_time = plot(it, 
                      loss, 
-                     title="Analytic Profile Loss Vs Iteration", 
                      xlabel="Iteration", 
                      ylabel="Loss",
-                     label="Star $itr Model")
+                     label="Star $i Model")
     push!(ltPlots, loss_time)
-    #=
-    if "$i" == "20"
-      savefig(ltPlots, joinpath("outdir", "lossTime.png")) 
+    
+    if "$i" == "$itr"
+      title = plot(title = "Analytic Profile Loss Vs Iteration", grid = false, showaxis = false, bottom_margin = -50Plots.px)
+      filler = plot(grid = false, showaxis = false, bottom_margin = -50Plots.px)
+      savefig(plot(title,
+                   filler,
+                   ltPlots[1], 
+                   ltPlots[2], 
+                   ltPlots[3], 
+                   ltPlots[4], 
+                   ltPlots[5], 
+                   ltPlots[6], 
+                   layout = (4,2),
+                   size = (900,400)), 
+                        joinpath("outdir", "lossTime.png"))
     end
-    =#
+    
 
 
     s_data[i] = x_cg.minimizer[1]^2
@@ -165,7 +174,16 @@ csemax = maximum(costSquaredError)
 rpgmin = minimum((star - pg).^2)
 rpgmax = maximum((star - pg).^2)
 
-plot_hm()
+dof = r*c - 3
+p = 1 - cdf(Chisq(dof), sum(chiSquare))#ccdf = 1 - cdf
+p = string(p)
+#print(Chisq(dof), sum(chiSquare), "\n")
+println("p-value: ", p, "\n")
+
+#logStar = log.(star)
+#logStarData = log.(starData)
+
+plot_hm(p)
 
 ns = size(s_data, 1)
 ng1 = size(g1_data, 1)
@@ -173,9 +191,5 @@ ng2 = size(g2_data, 1)
 
 ###error_plot([s, g1, g2], [mean(s_data), mean(g1_data), mean(g2_data)], [std(s_data)/sqrt(ns), std(g1_data)/sqrt(ng1), std(g2_data)/sqrt(ng2)], "Learned vs True Parameters Outliers Removed")
 
-dof = r*c - 3
-p = 1 - cdf(Chisq(dof), sum(chiSquare))#ccdf = 1 - cdf
-#print(Chisq(dof), sum(chiSquare), "\n")
-print("p-value: ", p, "\n")
 
 

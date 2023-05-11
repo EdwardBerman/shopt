@@ -1,19 +1,17 @@
 function generate_heatmap(data::Array{T, 2}, t, cbmin, cbmax) where T<:Real
-     heatmap(data,
-             aspect_ratio=:equal,  # ensure square cells
-             color=:winter,  # use the Winter color map
-             cbar=:true,  # add the color bar
-             xlabel="u",
- 
-             ylabel="v",
-             c=:log,
-             clims=(cbmin, cbmax),  # set the color limits
-             title= t,
-             xlims=(0.5, size(data, 2) + 0.5),  # set the x-axis limits to include the full cells
-             ylims=(0.5, size(data, 1) + 0.5),  # set the y-axis limits to include the full cells
-             ticks=:none,  # remove the ticks
-             frame=:box,  # draw a box around the plot
-             grid=:none  # remove the grid lines
+  heatmap(data,
+          aspect_ratio=:equal,  # ensure square cells
+          color=:winter,  # use the Winter color map
+          cbar=:true,  # add the color bar
+          xlabel="u",
+          ylabel="v",
+          clims=(cbmin, cbmax),  # set the color limits
+          title= t,
+          xlims=(0.5, size(data, 2) + 0.5),  # set the x-axis limits to include the full cells
+          ylims=(0.5, size(data, 1) + 0.5),  # set the y-axis limits to include the full cells
+          ticks=:none,  # remove the ticks
+          frame=:box,  # draw a box around the plot
+          grid=:none  # remove the grid lines
             )
 end
 
@@ -55,14 +53,21 @@ function hist(x::Array{T, 1}, y::Array{T, 1}) where T<:Real
   savefig(joinpath("outdir", "histograms_plot.png"))
 end
 
-function plot_hm()
+function plot_hm(p)
   hm = generate_heatmap(star, "I(u,v) Model", amin, amax)
   hm2 = generate_heatmap(costSquaredError, "SquaredError(u,v)", csemin, csemax)
   hm3 = generate_heatmap(starData, "I(u,v) Data", amin, amax)
   hm4 = generate_heatmap(Residuals, "Residuals", rmin, rmax)
-  hm5 = generate_heatmap(chiSquare, "ChiSquare", csmin, csmax)
+  hm5 = generate_heatmap(chiSquare, "Chi-Square Residuals, p = "*p, csmin, csmax)
   hm6 = generate_heatmap(pg, "Pixel Grid", amin, amax)
   hm7 = generate_heatmap((star - pg).^2, "Pixel Grid Squared Error", rpgmin, rpgmax)
+  s1 = surface(star, colorbar = false)
+  s2 = surface(starData, colorbar = false)
+  s3 = surface(Residuals, colorbar = false)
+  #l1 = generate_heatmap(logStar, "I(u,v) Model Log Plot", amin, amax)
+  #l2 = generate_heatmap(logStarData, "I(u,v) Data Log Plot", amin, amax)
   savefig(plot(hm, hm3, hm5, hm2, hm4, layout = (2,3),size = (900,400)), joinpath("outdir", "ellipticalGaussianResults.png"))
   savefig(plot(hm, hm6, hm7, layout = (1,3),size = (900,400)), joinpath("outdir", "pixelGrid.png"))
+  savefig(plot(s1, s2, s3, layout = (1,3)), joinpath("outdir", "3dGraphics.png"))
+  #savefig(plot(l1, l2, hm5, layout = (1,3)), joinpath("outdir", "logPlots.png"))
 end

@@ -1,0 +1,1 @@
+export WEBBPSF_PATH="datadir/webbpsf-data-1.1.1/webbpsf-data"
