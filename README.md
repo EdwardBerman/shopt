@@ -1,11 +1,14 @@
 # shopt
+## About
 Shear Optimization with Shopt.jl, a julia library for empirical point spread function characterizations
 
+## Running
+### Command
 To run `shopt.jl`
 
 Run ```julia shopt.jl [eventually the fits file you want to run] [configdir] [outdir] [datadir]```
 
-Dependencies:
+### Dependencies
 | Julia            | Python   |
 |------------------|----------|
 | Plots            | treecorr |  
@@ -18,9 +21,7 @@ Dependencies:
 | IterativeSolvers |          |  
 | QuadGK           |          |  
 | PyCall           |          |   
-
-
-Known Issues: Need to take stamps of images to focus on the actual PSF, Some plots have issues with colorbars 
+### Set Up
 
 Tourists Guide to this program:
 
@@ -59,3 +60,6 @@ LICENSE
 
 README.md
 > User guide, Dependencies, etc.
+
+
+Known Issues: Need to take stamps of images to focus on the actual PSF, Some plots have issues with colorbars 
