@@ -15,42 +15,78 @@ function generate_heatmap(data::Array{T, 2}, t, cbmin, cbmax) where T<:Real
             )
 end
 
-#Now we write a function that plots all of the learned parameters with error bars
-#errorBars::Array{T, 1}
-#yerr=errorBars
-function error_plot(learnedParameters::Array{T, 1}, trueParameters::Array{T, 1},errorBars::Array{T, 1}, Title) where T<:Real 
-  #Plot the learned parameters
-  plot(learnedParameters, 
-       label="True Parameters",
-       xlabel="Parameter", 
-       ylabel="Value", 
-       title=Title, 
-       seriestype=:scatter, 
-       legend=:topleft)
-  #labels = ["s", "g1", "g2"]
-  #annotate!([labels])
-  #Plot the true parameters
-  plot!(trueParameters, 
-        yerr=errorBars,
-        seriestype=:scatter, 
-        label="Learned Parameters")
-  #Save the plot
-  savefig(joinpath("outdir", replace(Title*".png", r"\s+" => "")))
+function error_plot(model, learned, errorModel, errorLearned, t)
+  # Generate example data
+  x = [1, 5, 10]  # Three points on the x-axis
+  labels = ["s", "g1", "g2"]  # Labels for the points
+  model_data = model
+  learned_data = learned
+  errM = errorModel
+  errD = errorLearned
+
+  # Plot scatter plot with error bars
+  scatter(x, model_data, yerr=errM, label="Model Data", color="blue", alpha=0.6)
+  scatter!(x, learned_data, yerr=errD, label="Learned Data", color="red", markersize=4)
+
+  # Set labels for the x-axis points
+  xticks!((x, labels))
+
+  title!(t)
+
+  # Show the plot
+  plot!(legend=:topright)
 end
 
-function hist(x::Array{T, 1}, y::Array{T, 1}) where T<:Real
+function plot_err()
+  s_modelClean = remove_outliers(s_model)
+  g1_modelClean = remove_outliers(g1_model)
+  g2_modelClean = remove_outliers(g2_model)
+
+  n_s = size(s_modelClean, 1)
+  n_g1 = size(g1_modelClean, 1)
+  n_g2 = size(g2_modelClean, 1)
+
+  s_dataClean = remove_outliers(s_data)
+  g1_dataClean = remove_outliers(g1_data)
+  g2_dataClean = remove_outliers(g2_data)
+
+  n_sD = size(s_modelClean, 1)
+  n_g1D = size(g1_modelClean, 1)
+  n_g2D = size(g2_modelClean, 1)
+
+  #Plotting Error True Vs Learned
+  ps1 = error_plot([s_model, g1_model, g2_model],
+             [s_data, g1_data, g2_data],
+             [std(s_model)/sqrt(itr), std(g1_model)/sqrt(itr), std(g2_model)/sqrt(itr)],
+             [std(s_data)/sqrt(itr), std(g1_data)/sqrt(itr), std(g2_data)/sqrt(itr)],
+             "Learned vs True Parameters")
+  ps2 = error_plot([s_modelClean, g1_modelClean, g2_modelClean],
+             [s_dataClean, g1_dataClean, g2_dataClean],
+             [std(s_model)/sqrt(n_s), std(g1_model)/sqrt(n_g1), std(g2_model)/sqrt(n_g2)],
+             [std(s_data)/sqrt(n_sD), std(g1_data)/sqrt(n_g1D), std(g2_data)/sqrt(n_g2D)],
+             "Learned vs True Parameters Outliers Removed")
+  savefig(ps1, joinpath("outdir", "parameterSpread.png"))
+  savefig(ps2, joinpath("outdir", "parameterSpreadOutliersRM.png"))
+end
+
+function hist(x::Array{T, 1}, y::Array{T, 1}, t1, t2) where T<:Real
   bin_edges = range(-1, stop=1, step=0.1)
   histogram(x, 
             alpha=0.5, 
             bins=bin_edges, 
-            label="g1 model", 
+            label=t1, 
             xticks = -1:0.1:1)
   histogram!(y, 
              alpha=0.5, 
              bins=bin_edges, 
-             label="g1 data",
+             label=t2,
              xticks = -1:0.1:1)
-  savefig(joinpath("outdir", "histograms_plot.png"))
+end
+function plot_hist()
+  hist1 = hist(s_model, s_data, "s Model", "s Data")
+  hist2 = hist(g1_model, g1_data, "g1 Model", "g1 Data")
+  hist3 = hist(g2_model, g2_data, "g2 Model", "g2 Data")
+  savefig(plot(hist1, hist2, hist3, layout = (1,3)), joinpath("outdir", "histograms_plot.png"))
 end
 
 function plot_hm(p)

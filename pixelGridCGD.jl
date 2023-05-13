@@ -6,15 +6,6 @@ function pgCost(params)
   return Totalcost
 end
 
-#=
-function pg_g!(storage, p)
-  storage = storage
-  for i in 1:100
-    storage[i] = ForwardDiff.gradient(pgCost, p)[i]
-  end
-end
-=#
-
 function pg_g!(storage, p)
   grad_cost = ForwardDiff.gradient(pgCost, p)
   for i in 1:(r*c)                                  

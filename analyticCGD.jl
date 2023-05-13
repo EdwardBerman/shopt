@@ -1,6 +1,6 @@
 include("radialProfiles.jl")
 
-function cost(params; r = r, c= c, star = star, radial = EGaussian) 
+function cost(params; r = r, c= c, star = star, radial=fGaussian) 
   Totalcost = 0
   σ = params[1]
   s_guess = σ^2
@@ -11,7 +11,7 @@ function cost(params; r = r, c= c, star = star, radial = EGaussian)
   ratio = ellipticity/normG
   g1_guess = e1_guess/ratio
   g2_guess = e2_guess/ratio
-
+  
   sum = 0
   for u in 1:r
     for v in 1:c
@@ -26,18 +26,14 @@ function cost(params; r = r, c= c, star = star, radial = EGaussian)
   
   for u in 1:r
     for v in 1:c
-      try
-        Totalcost += 0.5*(A_guess*radial(u, v, g1_guess, g2_guess, s_guess, r/2, c/2) - star[u, v])^2
-      catch
-        Totalcost += 0
-      end
+      Totalcost += 0.5*(A_guess*radial(u, v, g1_guess, g2_guess, s_guess, r/2, c/2) - star[u, v])^2
     end
   end
   return Totalcost
 end
 
 
-function costD(params; r = r, c= c, star = star, radial = EGaussian) 
+function costD(params; r = r, c= c, star = star, radial = fGaussian) 
   Totalcost = 0
   σ = params[1]
   s_guess = σ^2
@@ -81,8 +77,8 @@ function g!(storage, p)
 end
 
 function gD!(storage, p)
-    grad_cost = ForwardDiff.gradient(costD, p)
-    storage[1] = grad_cost[1]
-    storage[2] = grad_cost[2]
-    storage[3] = grad_cost[3]
+  grad_cost = ForwardDiff.gradient(costD, p)
+  storage[1] = grad_cost[1]
+  storage[2] = grad_cost[2]
+  storage[3] = grad_cost[3]
 end

@@ -74,7 +74,7 @@ println("Analytic Profile Fit for Model Star")
                      loss, 
                      xlabel="Iteration", 
                      ylabel="Loss",
-                     label="Star $i Model")
+                     label="Star $i Data")
     push!(ltPlots, loss_time)
     
     if "$i" == "$itr"
@@ -113,7 +113,7 @@ println("Analytic Profile Fit for Model Star")
     norm_data = zeros(r,c)
     for u in 1:r
       for v in 1:c
-        norm_data[u,v] = EGaussian(u, v, g1_model[i], g2_model[i], s_model[i], r/2, c/2)
+        norm_data[u,v] = fGaussian(u, v, g1_model[i], g2_model[i], s_model[i], r/2, c/2)
       end
     end
     A_model[i] = 1/sum(norm_data)
@@ -122,7 +122,6 @@ println("Analytic Profile Fit for Model Star")
   end
 end
 
-writeData(s_model, g1_model, g2_model)
 
 println("\t \t Outliers in s: ", detect_outliers(s_model))
 ns = length(detect_outliers(s_model))
@@ -174,12 +173,12 @@ println("Analytic Profile Fit for Learned Star")
       filler = plot(grid = false, showaxis = false, bottom_margin = -50Plots.px)
       savefig(plot(title,
                    filler,
-                   ltPlots[1], 
-                   ltPlots[2], 
-                   ltPlots[3], 
-                   ltPlots[4], 
-                   ltPlots[5], 
-                   ltPlots[6], 
+                   ltdPlots[1], 
+                   ltdPlots[2], 
+                   ltdPlots[3], 
+                   ltdPlots[4], 
+                   ltdPlots[5], 
+                   ltdPlots[6], 
                    layout = (4,2),
                    size = (900,400)), 
                         joinpath("outdir", "lossTimeData.png"))
@@ -198,7 +197,7 @@ println("Analytic Profile Fit for Learned Star")
     norm_data = zeros(r,c)
     for u in 1:r
       for v in 1:c
-        norm_data[u,v] = EGaussian(u, v, g1_data[i], g2_data[i], s_data[i], r/2, c/2)
+        norm_data[u,v] = fGaussian(u, v, g1_data[i], g2_data[i], s_data[i], r/2, c/2)
       end
     end
     A_data[i] = 1/sum(norm_data)
@@ -207,16 +206,10 @@ println("Analytic Profile Fit for Learned Star")
   end
 end
 
-#Plotting Error True Vs Learned
-###error_plot([s, g1, g2], [mean(s_data), mean(g1_data), mean(g2_data)], [std(s_data)/sqrt(itr), std(g1_data)/sqrt(itr), std(g2_data)/sqrt(itr)], "Learned vs True Parameters")
 
 # Plotting Heatmaps
 print("\nPlotting \n")
-s_model = remove_outliers(s_model)
-g1_model = remove_outliers(g1_model)
-g2_model = remove_outliers(g2_model)
 
-hist(g1_model, g2_model)
 
 norm2 = zeros(r, c)
 norm2[5,5] = 1
@@ -226,7 +219,7 @@ norm2[6,6] = 1
 
 for u in 1:r
   for v in 1:c
-    norm2[u,v] = EGaussian(u, v, mean(g1_model), mean(g2_model), mean(s_model), r/2, c/2)
+    norm2[u,v] = fGaussian(u, v, mean(g1_model), mean(g2_model), mean(s_model), r/2, c/2)
   end
 end
 A_model = 1/sum(norm2)
@@ -264,12 +257,9 @@ println("p-value: ", p, "\n")
 
 
 plot_hm(p)
+plot_hist()
+plot_err()
 
-ns = size(s_model, 1)
-ng1 = size(g1_model, 1)
-ng2 = size(g2_model, 1)
-
-###error_plot([s, g1, g2], [mean(s_data), mean(g1_data), mean(g2_data)], [std(s_data)/sqrt(ns), std(g1_data)/sqrt(ng1), std(g2_data)/sqrt(ng2)], "Learned vs True Parameters Outliers Removed")
-
-
-
+println("Saving DataFrame to df.shopt")
+writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
+println("\nDone! =]\n")

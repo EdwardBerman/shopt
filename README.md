@@ -68,4 +68,7 @@ README.md
 > User guide, Dependencies, etc.
 
 
-Known Issues: Need to take stamps of images to focus on the actual PSF, Some plots have issues with colorbars 
+Known Issues: 
++ Need to take stamps of images to focus on the actual PSF, 
++ Some Ploting Concerns with Size STD 
++ kolmogorov radial profile taking an unfeasible amount of time to compute
