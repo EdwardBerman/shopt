@@ -11,6 +11,8 @@ using SpecialFunctions
 using Optim
 using IterativeSolvers
 using QuadGK
+using DataFrames
+using CSV
 
 println("Importing Files")
 include("plot.jl")
@@ -19,6 +21,7 @@ include("radialProfiles.jl")
 include("pixelGridCGD.jl")
 include("dataPreprocessing.jl")
 include("outliers.jl")
+include("dataOutprocessing.jl")
 
 println("Processing Data for Fit")
 star, r, c = dataprocessing()
@@ -33,11 +36,16 @@ end
 starData = zeros(r, c)
 
 itr = 6
+A_model = zeros(itr)
+s_model = zeros(itr)
+g1_model = zeros(itr)
+g2_model = zeros(itr)
+
+
 A_data = zeros(itr)
 s_data = zeros(itr)
 g1_data = zeros(itr)
 g2_data = zeros(itr)
-
 
 ltPlots = []
 
@@ -60,7 +68,7 @@ println("Analytic Profile Fit for Model Star")
                     g!, 
                     initial_guess, 
                     ConjugateGradient(),
-                    Optim.Options(callback = cb))#store_trace=true
+                    Optim.Options(callback = cb))
 
     loss_time = plot(it, 
                      loss, 
@@ -70,7 +78,99 @@ println("Analytic Profile Fit for Model Star")
     push!(ltPlots, loss_time)
     
     if "$i" == "$itr"
-      title = plot(title = "Analytic Profile Loss Vs Iteration", grid = false, showaxis = false, bottom_margin = -50Plots.px)
+      title = plot(title = "Analytic Profile Loss Vs Iteration (Model)", 
+                   grid = false, 
+                   showaxis = false, 
+                   bottom_margin = -50Plots.px)
+
+      filler = plot(grid = false, 
+                    showaxis = false, 
+                    bottom_margin = -50Plots.px)
+
+      savefig(plot(title,
+                   filler,
+                   ltPlots[1], 
+                   ltPlots[2], 
+                   ltPlots[3], 
+                   ltPlots[4], 
+                   ltPlots[5], 
+                   ltPlots[6], 
+                   layout = (4,2),
+                   size = (900,400)), 
+                        joinpath("outdir", "lossTimeModel.png"))
+    end
+
+    s_model[i] = x_cg.minimizer[1]^2
+    e1_guess = x_cg.minimizer[2]
+    e2_guess = x_cg.minimizer[3]
+
+    ellipticityData = sqrt((e1_guess)^2 + (e2_guess)^2)
+    normGdata = sqrt(1 + 0.5*( (1/ellipticityData^2) - sqrt( (4/ellipticityData^2) + (1/ellipticityData^4)  )  )) 
+    ratioData = ellipticityData/normGdata
+    g1_model[i] = e1_guess/ratioData            
+    g2_model[i] = e2_guess/ratioData  
+    
+    norm_data = zeros(r,c)
+    for u in 1:r
+      for v in 1:c
+        norm_data[u,v] = EGaussian(u, v, g1_model[i], g2_model[i], s_model[i], r/2, c/2)
+      end
+    end
+    A_model[i] = 1/sum(norm_data)
+    println("\t Found A: ", A_model[i], "\t s: ", s_model[i]^2, "\t g1: ", g1_model[i], "\t g2: ", g2_model[i])
+
+  end
+end
+
+writeData(s_model, g1_model, g2_model)
+
+println("\t \t Outliers in s: ", detect_outliers(s_model))
+ns = length(detect_outliers(s_model))
+ng1 = length(detect_outliers(g1_model))
+ng2 = length(detect_outliers(g2_model))
+
+println("\t \t Number of outliers in s: ", ns[1])
+println("\t \t Number of outliers in g1: ", ng1[1])
+println("\t \t Number of outliers in g2: ", ng2[1])
+
+println("Pixel Grid Fit")
+pg = optimize(pgCost, pg_g!, zeros(r*c), ConjugateGradient())
+print(pg)
+pg = reshape(pg.minimizer, (r, c))
+
+
+ltdPlots = []
+
+println("Analytic Profile Fit for Learned Star")
+@time begin
+  for i in 1:itr
+    println("\t Star $i")
+    initial_guess = rand(3)
+    println("\t initial guess [σ, e1, e2]: ", initial_guess)
+     
+    it = []
+    loss = []
+
+    function cb(opt_state:: Optim.OptimizationState)
+      push!(it, opt_state.iteration)
+      push!(loss, opt_state.value)
+      return false  
+    end
+    x_cg = optimize(costD, 
+                    gD!, 
+                    initial_guess, 
+                    ConjugateGradient(),
+                    Optim.Options(callback = cb))
+
+    loss_time = plot(it, 
+                     loss, 
+                     xlabel="Iteration", 
+                     ylabel="Loss",
+                     label="Star $i Model")
+    push!(ltdPlots, loss_time)
+    
+    if "$i" == "$itr"
+    title = plot(title = "Analytic Profile Loss Vs Iteration (Data)", grid = false, showaxis = false, bottom_margin = -50Plots.px)
       filler = plot(grid = false, showaxis = false, bottom_margin = -50Plots.px)
       savefig(plot(title,
                    filler,
@@ -82,10 +182,8 @@ println("Analytic Profile Fit for Model Star")
                    ltPlots[6], 
                    layout = (4,2),
                    size = (900,400)), 
-                        joinpath("outdir", "lossTime.png"))
+                        joinpath("outdir", "lossTimeData.png"))
     end
-    
-
 
     s_data[i] = x_cg.minimizer[1]^2
     e1_guess = x_cg.minimizer[2]
@@ -109,31 +207,16 @@ println("Analytic Profile Fit for Model Star")
   end
 end
 
-println("\t \t Outliers in s: ", detect_outliers(s_data))
-ns = length(detect_outliers(s_data))
-ng1 = length(detect_outliers(g1_data))
-ng2 = length(detect_outliers(g2_data))
-
-println("\t \t Number of outliers in s: ", ns[1])
-println("\t \t Number of outliers in g1: ", ng1[1])
-println("\t \t Number of outliers in g2: ", ng2[1])
-
-println("Pixel Grid Fit")
-pg = optimize(pgCost, pg_g!, zeros(r*c), ConjugateGradient())
-print(pg)
-pg = reshape(pg.minimizer, (r, c))
-
-
 #Plotting Error True Vs Learned
 ###error_plot([s, g1, g2], [mean(s_data), mean(g1_data), mean(g2_data)], [std(s_data)/sqrt(itr), std(g1_data)/sqrt(itr), std(g2_data)/sqrt(itr)], "Learned vs True Parameters")
 
 # Plotting Heatmaps
 print("\nPlotting \n")
-s_data = remove_outliers(s_data)
-g1_data = remove_outliers(g1_data)
-g2_data = remove_outliers(g2_data)
+s_model = remove_outliers(s_model)
+g1_model = remove_outliers(g1_model)
+g2_model = remove_outliers(g2_model)
 
-hist(g1_data, g2_data)
+hist(g1_model, g2_model)
 
 norm2 = zeros(r, c)
 norm2[5,5] = 1
@@ -143,14 +226,14 @@ norm2[6,6] = 1
 
 for u in 1:r
   for v in 1:c
-    norm2[u,v] = EGaussian(u, v, mean(g1_data), mean(g2_data), mean(s_data), r/2, c/2)
+    norm2[u,v] = EGaussian(u, v, mean(g1_model), mean(g2_model), mean(s_model), r/2, c/2)
   end
 end
-A_data = 1/sum(norm2)
+A_model = 1/sum(norm2)
 
 for u in 1:r
   for v in 1:c
-    starData[u,v] = A_data*norm2[u,v]
+    starData[u,v] = A_model*norm2[u,v]
   end
 end
 
@@ -177,17 +260,14 @@ rpgmax = maximum((star - pg).^2)
 dof = r*c - 3
 p = 1 - cdf(Chisq(dof), sum(chiSquare))#ccdf = 1 - cdf
 p = string(p)
-#print(Chisq(dof), sum(chiSquare), "\n")
 println("p-value: ", p, "\n")
 
-#logStar = log.(star)
-#logStarData = log.(starData)
 
 plot_hm(p)
 
-ns = size(s_data, 1)
-ng1 = size(g1_data, 1)
-ng2 = size(g2_data, 1)
+ns = size(s_model, 1)
+ng1 = size(g1_model, 1)
+ng2 = size(g2_model, 1)
 
 ###error_plot([s, g1, g2], [mean(s_data), mean(g1_data), mean(g2_data)], [std(s_data)/sqrt(ns), std(g1_data)/sqrt(ng1), std(g2_data)/sqrt(ng2)], "Learned vs True Parameters Outliers Removed")
 
