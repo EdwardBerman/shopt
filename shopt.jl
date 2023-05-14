@@ -1,4 +1,20 @@
-println("Handling Imports")
+# ---------------------------------------------------------#
+include("argparser.jl")
+include("fancyPrint.jl")
+try
+  process_arguments(ARGS)
+catch err
+  println("Error: ", err)
+  println("Usage: julia shopt.jl <configdir> <outdir> <datadir>")
+  exit(1)
+end
+
+configdir = ARGS[1]
+outdir = ARGS[2]
+datadir = ARGS[3]
+# ---------------------------------------------------------#
+fancyPrint("Handling Imports")
+
 using Base: initarray!
 using BenchmarkTools
 using Plots
@@ -14,7 +30,8 @@ using QuadGK
 using DataFrames
 using CSV
 
-println("Importing Files")
+# ---------------------------------------------------------#
+fancyPrint("Importing Files")
 include("plot.jl")
 include("analyticCGD.jl")
 include("radialProfiles.jl")
@@ -23,7 +40,8 @@ include("dataPreprocessing.jl")
 include("outliers.jl")
 include("dataOutprocessing.jl")
 
-println("Processing Data for Fit")
+# ---------------------------------------------------------#
+fancyPrint("Processing Data for Fit")
 star, r, c = dataprocessing()
 
 for u in 1:r
@@ -49,7 +67,8 @@ g2_data = zeros(itr)
 
 ltPlots = []
 
-println("Analytic Profile Fit for Model Star")
+# ---------------------------------------------------------#
+fancyPrint("Analytic Profile Fit for Model Star")
 @time begin
   for i in 1:itr
     println("\t Star $i")
@@ -132,7 +151,8 @@ println("\t \t Number of outliers in s: ", ns[1])
 println("\t \t Number of outliers in g1: ", ng1[1])
 println("\t \t Number of outliers in g2: ", ng2[1])
 
-println("Pixel Grid Fit")
+# ---------------------------------------------------------#
+fancyPrint("Pixel Grid Fit")
 pg = optimize(pgCost, pg_g!, zeros(r*c), ConjugateGradient())
 print(pg)
 pg = reshape(pg.minimizer, (r, c))
@@ -140,7 +160,8 @@ pg = reshape(pg.minimizer, (r, c))
 
 ltdPlots = []
 
-println("Analytic Profile Fit for Learned Star")
+# ---------------------------------------------------------#
+fancyPrint("Analytic Profile Fit for Learned Star")
 @time begin
   for i in 1:itr
     println("\t Star $i")
@@ -207,8 +228,8 @@ println("Analytic Profile Fit for Learned Star")
 end
 
 
-# Plotting Heatmaps
-print("\nPlotting \n")
+# ---------------------------------------------------------#
+fancyPrint("Plotting")
 
 
 norm2 = zeros(r, c)
@@ -260,6 +281,10 @@ plot_hm(p)
 plot_hist()
 plot_err()
 
-println("Saving DataFrame to df.shopt")
+# ---------------------------------------------------------#
+fancyPrint("Saving DataFrame to df.shopt")
 writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
-println("\nDone! =]\n")
+println(readData())
+
+# ---------------------------------------------------------#
+fancyPrint("Done! =]")

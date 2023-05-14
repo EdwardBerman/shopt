@@ -26,10 +26,16 @@ Run ```julia shopt.jl [eventually the fits file you want to run] [configdir] [ou
 | Optim            |          |  
 | IterativeSolvers |          |  
 | QuadGK           |          |  
-| PyCall           |          |   
+| PyCall           |          |
+| DataFrames       |          |  
+| CSV              |          |
+
 ### Set Up
 
 ## Program Architecture
+
+tutorialNotebook.ipynb
+> See for yourself how to run Shopt!
 
 shopt.jl 
 > A runner script for all functions in this software
@@ -68,7 +74,7 @@ README.md
 > User guide, Dependencies, etc.
 
 
-Known Issues: 
+## Known Issues
 + Need to take stamps of images to focus on the actual PSF, 
 + Some Ploting Concerns with Size STD 
 + kolmogorov radial profile taking an unfeasible amount of time to compute
