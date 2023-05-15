@@ -59,7 +59,7 @@ shopt.jl
 dataPreprocessing.jl
 > A wrapper for python code to handle fits files and dedicated file to deal with data cleaning and adding noise to test robustness of the software
 
-dataPreprocessing.jl
+dataOutprocessing.jl
 > Convert data into a .shopt file. Access this data with readData()
 
 plot.jl 
