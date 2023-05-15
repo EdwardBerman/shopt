@@ -12,6 +12,16 @@ end
 configdir = ARGS[1]
 outdir = ARGS[2]
 datadir = ARGS[3]
+
+if isdir(outdir)
+  println("\tOutdir found")
+else
+  println("\tOutdir not found, creating...")
+  mkdir(outdir)
+end
+
+
+
 # ---------------------------------------------------------#
 fancyPrint("Handling Imports")
 
@@ -29,9 +39,10 @@ using IterativeSolvers
 using QuadGK
 using DataFrames
 using CSV
+#using CairoMakie
 
 # ---------------------------------------------------------#
-fancyPrint("Importing Files")
+fancyPrint("Reading .jl Files")
 include("plot.jl")
 include("analyticCGD.jl")
 include("radialProfiles.jl")
@@ -115,7 +126,7 @@ fancyPrint("Analytic Profile Fit for Model Star")
                    ltPlots[5], 
                    ltPlots[6], 
                    layout = (4,2),
-                   size = (900,400)), 
+                   size = (1800,800)), 
                         joinpath("outdir", "lossTimeModel.png"))
     end
 
@@ -153,8 +164,10 @@ println("\t \t Number of outliers in g2: ", ng2[1])
 
 # ---------------------------------------------------------#
 fancyPrint("Pixel Grid Fit")
-pg = optimize(pgCost, pg_g!, zeros(r*c), ConjugateGradient())
-print(pg)
+@time begin
+  pg = optimize(pgCost, pg_g!, zeros(r*c), ConjugateGradient())
+  print(pg)
+end
 pg = reshape(pg.minimizer, (r, c))
 
 
@@ -201,7 +214,7 @@ fancyPrint("Analytic Profile Fit for Learned Star")
                    ltdPlots[5], 
                    ltdPlots[6], 
                    layout = (4,2),
-                   size = (900,400)), 
+                   size = (1800,800)), 
                         joinpath("outdir", "lossTimeData.png"))
     end
 
@@ -280,6 +293,40 @@ println("p-value: ", p, "\n")
 plot_hm(p)
 plot_hist()
 plot_err()
+
+#=
+let
+    # cf. https://github.com/JuliaPlots/Makie.jl/issues/822#issuecomment-769684652
+    # with scale argument that is required now
+    struct LogMinorTicks end
+    
+    function MakieLayout.get_minor_tickvalues(::LogMinorTicks, scale, tickvalues, vmin, v    max)
+        vals = Float64[]
+        for (lo, hi) in zip(
+                  @view(tickvalues[1:end-1]),
+                  @view(tickvalues[2:end]))
+                        interval = hi-lo
+                        steps = log10.(LinRange(10^lo, 10^hi, 11))
+            append!(vals, steps[2:end-1])
+        end
+        vals
+    end
+    custom_formatter(values) = map(v -> "10" * Makie.UnicodeFun.to_superscript(round(Int64, v    )), values)
+      data = star
+      fig = Figure()
+      ax_a, hm = heatmap(fig[1, 1], log10.(data),
+      axis=(; xminorticksvisible=true,
+         xminorticks=IntervalsBetween(9)))
+      ax_a.xlabel = "U"
+      ax_a.ylabel = "V"
+      cb = Colorbar(fig[1, 2], hm;
+      tickformat=custom_formatter,
+      minorticksvisible=true,
+      minorticks=LogMinorTicks())
+      ax_a.title = "Log Scale Model PSF"
+      save(joinpath("outdir", "test.png"), fig)
+  end
+=#
 
 # ---------------------------------------------------------#
 fancyPrint("Saving DataFrame to df.shopt")
