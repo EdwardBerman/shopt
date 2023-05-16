@@ -103,3 +103,7 @@ README.md
 + Some Ploting Concerns with Size STD 
 + kolmogorov radial profile taking an unfeasible amount of time to compute
 + No current functionality for Rho statistics
+
+## Contributors
++ Edward Berman
++ Jacqueline McCleary

@@ -306,6 +306,7 @@ plot_hm(p)
 plot_hist()
 plot_err()
 
+using CairoMakie
 #=
 let
     # cf. https://github.com/JuliaPlots/Makie.jl/issues/822#issuecomment-769684652
