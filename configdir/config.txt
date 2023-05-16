@@ -4,3 +4,4 @@
 # Which Checkplots to output
 # Catalog / Image Names
 # Overrides to config file
+#print statements
