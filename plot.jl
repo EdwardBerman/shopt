@@ -122,11 +122,13 @@ function plot_hm(p)
   hm5 = generate_heatmap(chiSquare, "Chi-Square Residuals, p = "*p, csmin, csmax)
   hm6 = generate_heatmap(pg, "Pixel Grid", amin, amax)
   hm7 = generate_heatmap((star - pg).^2, "Pixel Grid Squared Error", rpgmin, rpgmax)
+  hm8 = generate_heatmap(fft_image, "FFT Residuals", fftmin, fftmax)
   s1 = surface(star, colorbar = false)
   s2 = surface(starData, colorbar = false)
   s3 = surface(Residuals, colorbar = false)
   #l1 = generate_heatmap(logStar, "I(u,v) Model Log Plot", amin, amax)
   #l2 = generate_heatmap(logStarData, "I(u,v) Data Log Plot", amin, amax)
+  pk_k = plot(pk, xlabel = "k", ylabel = "P(k)", title = "Power Spectrum")
   savefig(plot(hm, 
                hm3, 
                hm5, 
@@ -147,6 +149,12 @@ function plot_hm(p)
                   layout = (1,3),
                   size = (1800,800)), 
                       joinpath("outdir", "3dAnalyticFit.png"))
+  
+  savefig(plot(hm8, pk_k,
+                  layout = (1,2),
+                  size = (1800,800)), 
+                      joinpath("outdir", "fftResiduals.png"))
+  
   #savefig(plot(l1, l2, hm5, layout = (1,3)), joinpath("outdir", "logPlots.png"))
 end
 

@@ -38,6 +38,7 @@ using Optim
 using IterativeSolvers
 using QuadGK
 using DataFrames
+using FFTW
 using CSV
 #using CairoMakie
 
@@ -50,6 +51,7 @@ include("pixelGridCGD.jl")
 include("dataPreprocessing.jl")
 include("outliers.jl")
 include("dataOutprocessing.jl")
+include("powerSpectrum.jl")
 
 # ---------------------------------------------------------#
 fancyPrint("Processing Data for Fit")
@@ -273,6 +275,13 @@ for u in 1:r
   end
 end
 
+fft_image = fft(complex.(Residuals))
+fft_image = abs2.(fft_image)
+pk = []
+for i in range(3, maximum(r,c) - 1, length=10)
+  push!(pk, powerSpectrum(fft_image, i))
+end
+
 amin = minimum([minimum(star), minimum(starData)])
 amax = maximum([maximum(star), maximum(starData)])
 csmin = minimum(chiSquare)
@@ -283,6 +292,8 @@ csemin = minimum(costSquaredError)
 csemax = maximum(costSquaredError)
 rpgmin = minimum((star - pg).^2)
 rpgmax = maximum((star - pg).^2)
+fftmin = minimum(fft_image)
+fftmax = maximum(fft_image)
 
 dof = r*c - 3
 p = 1 - cdf(Chisq(dof), sum(chiSquare))#ccdf = 1 - cdf
