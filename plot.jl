@@ -126,8 +126,7 @@ function plot_hm(p)
   s1 = surface(star, colorbar = false)
   s2 = surface(starData, colorbar = false)
   s3 = surface(Residuals, colorbar = false)
-  #l1 = generate_heatmap(logStar, "I(u,v) Model Log Plot", amin, amax)
-  #l2 = generate_heatmap(logStarData, "I(u,v) Data Log Plot", amin, amax)
+
   pk_k = plot(pk, xlabel = "k", ylabel = "P(k)", title = "Power Spectrum")
   savefig(plot(hm, 
                hm3, 
@@ -155,6 +154,5 @@ function plot_hm(p)
                   size = (1800,800)), 
                       joinpath("outdir", "fftResiduals.png"))
   
-  #savefig(plot(l1, l2, hm5, layout = (1,3)), joinpath("outdir", "logPlots.png"))
 end
 

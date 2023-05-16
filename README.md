@@ -1,6 +1,6 @@
 # shopt
 ## About
- [![License](https://github.com/EdwardBerman/shopt)](https://github.com/EdwardBerman/shopt/blob/main/LICENSE)
+ [![License](https://github.com/EdwardBerman/shopt)](https://github.com/EdwardBerman/shopt/blob/main/LICENSE) [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 
 **Shear Optimization** with **Shopt.jl**, a julia library for empirical point spread function characterizations. We aim to improve upon the current state of Point Spread Function Modeling by using Julia to leverage performance gains, use a different mathematical formulation than the literature to provide more robust analytic fits, improve the diagnostic plots, and add features such as wavelets and shapelets. At this projects conclusion we will compare to existing software such as PIFF and PSFex. Work done under [McCleary's Group](https://github.com/mcclearyj).
 
@@ -46,6 +46,7 @@ Run ```julia shopt.jl [eventually the fits file you want to run] [configdir] [ou
 | PyCall           |          |
 | DataFrames       |          |  
 | CSV              |          |
+| FFTW             |          |
 
 ### Set Up
 
@@ -86,6 +87,9 @@ interpolate.jl
 
 outliers.jl 
 > Contains two functions for identifying and removing outliers from a list
+
+powerSpectrum.jl
+> Computes the power spectra for a circle of radius k, called iteratively to plot P(k) / k
 
 LICENSE
 > MIT LICENSE

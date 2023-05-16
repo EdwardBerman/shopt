@@ -279,7 +279,7 @@ fft_image = fft(complex.(Residuals))
 fft_image = abs2.(fft_image)
 pk = []
 for i in 1:10
-  radius = range(3, min(r/2,c/2) - 1, length=10)
+  radius = range(1, 10, length=10)
   push!(pk, powerSpectrum(fft_image, radius[i]))
 end
 
