@@ -32,25 +32,27 @@ To run `shopt.jl`
 Run ```julia shopt.jl [eventually the fits file you want to run] [configdir] [outdir] [datadir]```
 
 ### Dependencies
-| Julia            | Python   |
-|------------------|----------|
-| Plots            | treecorr |  
-| ForwardDiff      | astropy  |  
-| LinearAlgebra    | webbpsf  |  
-| Random           |          |  
-| Distributions    |          |  
-| SpecialFunctions |          |  
-| Optim            |          |  
-| IterativeSolvers |          |  
-| QuadGK           |          |  
-| PyCall           |          |
-| DataFrames       |          |  
-| CSV              |          |
-| FFTW             |          |
-| Images           |          |
-| ImageFiltering   |          |
-| ProgressBars     |          |
-| UnicodePlots     |          |
+Not all of these will be strictly necessary depending on the checkplots you produce, but for for full functionality of ShOpt the following are necessary. Source Extractor is also not a strict dependency, but in practice one should inevitably install.
+
+| Julia            | Python   | Binaries |
+|------------------|----------|----------|
+| Plots            | treecorr | SEx      |
+| ForwardDiff      | astropy  |          |
+| LinearAlgebra    | webbpsf  |          |
+| Random           |          |          |
+| Distributions    |          |          |
+| SpecialFunctions |          |          |
+| Optim            |          |          |
+| IterativeSolvers |          |          |
+| QuadGK           |          |          |
+| PyCall           |          |          |
+| DataFrames       |          |          |
+| CSV              |          |          |
+| FFTW             |          |          |
+| Images           |          |          |
+| ImageFiltering   |          |          |
+| ProgressBars     |          |          |
+| UnicodePlots     |          |          |
 
 ### Set Up
 

@@ -1,3 +1,13 @@
 export WEBBPSF_PATH="datadir/webbpsf-data-1.1.1/webbpsf-data"
 
+outdir
 /home/eddieberman/research/mcclearygroup/shopt/outdir
+
+configdir
+/home/eddieberman/research/mcclearygroup/shopt/configdir
+
+
+
+
+
+

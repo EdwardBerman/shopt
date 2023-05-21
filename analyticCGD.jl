@@ -1,6 +1,6 @@
 include("radialProfiles.jl")
 
-function cost(params; r = r, c= c, star=starCatalog[iteration], radial=fGaussian) #star=starCatalog[i] 
+function cost(params; r = r, c= c, starL=starCatalog[iteration], radial=fGaussian) #star=starCatalog[i] 
   Totalcost = 0
   σ = params[1]
   s_guess = σ^2
@@ -26,7 +26,7 @@ function cost(params; r = r, c= c, star=starCatalog[iteration], radial=fGaussian
   
   for u in 1:r
     for v in 1:c
-      Totalcost += 0.5*(A_guess*radial(u, v, g1_guess, g2_guess, s_guess, r/2, c/2) - star[u, v])^2
+      Totalcost += 0.5*(A_guess*radial(u, v, g1_guess, g2_guess, s_guess, r/2, c/2) - starL[u, v])^2
     end
   end
   return Totalcost
