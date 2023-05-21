@@ -34,23 +34,23 @@ Run ```julia shopt.jl [eventually the fits file you want to run] [configdir] [ou
 ### Dependencies
 Not all of these will be strictly necessary depending on the checkplots you produce, but for full functionality of Shopt the following are necessary. Source Extractor is also not a strict dependency, but in practice one will inevitably install.
 
-| Julia            | Python   | Binaries | Optional  |
-|------------------|----------|----------|-----------|
-| Plots            | treecorr | SEx      | ProgressBars |
-| ForwardDiff      | astropy  |          | UnicodePlots |
-| LinearAlgebra    | webbpsf  |          |              |
-| Random           |          |          |              |
-| Distributions    |          |          |              |
-| SpecialFunctions |          |          |              |
-| Optim            |          |          |              |
-| IterativeSolvers |          |          |              |
-| QuadGK           |          |          |              |
-| PyCall           |          |          |              |
-| DataFrames       |          |          |              |
-| CSV              |          |          |              |
-| FFTW             |          |          |              |
-| Images           |          |          |              |
-| ImageFiltering   |          |          |              |
+| Julia            | Python   | Binaries | Optional (.jl) |
+|------------------|----------|----------|----------------|
+| Plots            | treecorr | SEx      | ProgressBars   |
+| ForwardDiff      | astropy  |          | UnicodePlots   |
+| LinearAlgebra    | webbpsf  |          |                |
+| Random           |          |          |                |
+| Distributions    |          |          |                |
+| SpecialFunctions |          |          |                |
+| Optim            |          |          |                |
+| IterativeSolvers |          |          |                |
+| QuadGK           |          |          |                |
+| PyCall           |          |          |                |
+| DataFrames       |          |          |                |
+| CSV              |          |          |                |
+| FFTW             |          |          |                |
+| Images           |          |          |                |
+| ImageFiltering   |          |          |                |
 
 ### Set Up
 
