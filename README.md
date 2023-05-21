@@ -53,9 +53,19 @@ Not all of these will be strictly necessary depending on the checkplots you prod
 | ImageFiltering   |          |          |                |
 
 ### Set Up
-The dependencies can be installed in the julia REPL. For example.
+The dependencies can be installed in the Julia REPL. For example:
 ```julia
-import Pkg; Pkg.add("LinearAlgebra")
+import Pkg; Pkg.add("PyCall")
+```
+For calculating rho statistics we need to use the treecorr library. Thankfully, the setup for this is still pretty straightfoward. In the Julia REPL, you may do the following:
+```julia
+using PyCall
+pyimport("treecorr")
+```
+If you have a Conda Enviornment setup, you may find it easier to run 
+```julia
+using PyCall
+pyimport_conda("treecorr", "tc") #tc is my choice of name and treecorr is what I am importing from my conda Enviornment 
 ```
 
 ## Program Architecture
