@@ -53,6 +53,10 @@ Not all of these will be strictly necessary depending on the checkplots you prod
 | ImageFiltering   |          |          |                |
 
 ### Set Up
+The dependencies can be installed in the julia REPL. For example.
+```julia
+import Pkg; Pkg.add("LinearAlgebra")
+```
 
 ## Program Architecture
 
