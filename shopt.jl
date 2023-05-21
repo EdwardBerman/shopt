@@ -40,6 +40,10 @@ using QuadGK
 using DataFrames
 using FFTW
 using CSV
+using Images, ImageFiltering
+using Measures
+using ProgressBars
+#using UnicodePlots
 #using CairoMakie
 
 # ---------------------------------------------------------#
@@ -52,21 +56,22 @@ include("dataPreprocessing.jl")
 include("outliers.jl")
 include("dataOutprocessing.jl")
 include("powerSpectrum.jl")
+include("kaisserSquires.jl")
 
 # ---------------------------------------------------------#
+fancyPrint("Running Source Extractor")
+# ---------------------------------------------------------#
+
 fancyPrint("Processing Data for Fit")
 star, r, c = dataprocessing()
-
-for u in 1:r
-  for v in 1:c
-    star[u,v] = star[u,v] + rand(Normal(-0.1*star[u,v], star[u,v]*0.1))
-  end
-end
-
- 
 starData = zeros(r, c)
 
 itr = 6
+starCatalog = []
+for i in 1:itr
+  push!(starCatalog, star) #starDummy)
+end
+
 A_model = zeros(itr)
 s_model = zeros(itr)
 g1_model = zeros(itr)
@@ -83,11 +88,11 @@ ltPlots = []
 # ---------------------------------------------------------#
 fancyPrint("Analytic Profile Fit for Model Star")
 @time begin
-  for i in 1:itr
-    println("\t Star $i")
-    initial_guess = rand(3)
-    println("\t initial guess [σ, e1, e2]: ", initial_guess)
-     
+  pb = tqdm(1:itr)
+  for i in pb
+    initial_guess = rand(3) #println("\t initial guess [σ, e1, e2]: ", initial_guess)
+    set_description(pb, "Star $i/$itr Complete")
+
     it = []
     loss = []
 
@@ -96,42 +101,41 @@ fancyPrint("Analytic Profile Fit for Model Star")
       push!(loss, opt_state.value)
       return false  
     end
+    global iteration = i
     x_cg = optimize(cost, 
                     g!, 
                     initial_guess, 
                     ConjugateGradient(),
                     Optim.Options(callback = cb))
-
     loss_time = plot(it, 
                      loss, 
                      xlabel="Iteration", 
                      ylabel="Loss",
                      label="Star $i Data")
     push!(ltPlots, loss_time)
-    
+
     if "$i" == "$itr"
       title = plot(title = "Analytic Profile Loss Vs Iteration (Model)", 
                    grid = false, 
                    showaxis = false, 
                    bottom_margin = -50Plots.px)
-
+        
       filler = plot(grid = false, 
                     showaxis = false, 
                     bottom_margin = -50Plots.px)
-
+        
       savefig(plot(title,
-                   filler,
-                   ltPlots[1], 
-                   ltPlots[2], 
-                   ltPlots[3], 
-                   ltPlots[4], 
-                   ltPlots[5], 
-                   ltPlots[6], 
-                   layout = (4,2),
-                   size = (1800,800)), 
-                        joinpath("outdir", "lossTimeModel.png"))
+                    filler,
+                    ltPlots[1], 
+                    ltPlots[2], 
+                    ltPlots[3], 
+                    ltPlots[4], 
+                    ltPlots[5], 
+                    ltPlots[6], 
+                      layout = (4,2),
+                      size = (1800,800)), 
+                          joinpath("outdir", "lossTimeModel.png"))
     end
-
     s_model[i] = x_cg.minimizer[1]^2
     e1_guess = x_cg.minimizer[2]
     e2_guess = x_cg.minimizer[3]
@@ -141,7 +145,7 @@ fancyPrint("Analytic Profile Fit for Model Star")
     ratioData = ellipticityData/normGdata
     g1_model[i] = e1_guess/ratioData            
     g2_model[i] = e2_guess/ratioData  
-    
+  
     norm_data = zeros(r,c)
     for u in 1:r
       for v in 1:c
@@ -150,7 +154,7 @@ fancyPrint("Analytic Profile Fit for Model Star")
     end
     A_model[i] = 1/sum(norm_data)
     println("\t Found A: ", A_model[i], "\t s: ", s_model[i]^2, "\t g1: ", g1_model[i], "\t g2: ", g2_model[i])
-
+    #println(global stars)
   end
 end
 
@@ -177,11 +181,12 @@ ltdPlots = []
 
 # ---------------------------------------------------------#
 fancyPrint("Analytic Profile Fit for Learned Star")
+#Copy Star Catalog then replace it with the learned pixel grid stars
 @time begin
-  for i in 1:itr
-    println("\t Star $i")
-    initial_guess = rand(3)
-    println("\t initial guess [σ, e1, e2]: ", initial_guess)
+  pb = tqdm(1:itr)
+  for i in pb
+    initial_guess = rand(3) #println("\t initial guess [σ, e1, e2]: ", initial_guess)
+    set_description(pb, "Star $i/$itr Complete")
      
     it = []
     loss = []
@@ -191,6 +196,7 @@ fancyPrint("Analytic Profile Fit for Learned Star")
       push!(loss, opt_state.value)
       return false  
     end
+    global iteration = i
     x_cg = optimize(costD, 
                     gD!, 
                     initial_guess, 
@@ -279,9 +285,23 @@ fft_image = fft(complex.(Residuals))
 fft_image = abs2.(fft_image)
 pk = []
 for i in 1:10
-  radius = range(1, 10, length=10)
+  radius = range(1, max(r/2, c/2) - 1, length=10)
   push!(pk, powerSpectrum(fft_image, radius[i]))
 end
+
+#=
+for i in 1:10
+  for u in 1:size(fft_image,1)
+    for v in 1:size(fft_image,2)
+      if round(sqrt((u - size(fft_image,1)/2)^2 + (v - size(fft_image,2)/2)^2) - i) == 0
+        fft_image[u,v] = maximum(fft_image) 
+      end
+    end
+  end
+end
+=#
+
+#ksMatrix , b = ks 
 
 amin = minimum([minimum(star), minimum(starData)])
 amax = maximum([maximum(star), maximum(starData)])
@@ -346,5 +366,37 @@ fancyPrint("Saving DataFrame to df.shopt")
 writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
 println(readData())
 
+using UnicodePlots
+println(UnicodePlots.boxplot(["s model", "s data", "g1 model", "g1 data", "g2 model", "g2 data"], 
+                             [s_model, s_data, g1_model, g1_data, g2_model, g2_data],
+                            title="Boxplot of df.shopt"))
+println(UnicodePlots.histogram(s_model, vertical=true, title="Histogram of s model"))
+println(UnicodePlots.histogram(s_data, vertical=true, title="Histogram of s data"))
+println(UnicodePlots.histogram(g1_model, vertical=true, title="Histogram of g1 model"))
+println(UnicodePlots.histogram(g1_data, vertical=true, title="Histogram of g1 data"))
+println(UnicodePlots.histogram(g2_model, vertical=true, title="Histogram of g2 model"))
+println(UnicodePlots.histogram(g2_data, vertical=true, title="Histogram of g2 data"))
 # ---------------------------------------------------------#
 fancyPrint("Done! =]")
+#=
+function hist(x::Array{T, 1}, y::Array{T, 1}, t1, t2) where T<:Real
+ 76   bin_edges = range(-1, stop=1, step=0.1)
+ 77   histogram(x, 
+ 78             alpha=0.5, 
+ 79             bins=bin_edges,
+ 80             label=t1, 
+ 81             xticks = -1:0.1:1,
+ 82             titlefontsize=20, 
+ 83             xguidefontsize=20, 
+ 84             yguidefontsize=20)
+ 85   histogram!(y, 
+ 86              alpha=0.5, 
+ 87              bins=bin_edges, 
+ 88              label=t2,
+ 89              xticks = -1:0.1:1,
+ 90              titlefontsize=20, 
+ 91              xguidefontsize=20, 
+ 92              yguidefontsize=20)
+ 93   plot!(margin=15mm)
+ 94 end
+=#

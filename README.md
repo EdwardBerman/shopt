@@ -47,6 +47,10 @@ Run ```julia shopt.jl [eventually the fits file you want to run] [configdir] [ou
 | DataFrames       |          |  
 | CSV              |          |
 | FFTW             |          |
+| Images           |          |
+| ImageFiltering   |          |
+| ProgressBars     |          |
+| UnicodePlots     |          |
 
 ### Set Up
 
@@ -90,6 +94,12 @@ outliers.jl
 
 powerSpectrum.jl
 > Computes the power spectra for a circle of radius k, called iteratively to plot P(k) / k
+
+kaisserSquires.jl
+> Computes the Kaisser-Squires array to be plotted
+
+runSourceExtractor.jl
+> Runs Sex on input .fits file supplied in datadir 
 
 LICENSE
 > MIT LICENSE

@@ -5,3 +5,4 @@
 # Catalog / Image Names
 # Overrides to config file
 #print statements
+#Unicode Plots

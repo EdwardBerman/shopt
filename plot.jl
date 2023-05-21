@@ -11,7 +11,11 @@ function generate_heatmap(data::Array{T, 2}, t, cbmin, cbmax) where T<:Real
           ylims=(0.5, size(data, 1) + 0.5),  # set the y-axis limits to include the full cells
           ticks=:none,  # remove the ticks
           frame=:box,  # draw a box around the plot
-          grid=:none  # remove the grid lines
+          grid=:none,  # remove the grid lines
+          titlefontsize=20, 
+          xguidefontsize=20, 
+          yguidefontsize=20,
+          margin = 25mm
             )
 end
 
@@ -33,7 +37,7 @@ function error_plot(model, learned, errorModel, errorLearned, t)
   title!(t)
 
   # Show the plot
-  plot!(legend=:topright)
+  plot!(legend=:topright, titlefontsize=20, xguidefontsize=20, yguidefontsize=20, margin = 25mm)
 end
 
 function plot_err()
@@ -65,7 +69,7 @@ function plot_err()
                    [std(s_model)/sqrt(n_s), std(g1_model)/sqrt(n_g1), std(g2_model)/sqrt(n_g2)],
                    [std(s_data)/sqrt(n_sD), std(g1_data)/sqrt(n_g1D), std(g2_data)/sqrt(n_g2D)],
                    "Learned vs True Parameters Outliers Removed")
-  savefig(plot(ps1, ps2, layout=(1,2), size = (1800,800)), joinpath("outdir", "parametersScatterplot.png"))
+  savefig(plot(ps1, ps2, layout=(1,2), size = (1920, 1080)), joinpath("outdir", "parametersScatterplot.png"))
 end
 
 function hist(x::Array{T, 1}, y::Array{T, 1}, t1, t2) where T<:Real
@@ -74,12 +78,19 @@ function hist(x::Array{T, 1}, y::Array{T, 1}, t1, t2) where T<:Real
             alpha=0.5, 
             bins=bin_edges,
             label=t1, 
-            xticks = -1:0.1:1)
+            xticks = -1:0.1:1,
+            titlefontsize=20, 
+            xguidefontsize=20, 
+            yguidefontsize=20)
   histogram!(y, 
              alpha=0.5, 
              bins=bin_edges, 
              label=t2,
-             xticks = -1:0.1:1)
+             xticks = -1:0.1:1,
+             titlefontsize=20, 
+             xguidefontsize=20, 
+             yguidefontsize=20)
+  plot!(margin=15mm)
 end
 
 function plot_hist()
@@ -110,7 +121,7 @@ function plot_hist()
                hist5, 
                hist6, 
                     layout = (2,3), 
-                    size = (1800,800)), 
+                    size = (1920,1080)), 
                         joinpath("outdir", "parametersHistogram.png"))
 end
 
@@ -127,31 +138,31 @@ function plot_hm(p)
   s2 = surface(starData, colorbar = false)
   s3 = surface(Residuals, colorbar = false)
 
-  pk_k = plot(pk, xlabel = "k", ylabel = "P(k)", title = "Power Spectrum")
+  pk_k = plot(pk, xlabel = "k", titlefontsize=20, xguidefontsize=20, yguidefontsize=20, ylabel = "P(k)", title = "Power Spectrum", margin = 25mm)
   savefig(plot(hm, 
                hm3, 
                hm5, 
                hm2, 
                hm4, 
                   layout = (2,3),
-                  size = (1800,800)), 
+                  size = (1920,1080)), 
                       joinpath("outdir", "analyticProfileFit.png"))
   savefig(plot(hm, 
                hm6, 
                hm7, 
                   layout = (1,3),
-                  size = (1800,800)), 
+                  size = (1920,1080)), 
                       joinpath("outdir", "pixelGridFit.png"))
   savefig(plot(s1, 
                s2, 
                s3, 
                   layout = (1,3),
-                  size = (1800,800)), 
+                  size = (1920,1080)), 
                       joinpath("outdir", "3dAnalyticFit.png"))
   
   savefig(plot(hm8, pk_k,
                   layout = (1,2),
-                  size = (1800,800)), 
+                  size = (1920,1080)), 
                       joinpath("outdir", "fftResiduals.png"))
   
 end
