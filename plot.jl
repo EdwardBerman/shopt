@@ -114,15 +114,15 @@ function plot_hist()
                           label="g2 Model and Data Residuals", 
                           xticks = -1:0.1:1)
 
-  savefig(Plots.plot(hist1, 
-                     hist2, 
-                     hist3, 
-                     hist4, 
-                     hist5, 
-                     hist6, 
-                     layout = (2,3), 
-                     size = (1920,1080)), 
-                        joinpath("outdir", "parametersHistogram.png"))
+  Plots.savefig(Plots.plot(hist1, 
+                           hist2, 
+                           hist3, 
+                           hist4, 
+                           hist5, 
+                           hist6, 
+                           layout = (2,3), 
+                           size = (1920,1080)), 
+                              joinpath("outdir", "parametersHistogram.png"))
 end
 
 function plot_hm(p)

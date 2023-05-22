@@ -28,16 +28,16 @@ end
 scale = 1/0.29
 ks93, k0 = ks(rand(10,10),rand(10,10))
 ksCosmos = imfilter(ks93, Kernel.gaussian(scale))
-kshm = heatmap(ksCosmos, 
-        title="Kaisser-Squires", 
-        xlabel="u", 
-        ylabel="v",
-        xlims=(0.5, size(ksCosmos, 2) + 0.5),  # set the x-axis limits to include the full cells
-        ylims=(0.5, size(ksCosmos, 1) + 0.5),  # set the y-axis limits to include the full cells
-        aspect_ratio=:equal,
-        ticks=:none,  # remove the ticks
-        frame=:box,  # draw a box around the plot
-        grid=:none,  # remove the grid lines
-        size=(1800,800))
+kshm = Plots.heatmap(ksCosmos, 
+                      title="Kaisser-Squires", 
+                      xlabel="u", 
+                      ylabel="v",
+                      xlims=(0.5, size(ksCosmos, 2) + 0.5),  # set the x-axis limits to include the full cells
+                      ylims=(0.5, size(ksCosmos, 1) + 0.5),  # set the y-axis limits to include the full cells
+                      aspect_ratio=:equal,
+                      ticks=:none,  # remove the ticks
+                      frame=:box,  # draw a box around the plot
+                      grid=:none,  # remove the grid lines
+                      size=(1920,1080))
 
-savefig(kshm, joinpath("outdir","ks.png"))
+Plots.savefig(kshm, joinpath("outdir","ks.png"))
