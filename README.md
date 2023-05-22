@@ -117,6 +117,9 @@ kaisserSquires.jl
 runSourceExtractor.jl
 > Runs Sex on input .fits file supplied in datadir 
 
+runshopt.sh
+> A shell script for running Shopt. Available so that users can run a terminal command in whatever program they are writing to run shopt. For example, in a julia program you may invoke  ```julia run(`./runshopt.sh a b c`)``` 
+
 LICENSE
 > MIT LICENSE
 

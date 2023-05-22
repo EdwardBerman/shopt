@@ -20,11 +20,8 @@ else
   mkdir(outdir)
 end
 
-
-
 # ---------------------------------------------------------#
 fancyPrint("Handling Imports")
-
 using Base: initarray!
 using BenchmarkTools
 using Plots
@@ -43,8 +40,7 @@ using CSV
 using Images, ImageFiltering
 using Measures
 using ProgressBars
-#using UnicodePlots
-#using CairoMakie
+using UnicodePlots
 
 # ---------------------------------------------------------#
 fancyPrint("Reading .jl Files")
@@ -107,34 +103,34 @@ fancyPrint("Analytic Profile Fit for Model Star")
                     initial_guess, 
                     ConjugateGradient(),
                     Optim.Options(callback = cb))
-    loss_time = plot(it, 
-                     loss, 
-                     xlabel="Iteration", 
-                     ylabel="Loss",
-                     label="Star $i Data")
+    loss_time = Plots.plot(it, 
+                           loss, 
+                           xlabel="Iteration", 
+                           ylabel="Loss",
+                           label="Star $i Data")
     push!(ltPlots, loss_time)
 
     if "$i" == "$itr"
-      title = plot(title = "Analytic Profile Loss Vs Iteration (Model)", 
-                   grid = false, 
-                   showaxis = false, 
-                   bottom_margin = -50Plots.px)
+      title = Plots.plot(title = "Analytic Profile Loss Vs Iteration (Model)", 
+                         grid = false, 
+                         showaxis = false, 
+                         bottom_margin = -50Plots.px)
         
-      filler = plot(grid = false, 
-                    showaxis = false, 
-                    bottom_margin = -50Plots.px)
+      filler = Plots.plot(grid = false, 
+                          showaxis = false, 
+                          bottom_margin = -50Plots.px)
         
-      savefig(plot(title,
-                    filler,
-                    ltPlots[1], 
-                    ltPlots[2], 
-                    ltPlots[3], 
-                    ltPlots[4], 
-                    ltPlots[5], 
-                    ltPlots[6], 
-                      layout = (4,2),
-                      size = (1800,800)), 
-                          joinpath("outdir", "lossTimeModel.png"))
+      Plots.savefig(Plots.plot(title,
+                               filler,
+                               ltPlots[1], 
+                               ltPlots[2], 
+                               ltPlots[3], 
+                               ltPlots[4], 
+                               ltPlots[5], 
+                               ltPlots[6], 
+                                  layout = (4,2),
+                                  size = (1920,1080)), 
+                                  joinpath("outdir", "lossTimeModel.png"))
     end
     s_model[i] = x_cg.minimizer[1]^2
     e1_guess = x_cg.minimizer[2]
@@ -153,7 +149,7 @@ fancyPrint("Analytic Profile Fit for Model Star")
       end
     end
     A_model[i] = 1/sum(norm_data)
-    println("\t Found A: ", A_model[i], "\t s: ", s_model[i]^2, "\t g1: ", g1_model[i], "\t g2: ", g2_model[i])
+    #println("\t Found A: ", A_model[i], "\t s: ", s_model[i]^2, "\t g1: ", g1_model[i], "\t g2: ", g2_model[i])
     #println(global stars)
   end
 end
@@ -203,27 +199,33 @@ fancyPrint("Analytic Profile Fit for Learned Star")
                     ConjugateGradient(),
                     Optim.Options(callback = cb))
 
-    loss_time = plot(it, 
-                     loss, 
-                     xlabel="Iteration", 
-                     ylabel="Loss",
-                     label="Star $i Model")
+    loss_time = Plots.plot(it, 
+                           loss, 
+                           xlabel="Iteration", 
+                           ylabel="Loss",
+                           label="Star $i Model")
     push!(ltdPlots, loss_time)
     
     if "$i" == "$itr"
-    title = plot(title = "Analytic Profile Loss Vs Iteration (Data)", grid = false, showaxis = false, bottom_margin = -50Plots.px)
-      filler = plot(grid = false, showaxis = false, bottom_margin = -50Plots.px)
-      savefig(plot(title,
-                   filler,
-                   ltdPlots[1], 
-                   ltdPlots[2], 
-                   ltdPlots[3], 
-                   ltdPlots[4], 
-                   ltdPlots[5], 
-                   ltdPlots[6], 
-                   layout = (4,2),
-                   size = (1800,800)), 
-                        joinpath("outdir", "lossTimeData.png"))
+      title = Plots.plot(title = "Analytic Profile Loss Vs Iteration (Data)", 
+                         grid = false, 
+                         showaxis = false, 
+                         bottom_margin = -50Plots.px)
+
+      filler = Plots.plot(grid = false, 
+                          showaxis = false, 
+                          bottom_margin = -50Plots.px)
+      Plots.savefig(Plots.plot(title,
+                               filler,
+                               ltdPlots[1], 
+                               ltdPlots[2], 
+                               ltdPlots[3], 
+                               ltdPlots[4], 
+                               ltdPlots[5], 
+                               ltdPlots[6], 
+                               layout = (4,2),
+                               size = (1920,1080)), 
+                               joinpath("outdir", "lossTimeData.png"))
     end
 
     s_data[i] = x_cg.minimizer[1]^2
@@ -243,7 +245,7 @@ fancyPrint("Analytic Profile Fit for Learned Star")
       end
     end
     A_data[i] = 1/sum(norm_data)
-    println("\t Found A: ", A_data[i], "\t s: ", s_data[i]^2, "\t g1: ", g1_data[i], "\t g2: ", g2_data[i])
+    #println("\t Found A: ", A_data[i], "\t s: ", s_data[i]^2, "\t g1: ", g1_data[i], "\t g2: ", g2_data[i])
 
   end
 end
@@ -326,7 +328,7 @@ plot_hm(p)
 plot_hist()
 plot_err()
 
-using CairoMakie
+#using CairoMakie
 #=
 let
     # cf. https://github.com/JuliaPlots/Makie.jl/issues/822#issuecomment-769684652
@@ -366,37 +368,20 @@ fancyPrint("Saving DataFrame to df.shopt")
 writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
 println(readData())
 
-using UnicodePlots
 println(UnicodePlots.boxplot(["s model", "s data", "g1 model", "g1 data", "g2 model", "g2 data"], 
                              [s_model, s_data, g1_model, g1_data, g2_model, g2_data],
                             title="Boxplot of df.shopt"))
+#=
 println(UnicodePlots.histogram(s_model, vertical=true, title="Histogram of s model"))
 println(UnicodePlots.histogram(s_data, vertical=true, title="Histogram of s data"))
 println(UnicodePlots.histogram(g1_model, vertical=true, title="Histogram of g1 model"))
 println(UnicodePlots.histogram(g1_data, vertical=true, title="Histogram of g1 data"))
 println(UnicodePlots.histogram(g2_model, vertical=true, title="Histogram of g2 model"))
 println(UnicodePlots.histogram(g2_data, vertical=true, title="Histogram of g2 data"))
+=#
+starSample = rand(1:6)
+println(UnicodePlots.heatmap(starCatalog[starSample], colormap=:inferno, title="Heatmap of star $starSample"))
+println(UnicodePlots.heatmap(starData, colormap=:inferno, title="Heatmap of Analytic Fit"))
+println(UnicodePlots.heatmap(star - starData, colormap=:inferno, title="Heatmap of Residuals"))
 # ---------------------------------------------------------#
 fancyPrint("Done! =]")
-#=
-function hist(x::Array{T, 1}, y::Array{T, 1}, t1, t2) where T<:Real
- 76   bin_edges = range(-1, stop=1, step=0.1)
- 77   histogram(x, 
- 78             alpha=0.5, 
- 79             bins=bin_edges,
- 80             label=t1, 
- 81             xticks = -1:0.1:1,
- 82             titlefontsize=20, 
- 83             xguidefontsize=20, 
- 84             yguidefontsize=20)
- 85   histogram!(y, 
- 86              alpha=0.5, 
- 87              bins=bin_edges, 
- 88              label=t2,
- 89              xticks = -1:0.1:1,
- 90              titlefontsize=20, 
- 91              xguidefontsize=20, 
- 92              yguidefontsize=20)
- 93   plot!(margin=15mm)
- 94 end
-=#
