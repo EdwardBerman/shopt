@@ -33,6 +33,8 @@ First use Source Extractor to create a catalog for Shopt to accept and save this
 
 Run ```julia shopt.jl [configdir] [outdir] [datadir]```
 
+There is also a shell script that runs this command so that the user may call shopt from a larger program they are running
+
 ### Dependencies
 Not all of these will be strictly necessary depending on the checkplots you produce, but for full functionality of Shopt the following are necessary. Source Extractor is also not a strict dependency, but in practice one will inevitably install.
 
