@@ -72,7 +72,7 @@ pyimport_conda("treecorr", "tc") #tc is my choice of name and treecorr is what I
 
 Once all dependencies are handled, the user now should clone this repository to obtain its file contents. There are future plans to release shopt onto the julia package repository, but for now the user needs these files contents.
 
-After the file contents are downloaded the user can run ```julia shopt.jl [configdir] [outdir] [datadir]``` as stated above. Alternatively, they can run the shellscript that calls shopt in whatever program they are working with to create their catalog. For example, in a julia program you may use ```run(`./runshopt.sh a b c`)```
+After the file contents are downloaded the user can run ```julia shopt.jl [configdir] [outdir] [datadir]``` as stated above. Alternatively, they can run the shellscript that calls shopt in whatever program they are working with to create their catalog. For example, in a julia program you may use ```run(`./runshopt.sh [configdir] [outdir] [datadir]`)```
 
 ## Program Architecture
 
