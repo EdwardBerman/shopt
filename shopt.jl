@@ -105,13 +105,21 @@ fancyPrint("Analytic Profile Fit for Model Star")
                     Optim.Options(callback = cb))
     loss_time = Plots.plot(it, 
                            loss, 
+                           linewidth = 5,
+                           tickfontsize=8,
+                           margin=15mm,
+                           xlims=(0,30),
+                           ylims=(0,0.03),
+                           xguidefontsize=20,
+                           yguidefontsize=20,
                            xlabel="Iteration", 
                            ylabel="Loss",
-                           label="Star $i Data")
+                           label="Star $i Model")
     push!(ltPlots, loss_time)
 
     if "$i" == "$itr"
-      title = Plots.plot(title = "Analytic Profile Loss Vs Iteration (Model)", 
+      title = Plots.plot(title = "Analytic Profile Loss Vs Iteration (Model)",
+                         titlefontsize=30,
                          grid = false, 
                          showaxis = false, 
                          bottom_margin = -50Plots.px)
@@ -129,8 +137,8 @@ fancyPrint("Analytic Profile Fit for Model Star")
                                ltPlots[5], 
                                ltPlots[6], 
                                   layout = (4,2),
-                                  size = (1920,1080)), 
-                                  joinpath("outdir", "lossTimeModel.png"))
+                                  size = (1800,800)),
+                                  joinpath("outdir", "lossTimeModel.pdf"))
     end
     s_model[i] = x_cg.minimizer[1]^2
     e1_guess = x_cg.minimizer[2]
@@ -201,13 +209,21 @@ fancyPrint("Analytic Profile Fit for Learned Star")
 
     loss_time = Plots.plot(it, 
                            loss, 
-                           xlabel="Iteration", 
+                           margin=15mm,
+                           linewidth = 5,
+                           tickfontsize=8,
+                           xlims=(0,30),
+                           ylims=(0,0.03),
+                           xlabel="Iteration",
+                           xguidefontsize=20,               
+                           yguidefontsize=20,
                            ylabel="Loss",
-                           label="Star $i Model")
+                           label="Star $i Data")
     push!(ltdPlots, loss_time)
     
     if "$i" == "$itr"
       title = Plots.plot(title = "Analytic Profile Loss Vs Iteration (Data)", 
+                         titlefontsize=30,
                          grid = false, 
                          showaxis = false, 
                          bottom_margin = -50Plots.px)
@@ -224,8 +240,8 @@ fancyPrint("Analytic Profile Fit for Learned Star")
                                ltdPlots[5], 
                                ltdPlots[6], 
                                layout = (4,2),
-                               size = (1920,1080)), 
-                               joinpath("outdir", "lossTimeData.png"))
+                               size = (1800,800)),
+                               joinpath("outdir", "lossTimeData.pdf"))
     end
 
     s_data[i] = x_cg.minimizer[1]^2
@@ -328,41 +344,6 @@ plot_hm(p)
 plot_hist()
 plot_err()
 
-#using CairoMakie
-#=
-let
-    # cf. https://github.com/JuliaPlots/Makie.jl/issues/822#issuecomment-769684652
-    # with scale argument that is required now
-    struct LogMinorTicks end
-    
-    function MakieLayout.get_minor_tickvalues(::LogMinorTicks, scale, tickvalues, vmin, v    max)
-        vals = Float64[]
-        for (lo, hi) in zip(
-                  @view(tickvalues[1:end-1]),
-                  @view(tickvalues[2:end]))
-                        interval = hi-lo
-                        steps = log10.(LinRange(10^lo, 10^hi, 11))
-            append!(vals, steps[2:end-1])
-        end
-        vals
-    end
-    custom_formatter(values) = map(v -> "10" * Makie.UnicodeFun.to_superscript(round(Int64, v    )), values)
-      data = star
-      fig = Figure()
-      ax_a, hm = heatmap(fig[1, 1], log10.(data),
-      axis=(; xminorticksvisible=true,
-         xminorticks=IntervalsBetween(9)))
-      ax_a.xlabel = "U"
-      ax_a.ylabel = "V"
-      cb = Colorbar(fig[1, 2], hm;
-      tickformat=custom_formatter,
-      minorticksvisible=true,
-      minorticks=LogMinorTicks())
-      ax_a.title = "Log Scale Model PSF"
-      save(joinpath("outdir", "test.png"), fig)
-  end
-=#
-
 # ---------------------------------------------------------#
 fancyPrint("Saving DataFrame to df.shopt")
 writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
@@ -385,3 +366,56 @@ println(UnicodePlots.heatmap(starData, colormap=:inferno, title="Heatmap of Anal
 println(UnicodePlots.heatmap(star - starData, colormap=:inferno, title="Heatmap of Residuals"))
 # ---------------------------------------------------------#
 fancyPrint("Done! =]")
+using CairoMakie
+
+let
+    # cf. https://github.com/JuliaPlots/Makie.jl/issues/822#issuecomment-769684652
+    # with scale argument that is required now
+    struct LogMinorTicks end
+    
+    function MakieLayout.get_minor_tickvalues(::LogMinorTicks, scale, tickvalues, vmin, vmax)
+        vals = Float64[]
+        for (lo, hi) in zip(
+                  @view(tickvalues[1:end-1]),
+                  @view(tickvalues[2:end]))
+                        interval = hi-lo
+                        steps = log10.(LinRange(10^lo, 10^hi, 11))
+            append!(vals, steps[2:end-1])
+        end
+        vals
+    end
+    custom_formatter(values) = map(v -> "10" * Makie.UnicodeFun.to_superscript(round(Int64, v    )), values)
+      data = star
+      fig = Figure(resolution = (1800, 1800))
+      ax_a, hm = CairoMakie.heatmap(fig[1, 1], log10.(data),
+      axis=(; xminorticksvisible=true,
+         xminorticks=IntervalsBetween(9)))
+      ax_a.xlabel = "U"
+      ax_a.ylabel = "V"
+      ax_a.aspect = DataAspect()
+
+      ax_b, hm = CairoMakie.heatmap(fig[1, 2], log10.(starData),
+      axis=(; xminorticksvisible=true,
+         xminorticks=IntervalsBetween(9)))
+      ax_b.xlabel = "U"
+      ax_b.ylabel = "V"
+      ax_b.aspect = DataAspect()
+    
+      ax_c, hm = CairoMakie.heatmap(fig[1, 3], log10.(abs.(star - starData)),
+      axis=(; xminorticksvisible=true,
+         xminorticks=IntervalsBetween(9)))
+      ax_c.xlabel = "U"
+      ax_c.ylabel = "V"
+      ax_c.aspect = DataAspect()
+      
+      cb = Colorbar(fig[1, 4], hm;
+      tickformat=custom_formatter,
+      minorticksvisible=true,
+      minorticks=LogMinorTicks())
+      ax_a.title = "Log Scale Model PSF"
+      ax_b.title = "Log Scale Learned PSF"
+      ax_c.title = "Log Scale Absolute Value of Residuals"
+      save(joinpath("outdir", "logScale.pdf"), fig)
+end
+
+

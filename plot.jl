@@ -12,9 +12,9 @@ function generate_heatmap(data::Array{T, 2}, t, cbmin, cbmax) where T<:Real
                 ticks=:none,  # remove the ticks
                 frame=:box,  # draw a box around the plot
                 grid=:none,  # remove the grid lines
-                titlefontsize=20, 
-                xguidefontsize=20, 
-                yguidefontsize=20,
+                titlefontsize=30, 
+                xguidefontsize=30, 
+                yguidefontsize=30,
                 margin = 25mm
                 )
 end
@@ -37,7 +37,7 @@ function error_plot(model, learned, errorModel, errorLearned, t)
   Plots.title!(t)
 
   # Show the plot
-  Plots.plot!(legend=:topright, titlefontsize=20, xguidefontsize=20, yguidefontsize=20, margin = 25mm)
+  Plots.plot!(legend=:topright, titlefontsize=30, xguidefontsize=30, yguidefontsize=30, margin = 25mm)
 end
 
 function plot_err()
@@ -69,7 +69,7 @@ function plot_err()
                    [std(s_model)/sqrt(n_s), std(g1_model)/sqrt(n_g1), std(g2_model)/sqrt(n_g2)],
                    [std(s_data)/sqrt(n_sD), std(g1_data)/sqrt(n_g1D), std(g2_data)/sqrt(n_g2D)],
                    "Learned vs True Parameters Outliers Removed")
-  Plots.savefig(Plots.plot(ps1, ps2, layout=(1,2), size = (1920, 1080)), joinpath("outdir", "parametersScatterplot.png"))
+  Plots.savefig(Plots.plot(ps1, ps2, layout=(1,2), size = (1920, 1080)), joinpath("outdir", "parametersScatterplot.pdf"))
 end
 
 function hist(x::Array{T, 1}, y::Array{T, 1}, t1, t2) where T<:Real
@@ -79,17 +79,19 @@ function hist(x::Array{T, 1}, y::Array{T, 1}, t1, t2) where T<:Real
                   bins=bin_edges,
                   label=t1, 
                   xticks = -1:0.1:1,
-                  titlefontsize=20, 
-                  xguidefontsize=20, 
-                  yguidefontsize=20)
+                  tickfontsize=16,
+                  titlefontsize=30, 
+                  xguidefontsize=30, 
+                  yguidefontsize=30)
   Plots.histogram!(y, 
                    alpha=0.5, 
                    bins=bin_edges, 
                    label=t2,
                    xticks = -1:0.1:1,
+                   tickfontsize=16,
                    titlefontsize=20, 
-                   xguidefontsize=20, 
-                   yguidefontsize=20)
+                   xguidefontsize=30, 
+                   yguidefontsize=30)
   Plots.plot!(margin=15mm)
 end
 
@@ -122,7 +124,7 @@ function plot_hist()
                            hist6, 
                            layout = (2,3), 
                            size = (1920,1080)), 
-                              joinpath("outdir", "parametersHistogram.png"))
+                              joinpath("outdir", "parametersHistogram.pdf"))
 end
 
 function plot_hm(p)
@@ -138,7 +140,17 @@ function plot_hm(p)
   s2 = Plots.surface(starData, colorbar = false)
   s3 = Plots.surface(Residuals, colorbar = false)
 
-  pk_k = Plots.plot(pk, xlabel = "k", titlefontsize=20, xguidefontsize=20, yguidefontsize=20, ylabel = "P(k)", title = "Power Spectrum", margin = 25mm)
+  pk_k = Plots.plot(pk, 
+                    xlabel = "k", 
+                    linewidth=5, 
+                    tickfontsize=16,
+                    titlefontsize=30, 
+                    xguidefontsize=30, 
+                    yguidefontsize=30, 
+                    ylabel = "P(k)", 
+                    title = "Power Spectrum", 
+                    margin = 25mm)
+
   Plots.savefig(Plots.plot(hm, 
                            hm3, 
                            hm5, 
@@ -146,25 +158,25 @@ function plot_hm(p)
                            hm4, 
                               layout = (2,3),
                               size = (1920,1080)), 
-                                  joinpath("outdir", "analyticProfileFit.png"))
+                                  joinpath("outdir", "analyticProfileFit.pdf"))
   Plots.savefig(Plots.plot(hm,
                            hm6, 
                            hm7, 
                             layout = (1,3),
                             size = (1920,1080)), 
-                                joinpath("outdir", "pixelGridFit.png"))
+                                joinpath("outdir", "pixelGridFit.pdf"))
   Plots.savefig(Plots.plot(s1, 
                            s2, 
                            s3, 
                            layout = (1,3),
                            size = (1920,1080)), 
-                           joinpath("outdir", "3dAnalyticFit.png"))
+                           joinpath("outdir", "3dAnalyticFit.pdf"))
   
   Plots.savefig(Plots.plot(hm8, 
                            pk_k,
                             layout = (1,2),
                             size = (1920,1080)), 
-                                joinpath("outdir", "fftResiduals.png"))
+                                joinpath("outdir", "fftResiduals.pdf"))
   
 end
 
