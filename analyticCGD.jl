@@ -33,7 +33,7 @@ function cost(params; r = r, c= c, starL=starCatalog[iteration], radial=fGaussia
 end
 
 
-function costD(params; r = r, c= c, star = star, radial = fGaussian) 
+function costD(params; r = r, c= c, starL = pixelGridFits[iteration], radial = fGaussian) 
   Totalcost = 0
   σ = params[1]
   s_guess = σ^2
@@ -60,7 +60,7 @@ function costD(params; r = r, c= c, star = star, radial = fGaussian)
   for u in 1:r
     for v in 1:c
       try
-        Totalcost += 0.5*(A_guess*radial(u, v, g1_guess, g2_guess, s_guess, r/2, c/2) - pg[u, v])^2
+        Totalcost += 0.5*(A_guess*radial(u, v, g1_guess, g2_guess, s_guess, r/2, c/2) - starL[u, v])^2
       catch
         Totalcost += 0
       end

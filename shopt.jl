@@ -59,14 +59,19 @@ fancyPrint("Running Source Extractor")
 # ---------------------------------------------------------#
 
 fancyPrint("Processing Data for Fit")
-star, r, c = dataprocessing()
+starCatalog, r, c, itr = cataloging()
 starData = zeros(r, c)
 
-itr = 6
-starCatalog = []
-for i in 1:itr
-  push!(starCatalog, star) #starDummy)
+function sample_indices(array, k)
+    indices = collect(1:length(array))  # Create an array of indices
+    return sample(indices, k, replace = false)
 end
+
+sampled_indices = sort(sample_indices(starCatalog, 6))
+
+println("Sampled indices: ", sampled_indices)
+
+star = starCatalog[1]
 
 A_model = zeros(itr)
 s_model = zeros(itr)
@@ -80,7 +85,7 @@ g1_data = zeros(itr)
 g2_data = zeros(itr)
 
 ltPlots = []
-
+failedStars = []
 # ---------------------------------------------------------#
 fancyPrint("Analytic Profile Fit for Model Star")
 @time begin
@@ -98,18 +103,24 @@ fancyPrint("Analytic Profile Fit for Model Star")
       return false  
     end
     global iteration = i
-    x_cg = optimize(cost, 
-                    g!, 
-                    initial_guess, 
-                    ConjugateGradient(),
-                    Optim.Options(callback = cb))
+    try
+      global x_cg = optimize(cost, 
+                             g!, 
+                             initial_guess, 
+                             ConjugateGradient(),
+                             Optim.Options(callback = cb))
+    catch
+      println("Star $i failed")
+      push!(failedStars, i)
+      continue
+    end
+
     loss_time = Plots.plot(it, 
                            loss, 
                            linewidth = 5,
                            tickfontsize=8,
                            margin=15mm,
                            xlims=(0,30),
-                           ylims=(0,0.03),
                            xguidefontsize=20,
                            yguidefontsize=20,
                            xlabel="Iteration", 
@@ -174,11 +185,16 @@ println("\t \t Number of outliers in g2: ", ng2[1])
 
 # ---------------------------------------------------------#
 fancyPrint("Pixel Grid Fit")
+pixelGridFits = []
 @time begin
-  pg = optimize(pgCost, pg_g!, zeros(r*c), ConjugateGradient())
-  print(pg)
+  pb = tqdm(1:itr)
+  for i in pb
+    set_description(pb, "Star $i/$itr Complete")
+    global iteration = i
+    pg = optimize(pgCost, pg_g!, zeros(r*c), ConjugateGradient())
+    push!(pixelGridFits ,reshape(pg.minimizer, (r, c)))
+  end
 end
-pg = reshape(pg.minimizer, (r, c))
 
 
 ltdPlots = []
@@ -201,11 +217,17 @@ fancyPrint("Analytic Profile Fit for Learned Star")
       return false  
     end
     global iteration = i
-    x_cg = optimize(costD, 
-                    gD!, 
-                    initial_guess, 
-                    ConjugateGradient(),
-                    Optim.Options(callback = cb))
+    try 
+      global y_cg = optimize(costD, 
+                             gD!, 
+                             initial_guess, 
+                             ConjugateGradient(),
+                             Optim.Options(callback = cb))
+    catch
+      println("Star $i failed")
+      push!(failedStars, i)
+      continue
+    end
 
     loss_time = Plots.plot(it, 
                            loss, 
@@ -213,7 +235,6 @@ fancyPrint("Analytic Profile Fit for Learned Star")
                            linewidth = 5,
                            tickfontsize=8,
                            xlims=(0,30),
-                           ylims=(0,0.03),
                            xlabel="Iteration",
                            xguidefontsize=20,               
                            yguidefontsize=20,
@@ -244,9 +265,9 @@ fancyPrint("Analytic Profile Fit for Learned Star")
                                joinpath("outdir", "lossTimeData.pdf"))
     end
 
-    s_data[i] = x_cg.minimizer[1]^2
-    e1_guess = x_cg.minimizer[2]
-    e2_guess = x_cg.minimizer[3]
+    s_data[i] = y_cg.minimizer[1]^2
+    e1_guess = y_cg.minimizer[2]
+    e2_guess = y_cg.minimizer[3]
 
     ellipticityData = sqrt((e1_guess)^2 + (e2_guess)^2)
     normGdata = sqrt(1 + 0.5*( (1/ellipticityData^2) - sqrt( (4/ellipticityData^2) + (1/ellipticityData^4)  )  )) 
@@ -266,38 +287,27 @@ fancyPrint("Analytic Profile Fit for Learned Star")
   end
 end
 
-
+println("failed stars: ", failedStars)
 # ---------------------------------------------------------#
 fancyPrint("Plotting")
 
-
-norm2 = zeros(r, c)
-norm2[5,5] = 1
-norm2[5,6] = 1
-norm2[6,5] = 1
-norm2[6,6] = 1
+analyticModel = zeros(r, c)
 
 for u in 1:r
   for v in 1:c
-    norm2[u,v] = fGaussian(u, v, mean(g1_model), mean(g2_model), mean(s_model), r/2, c/2)
+    analyticModel[u,v] = fGaussian(u, v, g1_model[100], g2_model[100], s_model[100], r/2, c/2)
   end
 end
-A_model = 1/sum(norm2)
+A_model = 1/sum(analyticModel)
 
 for u in 1:r
   for v in 1:c
-    starData[u,v] = A_model*norm2[u,v]
+    starData[u,v] = A_model*analyticModel[u,v]
   end
 end
 
-Residuals = star - starData
+Residuals = starCatalog[100] - starData
 costSquaredError = Residuals.^2 
-chiSquare = zeros(r, c)
-for u in 1:r
-  for v in 1:c
-    chiSquare[u,v] = costSquaredError[u,v]/var(vec(star)) 
-  end
-end
 
 fft_image = fft(complex.(Residuals))
 fft_image = abs2.(fft_image)
@@ -307,40 +317,20 @@ for i in 1:10
   push!(pk, powerSpectrum(fft_image, radius[i]))
 end
 
-#=
-for i in 1:10
-  for u in 1:size(fft_image,1)
-    for v in 1:size(fft_image,2)
-      if round(sqrt((u - size(fft_image,1)/2)^2 + (v - size(fft_image,2)/2)^2) - i) == 0
-        fft_image[u,v] = maximum(fft_image) 
-      end
-    end
-  end
-end
-=#
 
 #ksMatrix , b = ks 
 
-amin = minimum([minimum(star), minimum(starData)])
-amax = maximum([maximum(star), maximum(starData)])
-csmin = minimum(chiSquare)
-csmax = maximum(chiSquare)
-rmin = minimum(Residuals)
-rmax = maximum(Residuals)
-csemin = minimum(costSquaredError)
-csemax = maximum(costSquaredError)
-rpgmin = minimum((star - pg).^2)
-rpgmax = maximum((star - pg).^2)
 fftmin = minimum(fft_image)
 fftmax = maximum(fft_image)
 
+#=
 dof = r*c - 3
 p = 1 - cdf(Chisq(dof), sum(chiSquare))#ccdf = 1 - cdf
 p = string(p)
 println("p-value: ", p, "\n")
+=#
 
-
-plot_hm(p)
+plot_hm()
 plot_hist()
 plot_err()
 
@@ -366,6 +356,7 @@ println(UnicodePlots.heatmap(starData, colormap=:inferno, title="Heatmap of Anal
 println(UnicodePlots.heatmap(star - starData, colormap=:inferno, title="Heatmap of Residuals"))
 # ---------------------------------------------------------#
 fancyPrint("Done! =]")
+#=
 using CairoMakie
 
 let
@@ -417,5 +408,4 @@ let
       ax_c.title = "Log Scale Absolute Value of Residuals"
       save(joinpath("outdir", "logScale.pdf"), fig)
 end
-
-
+=#
