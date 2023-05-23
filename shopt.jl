@@ -350,10 +350,12 @@ println(UnicodePlots.histogram(g1_data, vertical=true, title="Histogram of g1 da
 println(UnicodePlots.histogram(g2_model, vertical=true, title="Histogram of g2 model"))
 println(UnicodePlots.histogram(g2_data, vertical=true, title="Histogram of g2 data"))
 =#
-starSample = rand(1:6)
-println(UnicodePlots.heatmap(starCatalog[starSample], colormap=:inferno, title="Heatmap of star $starSample"))
-println(UnicodePlots.heatmap(starData, colormap=:inferno, title="Heatmap of Analytic Fit"))
-println(UnicodePlots.heatmap(star - starData, colormap=:inferno, title="Heatmap of Residuals"))
+starSample = rand(1:itr)
+a = starCatalog[starSample]
+b = pixelGridFits[starSample]
+println(UnicodePlots.heatmap(a, colormap=:inferno, title="Heatmap of star $starSample"))
+println(UnicodePlots.heatmap(b, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
+println(UnicodePlots.heatmap(a - b, colormap=:inferno, title="Heatmap of Residuals"))
 # ---------------------------------------------------------#
 fancyPrint("Done! =]")
 #=
