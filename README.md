@@ -15,14 +15,14 @@ Currently, the inputs are JWST Point Spread Functions source catalogs. The curre
 ### Outputs
 | Image      | Description         |
 |------------|---------------------|
-| ![image](outdir/lossTimeModel.png) | Loss versus iteration for matching analytic profile to the Model Star |
-| ![image](outdir/lossTimeData.png)  | Loss versus iteration for matching analytic profile to the Star Learned by a Pixel Grid Fit |
-| ![image](outdir/3dAnalyticFit.png) | 3D map to easily show where PSF is over and under subtracted |
-| ![image](outdir/pixelGridFit.png) | Pixel Grid fit for Model Star |
-| ![image](outdir/parametersHistogram.png) | Histogram for learned profiles for each star in an analytic fit with their residuals |
-| ![image](outdir/parametersScatterplot.png) | Same data recorded as a scatterplot with and without outliers removed and with error bars |
-| ![image](outdir/fftResiduals.png) | The complex magnitude squared of each pixel of the fourier transform of the residual map side by side with the Power spectrum graph | 
-| ![image](outdir/shoptFile.png) | An image of the output .shopt file (a wrapper for a DataFrame turned into a CSV) | 
+| ![image](READMEassets/lossTimeModel.png) | Loss versus iteration for matching analytic profile to the Model Star |
+| ![image](READMEassets/lossTimeData.png)  | Loss versus iteration for matching analytic profile to the Star Learned by a Pixel Grid Fit |
+| ![image](READMEassets/3dAnalyticFit.png) | 3D map to easily show where PSF is over and under subtracted |
+| ![image](READMEassets/pixelGridFit.png) | Pixel Grid fit for Model Star |
+| ![image](READMEassets/parametersHistogram.png) | Histogram for learned profiles for each star in an analytic fit with their residuals |
+| ![image](READMEassets/parametersScatterplot.png) | Same data recorded as a scatterplot with and without outliers removed and with error bars |
+| ![image](READMEassets/fftResiduals.png) | The complex magnitude squared of each pixel of the fourier transform of the residual map side by side with the Power spectrum graph | 
+| ![image](READMEassets/shoptFile.png) | An image of the output .shopt file (a wrapper for a DataFrame turned into a CSV) | 
 
 ## Running
 ### Command
