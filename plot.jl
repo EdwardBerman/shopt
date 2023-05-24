@@ -18,6 +18,22 @@ function generate_heatmap(data::Array{T, 2}, cbmin, cbmax) where T<:Real
                 )
 end
 
+function generate_heatmap_sp_t(data::Array{T, 2}, t, cbmin, cbmax) where T<:Real
+  Plots.heatmap(data,
+                aspect_ratio=:equal,  # ensure square cells
+                color=:winter,  # use the Winter color map
+                cbar=:true,  # add the color bar
+                title = t,
+                clims=(cbmin, cbmax),  # set the color limits
+                xlims=(0.5, size(data, 2) + 0.5),  # set the x-axis limits to include the full cells
+                ylims=(0.5, size(data, 1) + 0.5),  # set the y-axis limits to include the full cells
+                ticks=:none,  # remove the ticks
+                frame=:box,  # draw a box around the plot
+                grid=:none,  # remove the grid lines
+                margin = 15mm
+                )
+end
+
 function generate_heatmap_sp(data::Array{T, 2}, cbmin, cbmax) where T<:Real
   Plots.heatmap(data,
                 aspect_ratio=:equal,  # ensure square cells
@@ -192,27 +208,24 @@ function plot_hm()#p
   star1 = sampled_indices[1]
   star2 = sampled_indices[2]
   star3 = sampled_indices[3]
-  star4 = sampled_indices[4]
-  star5 = sampled_indices[5]
-  star6 = sampled_indices[6]
   #p_value = p
   chiSquareTemplate = zeros(r, c)
   chiSquare = []
   
-  for i in 1:6
+  for i in 1:3
     starCatalog[sampled_indices[i]] = Float64.(starCatalog[sampled_indices[i]])
   end
 
-  for i in 1:6
+  for i in 1:3
     chiSquareTemplate = Float64.(starCatalog[sampled_indices[i]]) - pixelGridFits[sampled_indices[i]].^2
     chiSquareTemplate = chiSquareTemplate./var(vec(Float64.(starCatalog[sampled_indices[i]])))
     push!(chiSquare, chiSquareTemplate)                              
   end
 
 
-  hm11 = generate_heatmap_sp(starCatalog[star1], minimum([minimum(starCatalog[star1]), minimum(pixelGridFits[star1])]), maximum([maximum(starCatalog[star1]), maximum(pixelGridFits[star1])]))
-  hm12 = generate_heatmap_sp(pixelGridFits[star1], minimum([minimum(starCatalog[star1]), minimum(pixelGridFits[star1])]), maximum([maximum(starCatalog[star1]), maximum(pixelGridFits[star1])]))
-  hm13 = generate_heatmap_sp(chiSquare[1], minimum(chiSquare[1]), maximum(chiSquare[1]))
+  hm11 = generate_heatmap_sp_t(starCatalog[star1], "Model", minimum([minimum(starCatalog[star1]), minimum(pixelGridFits[star1])]), maximum([maximum(starCatalog[star1]), maximum(pixelGridFits[star1])]))
+  hm12 = generate_heatmap_sp_t(pixelGridFits[star1], "Data", minimum([minimum(starCatalog[star1]), minimum(pixelGridFits[star1])]), maximum([maximum(starCatalog[star1]), maximum(pixelGridFits[star1])]))
+  hm13 = generate_heatmap_sp_t(chiSquare[1], "ChiSquare", minimum(chiSquare[1]), maximum(chiSquare[1]))
   
   hm21 = generate_heatmap_sp(starCatalog[star2], minimum([minimum(starCatalog[star2]), minimum(pixelGridFits[star2])]), maximum([maximum(starCatalog[star2]), maximum(pixelGridFits[star2])]))
   hm22 = generate_heatmap_sp(pixelGridFits[star2], minimum([minimum(starCatalog[star2]), minimum(pixelGridFits[star2])]), maximum([maximum(starCatalog[star2]), maximum(pixelGridFits[star2])]))
@@ -221,7 +234,7 @@ function plot_hm()#p
   hm31 = generate_heatmap_sp(starCatalog[star3], minimum([minimum(starCatalog[star3]), minimum(pixelGridFits[star3])]), maximum([maximum(starCatalog[star3]), maximum(pixelGridFits[star3])]))
   hm32 = generate_heatmap_sp(pixelGridFits[star3], minimum([minimum(starCatalog[star3]), minimum(pixelGridFits[star3])]), maximum([maximum(starCatalog[star3]), maximum(pixelGridFits[star3])]))
   hm33 = generate_heatmap_sp(chiSquare[3], minimum(chiSquare[3]), maximum(chiSquare[3]))
-
+#=
   hm41 = generate_heatmap_sp(starCatalog[star4], minimum([minimum(starCatalog[star1]), minimum(pixelGridFits[star4])]), maximum([maximum(starCatalog[star4]), maximum(pixelGridFits[star4])]))
   hm42 = generate_heatmap_sp(pixelGridFits[star4], minimum([minimum(starCatalog[star4]), minimum(pixelGridFits[star4])]), maximum([maximum(starCatalog[star4]), maximum(pixelGridFits[star4])]))
   hm43 = generate_heatmap_sp(chiSquare[4], minimum(chiSquare[4]), maximum(chiSquare[4]))
@@ -233,14 +246,18 @@ function plot_hm()#p
   hm61 = generate_heatmap_sp(starCatalog[star6], minimum([minimum(starCatalog[star6]), minimum(pixelGridFits[star6])]), maximum([maximum(starCatalog[star6]), maximum(pixelGridFits[star6])]))
   hm62 = generate_heatmap_sp(pixelGridFits[star6], minimum([minimum(starCatalog[star6]), minimum(pixelGridFits[star6])]), maximum([maximum(starCatalog[star6]), maximum(pixelGridFits[star6])]))
   hm63 = generate_heatmap_sp(chiSquare[6], minimum(chiSquare[6]), maximum(chiSquare[6]))
-
+=#
   fftmin = minimum(fft_image)       
   fftmax = maximum(fft_image) 
 
   hm8 = generate_heatmap_titled(fft_image, "FFT Residuals", fftmin, fftmax)
-  s1 = Plots.surface(starCatalog[star3], colorbar = false)
-  s2 = Plots.surface(pixelGridFits[star3], colorbar = false)
-  s3 = Plots.surface(starCatalog[star3] - pixelGridFits[star3], colorbar = false)
+  
+  zmn = minimum([minimum(starCatalog[star3]), minimum(pixelGridFits[star3])])
+  zmx = maximum([maximum(starCatalog[star3]), maximum(pixelGridFits[star3])])
+
+  s1 = Plots.surface(title="Model Star", titlefontsize=30, starCatalog[star3], zlim=(zmn, zmx), colorbar = false)
+  s2 = Plots.surface(title="pixelGridFit", titlefontsize=30, pixelGridFits[star3], zlim=(zmn, zmx), colorbar = false)
+  s3 = Plots.surface(title="Residuals", titlefontsize=30, starCatalog[star3] .- pixelGridFits[star3], zlim=(2*zmn, 2*zmx), colorbar = false)
 
   pk_k = Plots.plot(pk, 
                     xlabel = "k", 
@@ -253,29 +270,21 @@ function plot_hm()#p
                     title = "Power Spectrum", 
                     margin = 25mm)
 
-  title1 = Plots.plot(title = "I(u,v) Model", titlefontsize=30, grid = false, showaxis = false, bottom_margin = -25Plots.px)
-  title2 = Plots.plot(title = "I(u,v) Data", titlefontsize=30, grid = false, showaxis = false, bottom_margin = -25Plots.px)
-  title3 = Plots.plot(title = "Chi-Square Residuals", titlefontsize=30, grid = false, showaxis = false, bottom_margin = -25Plots.px)
+  #title1 = Plots.plot(title = "I(u,v) Model", titlefontsize=30, grid = false, showaxis = false, bottom_margin = -25Plots.px)
+  #title2 = Plots.plot(title = "I(u,v) Data", titlefontsize=30, grid = false, showaxis = false, bottom_margin = -25Plots.px)
+  #title3 = Plots.plot(title = "Chi-Square Residuals", titlefontsize=30, grid = false, showaxis = false, bottom_margin = -25Plots.px)
 
-  Plots.savefig(Plots.plot(title1, title2, title3,
-                           hm11, hm12, hm13, 
+  Plots.savefig(Plots.plot(hm11, hm12, hm13, 
                            hm21, hm22, hm23, 
                            hm31, hm32, hm33, 
-                           hm41, hm42, hm43, 
-                           hm51, hm52, hm53, 
-                           hm61, hm62, hm63, 
-                              layout = (7,3),
-                              size = (1080,1920)), 
+                              layout = (3,3),
+                              size = (1920,1080)), 
                                   joinpath("outdir", "pixelGridFit.pdf"))
   
-  Plots.savefig(Plots.plot(title1, title2, title3,
-                           hm11, hm12, hm13, 
+  Plots.savefig(Plots.plot(hm11, hm12, hm13, 
                            hm21, hm22, hm23, 
                            hm31, hm32, hm33, 
-                           hm41, hm42, hm43, 
-                           hm51, hm52, hm53, 
-                           hm61, hm62, hm63, 
-                              layout = (7,3),
+                              layout = (3,3),
                               size = (1080,1920)), 
                                   joinpath("outdir", "pixelGridFit.png"))
 
@@ -286,14 +295,14 @@ function plot_hm()#p
                            s3, 
                            layout = (1,3),
                            size = (1920,1080)), 
-                           joinpath("outdir", "3dAnalyticFit.pdf"))
+                           joinpath("outdir", "3dPixelGridFit.pdf"))
   
   Plots.savefig(Plots.plot(s1, 
                            s2, 
                            s3, 
                            layout = (1,3),
                            size = (1920,1080)), 
-                           joinpath("outdir", "3dAnalyticFit.png"))
+                           joinpath("outdir", "3dPixelGridFit.png"))
   
   Plots.savefig(Plots.plot(hm8, 
                            pk_k,

@@ -41,7 +41,7 @@ using Images, ImageFiltering
 using Measures
 using ProgressBars
 using UnicodePlots
-
+using Flux
 # ---------------------------------------------------------#
 fancyPrint("Reading .jl Files")
 include("plot.jl")
@@ -60,18 +60,11 @@ fancyPrint("Running Source Extractor")
 
 fancyPrint("Processing Data for Fit")
 starCatalog, r, c, itr = cataloging()
+starCatalog = starCatalog[1:25]
+itr = length(starCatalog)
+
 starData = zeros(r, c)
 
-function sample_indices(array, k)
-    indices = collect(1:length(array))  # Create an array of indices
-    return sample(indices, k, replace = false)
-end
-
-sampled_indices = sort(sample_indices(starCatalog, 6))
-
-println("Sampled indices: ", sampled_indices)
-
-star = starCatalog[1]
 
 A_model = zeros(itr)
 s_model = zeros(itr)
@@ -109,9 +102,30 @@ fancyPrint("Analytic Profile Fit for Model Star")
                              initial_guess, 
                              ConjugateGradient(),
                              Optim.Options(callback = cb))
+      
+      s_model[i] = x_cg.minimizer[1]^2
+      e1_guess = x_cg.minimizer[2]
+      e2_guess = x_cg.minimizer[3]
+
+      ellipticityData = sqrt((e1_guess)^2 + (e2_guess)^2)
+      normGdata = sqrt(1 + 0.5*( (1/ellipticityData^2) - sqrt( (4/ellipticityData^2) + (1/ellipticityData^4)  )  )) 
+      ratioData = ellipticityData/normGdata
+      g1_model[i] = e1_guess/ratioData            
+      g2_model[i] = e2_guess/ratioData  
+  
+      norm_data = zeros(r,c)
+      for u in 1:r
+        for v in 1:c
+          norm_data[u,v] = fGaussian(u, v, g1_model[i], g2_model[i], s_model[i], r/2, c/2)
+        end
+      end
+      A_model[i] = 1/sum(norm_data)
     catch
       println("Star $i failed")
       push!(failedStars, i)
+      s_model[i] = 0
+      g1_model[i] = 0
+      g2_model[i] = 0
       continue
     end
 
@@ -151,25 +165,6 @@ fancyPrint("Analytic Profile Fit for Model Star")
                                   size = (1800,800)),
                                   joinpath("outdir", "lossTimeModel.pdf"))
     end
-    s_model[i] = x_cg.minimizer[1]^2
-    e1_guess = x_cg.minimizer[2]
-    e2_guess = x_cg.minimizer[3]
-
-    ellipticityData = sqrt((e1_guess)^2 + (e2_guess)^2)
-    normGdata = sqrt(1 + 0.5*( (1/ellipticityData^2) - sqrt( (4/ellipticityData^2) + (1/ellipticityData^4)  )  )) 
-    ratioData = ellipticityData/normGdata
-    g1_model[i] = e1_guess/ratioData            
-    g2_model[i] = e2_guess/ratioData  
-  
-    norm_data = zeros(r,c)
-    for u in 1:r
-      for v in 1:c
-        norm_data[u,v] = fGaussian(u, v, g1_model[i], g2_model[i], s_model[i], r/2, c/2)
-      end
-    end
-    A_model[i] = 1/sum(norm_data)
-    #println("\t Found A: ", A_model[i], "\t s: ", s_model[i]^2, "\t g1: ", g1_model[i], "\t g2: ", g2_model[i])
-    #println(global stars)
   end
 end
 
@@ -191,8 +186,53 @@ pixelGridFits = []
   for i in pb
     set_description(pb, "Star $i/$itr Complete")
     global iteration = i
-    pg = optimize(pgCost, pg_g!, zeros(r*c), ConjugateGradient())
-    push!(pixelGridFits ,reshape(pg.minimizer, (r, c)))
+    encoder = Chain(
+                    Dense(r*c, 128, relu),
+                    Dense(128, 64, relu),
+                    Dense(64, 32, relu),
+                   )
+    # Define the decoder
+    decoder = Chain(
+                    Dense(32, 64, relu),
+                    Dense(64, 128, relu),
+                    Dense(128, r*c, sigmoid),
+                   )
+  
+    # Define the full autoencoder
+    autoencoder = Chain(encoder, decoder)
+
+    # Define the loss function (mean squared error)
+    loss(autoencoder, x, x̂) = Flux.mse(autoencoder(x), x̂)
+  
+    # Format some random image data
+    data = reshape(starCatalog[i], length(starCatalog[i]))
+  
+    #opt = ADAM()
+    opt = Flux.setup(Adam(), autoencoder)
+   
+    # Train the autoencoder
+    try
+      for epoch in 1:1000
+        Flux.train!(loss, autoencoder, [(data, data)], opt) #Flux.params(autoencoder))
+      end
+      # Take a sample input image
+      input_image = reshape(starCatalog[i], length(starCatalog[i]))
+  
+      # Pass the input image through the autoencoder to get the reconstructed image
+      reconstructed_image = autoencoder(input_image)
+
+      #pg = optimize(pgCost, pg_g!, rand(r*c), ConjugateGradient())
+      #push!(pixelGridFits ,reshape(pg.minimizer, (r, c)))
+      push!(pixelGridFits, reshape(reconstructed_image, (r, c)))
+    catch
+      println("Star $i failed")
+      push!(failedStars, i)
+      push!(pixelGridFits, zeros(r,c))
+      continue
+    end
+
+ 
+  
   end
 end
 
@@ -223,9 +263,30 @@ fancyPrint("Analytic Profile Fit for Learned Star")
                              initial_guess, 
                              ConjugateGradient(),
                              Optim.Options(callback = cb))
+    
+      s_data[i] = y_cg.minimizer[1]^2
+      e1_guess = y_cg.minimizer[2]
+      e2_guess = y_cg.minimizer[3]
+
+      ellipticityData = sqrt((e1_guess)^2 + (e2_guess)^2)
+      normGdata = sqrt(1 + 0.5*( (1/ellipticityData^2) - sqrt( (4/ellipticityData^2) + (1/ellipticityData^4)  )  )) 
+      ratioData = ellipticityData/normGdata
+      g1_data[i] = e1_guess/ratioData            
+      g2_data[i] = e2_guess/ratioData  
+      
+      norm_data = zeros(r,c)
+      for u in 1:r
+        for v in 1:c
+          norm_data[u,v] = fGaussian(u, v, g1_data[i], g2_data[i], s_data[i], r/2, c/2)
+        end
+      end
+      A_data[i] = 1/sum(norm_data)
     catch
       println("Star $i failed")
       push!(failedStars, i)
+      s_data[i] = 0
+      g1_data[i] = 0
+      g2_data[i] = 0
       continue
     end
 
@@ -265,23 +326,6 @@ fancyPrint("Analytic Profile Fit for Learned Star")
                                joinpath("outdir", "lossTimeData.pdf"))
     end
 
-    s_data[i] = y_cg.minimizer[1]^2
-    e1_guess = y_cg.minimizer[2]
-    e2_guess = y_cg.minimizer[3]
-
-    ellipticityData = sqrt((e1_guess)^2 + (e2_guess)^2)
-    normGdata = sqrt(1 + 0.5*( (1/ellipticityData^2) - sqrt( (4/ellipticityData^2) + (1/ellipticityData^4)  )  )) 
-    ratioData = ellipticityData/normGdata
-    g1_data[i] = e1_guess/ratioData            
-    g2_data[i] = e2_guess/ratioData  
-    
-    norm_data = zeros(r,c)
-    for u in 1:r
-      for v in 1:c
-        norm_data[u,v] = fGaussian(u, v, g1_data[i], g2_data[i], s_data[i], r/2, c/2)
-      end
-    end
-    A_data[i] = 1/sum(norm_data)
     #println("\t Found A: ", A_data[i], "\t s: ", s_data[i]^2, "\t g1: ", g1_data[i], "\t g2: ", g2_data[i])
 
   end
@@ -295,7 +339,7 @@ analyticModel = zeros(r, c)
 
 for u in 1:r
   for v in 1:c
-    analyticModel[u,v] = fGaussian(u, v, g1_model[100], g2_model[100], s_model[100], r/2, c/2)
+    analyticModel[u,v] = fGaussian(u, v, g1_model[10], g2_model[10], s_model[10], r/2, c/2)
   end
 end
 A_model = 1/sum(analyticModel)
@@ -306,7 +350,7 @@ for u in 1:r
   end
 end
 
-Residuals = starCatalog[100] - starData
+Residuals = starCatalog[10] - starData
 costSquaredError = Residuals.^2 
 
 fft_image = fft(complex.(Residuals))
@@ -330,6 +374,28 @@ p = string(p)
 println("p-value: ", p, "\n")
 =#
 
+failedStars = unique(failedStars)
+
+for i in sort(failedStars, rev=true)
+  splice!(starCatalog, i)
+  splice!(pixelGridFits, i)
+  splice!(s_model, i)
+  splice!(s_data, i)
+  splice!(g1_model, i)
+  splice!(g1_data, i)
+  splice!(g2_model, i)
+  splice!(g2_data, i)
+end
+
+function sample_indices(array, k)
+    indices = collect(1:length(array))  # Create an array of indices
+    return sample(indices, k, replace = false)
+end
+
+sampled_indices = sort(sample_indices(starCatalog, 3))
+
+println("Sampled indices: ", sampled_indices)
+
 plot_hm()
 plot_hist()
 plot_err()
@@ -350,11 +416,15 @@ println(UnicodePlots.histogram(g1_data, vertical=true, title="Histogram of g1 da
 println(UnicodePlots.histogram(g2_model, vertical=true, title="Histogram of g2 model"))
 println(UnicodePlots.histogram(g2_data, vertical=true, title="Histogram of g2 data"))
 =#
-starSample = rand(1:itr)
+starSample = rand(1:(itr - length(failedStars)))
 a = starCatalog[starSample]
 b = pixelGridFits[starSample]
-println(UnicodePlots.heatmap(a, colormap=:inferno, title="Heatmap of star $starSample"))
-println(UnicodePlots.heatmap(b, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
+
+cmx = maximum([maximum(a), maximum(b)])
+cmn = minimum([minimum(a), minimum(b)])
+
+println(UnicodePlots.heatmap(a, cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of star $starSample"))
+println(UnicodePlots.heatmap(b, cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
 println(UnicodePlots.heatmap(a - b, colormap=:inferno, title="Heatmap of Residuals"))
 # ---------------------------------------------------------#
 fancyPrint("Done! =]")
