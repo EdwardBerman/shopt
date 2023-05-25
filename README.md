@@ -55,7 +55,7 @@ Not all of these will be strictly necessary depending on the checkplots you prod
 | SpecialFunctions |          |          | ImageFiltering |
 | Optim            |          |          | DataFrames     |
 | IterativeSolvers |          |          | PyCall         |
-| QuadGK           |          |          |                |
+| QuadGK           |          |          | Flux           |
 
 ### Set Up
 The dependencies can be installed in the Julia REPL. For example:
