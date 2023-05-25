@@ -62,7 +62,8 @@ The dependencies can be installed in the Julia REPL. For example:
 ```julia
 import Pkg; Pkg.add("PyCall")
 ```
-For calculating rho statistics we need to use the treecorr library. Thankfully, the setup for this is still pretty straightfoward even if the wrapper for Python code doesn't work out of the box. In the Julia REPL, you may have do the following to ensure that the Python portion works:
+For some functionality we need to use wrappers for Python code, such as calculating rho statistics or reading in fits files. Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. If the Python snippets throw an error, run the following in the Julia REPL:
+
 ```julia
 using PyCall
 pyimport("treecorr")
