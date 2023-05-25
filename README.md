@@ -11,12 +11,14 @@ theme: Hacker
 Currently, the inputs are JWST Point Spread Functions source catalogs. The current outputs are images of these Point Spread Functions, Learned Analytic Fits, Learned Pixel Grid Fits, Residual Maps, Loss versus iteration charts, and p-value statisitcs. Not all functionality is working in its current state. Planned functionality for more Shear checkplots.
 
 ### Inputs
+
 | Image                     | Description                        |
 |---------------------------|------------------------------------|
 | ![image](outdir/test.png) | Perfectly Simulated PSF by webbpsf |
 
 
 ### Outputs
+
 | Image                                              | Description                                                                                                                         |
 |----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | ![image](READMEassets/lossTimeModel.png)           | Loss versus iteration for matching analytic profile to the Model Star                                                               |
