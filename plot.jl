@@ -278,14 +278,16 @@ function plot_hm()#p
                            hm21, hm22, hm23, 
                            hm31, hm32, hm33, 
                               layout = (3,3),
+                              widths=ones(9),
                               size = (1920,1080)), 
                                   joinpath("outdir", "pixelGridFit.pdf"))
   
   Plots.savefig(Plots.plot(hm11, hm12, hm13, 
                            hm21, hm22, hm23, 
                            hm31, hm32, hm33, 
-                              layout = (3,3),
-                              size = (1080,1920)), 
+                           layout = (3,3),
+                           widths=ones(9),
+                              size = (1920,1080)), 
                                   joinpath("outdir", "pixelGridFit.png"))
 
   #Plots.savefig(Plots.plot(hm, hm6, hm7, layout = (1,3), size = (1920,1080)), joinpath("outdir", "pixelGridFit.pdf"))
