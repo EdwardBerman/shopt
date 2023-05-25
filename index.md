@@ -12,7 +12,7 @@ Currently, the inputs are JWST Point Spread Functions source catalogs. The curre
 
 | Image                             | Description                        |
 |-----------------------------------|------------------------------------|
-| ![image](READMEassets/sample.png) | Perfectly Simulated PSF by webbpsf |
+| ![image](READMEassets/sample.png) | Model Star, Pixel Fit, Residuals   |
 
 
 ### Outputs
