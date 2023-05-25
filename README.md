@@ -9,21 +9,22 @@ theme: Hacker
 Currently, the inputs are JWST Point Spread Functions source catalogs. The current outputs are images of these Point Spread Functions, Learned Analytic Fits, Learned Pixel Grid Fits, Residual Maps, Loss versus iteration charts, and p-value statisitcs. Not all functionality is working in its current state. Planned functionality for more Shear checkplots.
 
 ### Inputs
-| Image      | Description         |
-|------------|---------------------|
-|  ![image](outdir/test.png) | Perfectly Simulated PSF by webbpsf |
+| Image                   | Description                     |
+|-------------------------|---------------------------------|
+| ![image](outdir/test.png) | Perfectly Simulated PSF by webbpsf |
+
 
 ### Outputs
-| Image      | Description         |
-|------------|---------------------|
-| ![image](READMEassets/lossTimeModel.png) | Loss versus iteration for matching analytic profile to the Model Star |
-| ![image](READMEassets/lossTimeData.png)  | Loss versus iteration for matching analytic profile to the Star Learned by a Pixel Grid Fit |
-| ![image](READMEassets/3dAnalyticFit.png) | 3D map to easily show where PSF is over and under subtracted |
-| ![image](READMEassets/pixelGridFit.png) | Pixel Grid fit for Model Star |
-| ![image](READMEassets/parametersHistogram.png) | Histogram for learned profiles for each star in an analytic fit with their residuals |
-| ![image](READMEassets/parametersScatterplot.png) | Same data recorded as a scatterplot with and without outliers removed and with error bars |
-| ![image](READMEassets/fftResiduals.png) | The complex magnitude squared of each pixel of the fourier transform of the residual map side by side with the Power spectrum graph | 
-| ![image](READMEassets/shoptFile.png) | An image of the output .shopt file (a wrapper for a DataFrame turned into a CSV) | 
+| Image                                              | Description                                                                  |
+|----------------------------------------------------|------------------------------------------------------------------------------|
+| ![image](READMEassets/lossTimeModel.png)           | Loss versus iteration for matching analytic profile to the Model Star         |
+| ![image](READMEassets/lossTimeData.png)            | Loss versus iteration for matching analytic profile to the Star Learned by a Pixel Grid Fit |
+| ![image](READMEassets/3dAnalyticFit.png)           | 3D map to easily show where PSF is over and under subtracted                   |
+| ![image](READMEassets/pixelGridFit.png)            | Pixel Grid fit for Model Star                                                 |
+| ![image](READMEassets/parametersHistogram.png)     | Histogram for learned profiles for each star in an analytic fit with their residuals |
+| ![image](READMEassets/parametersScatterplot.png)   | Same data recorded as a scatterplot with and without outliers removed and with error bars |
+| ![image](READMEassets/fftResiduals.png)            | The complex magnitude squared of each pixel of the Fourier transform of the residual map side by side with the Power spectrum graph |
+| ![image](READMEassets/shoptFile.png)               | An image of the output .shopt file (a wrapper for a DataFrame turned into a CSV) |
 
 ## Running
 ### Command
