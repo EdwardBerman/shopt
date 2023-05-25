@@ -1,6 +1,3 @@
----
-theme: Hacker
----
 
 ## About
  [![License](https://img.shields.io/pypi/l/jax-cosmo)](https://github.com/EdwardBerman/shopt/blob/main/LICENSE) [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors)
@@ -160,5 +157,5 @@ _config.yml
 ## Further Acknowledgements                                                                                                             
 + The Northeastern Cosmology Group for Their Continued Support and Guidance                                                           
 + The Northeastern Physics Department and Northeastern Undergraduate Research and Fellowships, for making this project possible with funding from the Northeastern Physics Co-Op Fellowship and PEAK Ascent Award respectively   
-+ David Rosen, who gave valuable input in the early stages of this project and during his course Math 7223, Riemannian Optimization
++ [David Rosen](https://github.com/david-m-rosen), who gave valuable input in the early stages of this project and during his course Math 7223, Riemannian Optimization
 
