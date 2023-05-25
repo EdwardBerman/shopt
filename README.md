@@ -138,6 +138,11 @@ LICENSE
 README.md
 > User guide, Dependencies, etc.
 
+index.md
+> For official website
+
+_config.yml
+> Also for official website
 
 ## Known Issues
 + Need to take stamps of images to focus on the actual PSF 
@@ -151,5 +156,6 @@ README.md
 
 ## Further Acknowledgements                                                                                                             
 + The Northeastern Cosmology Group for Their Continued Support and Guidance                                                           
++ The Northeastern Physics Department and Northeastern Undergraduate Research and Fellowships, for making this project possible with funding from the Northeastern Physics Co-Op Fellowship and PEAK Ascent Award respectively   
 + David Rosen, who gave valuable input in the early stages of this project and during his course Math 7223, Riemannian Optimization
 
