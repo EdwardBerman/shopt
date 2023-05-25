@@ -148,3 +148,8 @@ README.md
 ## Contributors
 + Edward Berman
 + Jacqueline McCleary
+
+## Further Acknowledgements                                                                                                             
++ The Northeastern Cosmology Group for Their Continued Support and Guidance                                                           
++ David Rosen, who gave valuable input in the early stages of this project and during his course Math 7223, Riemannian Optimization
+
