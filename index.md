@@ -61,7 +61,7 @@ The dependencies can be installed in the Julia REPL. For example:
 import Pkg; Pkg.add("PyCall")
 ```
 
-For some functionality we need to use wrappers for Python code, such as calculating rho statistics or reading in fits files. Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. If the Python snippets throw an error, run the following in the Julia REPL:          
+For some functionality we need to use wrappers for Python code, such as calculating rho statistics or reading in fits files. Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. If the Python snippets throw an error, run the following in the Julia REPL for each Python Library:          
 
 ```julia
 using PyCall
