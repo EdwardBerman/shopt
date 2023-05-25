@@ -10,9 +10,9 @@ Currently, the inputs are JWST Point Spread Functions source catalogs. The curre
 
 ### Inputs
 
-| Image                     | Description                        |
-|---------------------------|------------------------------------|
-| ![image](outdir/test.png) | Perfectly Simulated PSF by webbpsf |
+| Image                             | Description                        |
+|-----------------------------------|------------------------------------|
+| ![image](READMEassets/sample.png) | Perfectly Simulated PSF by webbpsf |
 
 
 ### Outputs
