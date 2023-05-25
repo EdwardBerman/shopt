@@ -20,7 +20,7 @@ Currently, the inputs are JWST Point Spread Functions source catalogs. The curre
 | Image                                              | Description                                                                                                                         |
 |----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | ![image](READMEassets/pgf9.png)                    | Pixel Grid Fit for the Star Above                                                                                                   |
-| ![image](READMEassets/hmresid.png)                 | Pixel Grid Fit for the Star Above                                                                                                   |
+| ![image](READMEassets/hmresid.png)                 | Residual Map for Above Model and Fit                                                                                                |
 | ![image](READMEassets/lossTimeModel.png)           | Loss versus iteration for matching analytic profile to the Model Star                                                               |
 | ![image](READMEassets/lossTimeData.png)            | Loss versus iteration for matching analytic profile to the Star Learned by a Pixel Grid Fit                                         |
 | ![image](READMEassets/3dAnalyticFit.png)           | 3D map to easily show where PSF is over and under subtracted                                                                        |
