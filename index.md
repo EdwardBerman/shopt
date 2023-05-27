@@ -5,6 +5,15 @@
 
 **Shear Optimization** with **Shopt.jl**, a julia library for empirical point spread function characterizations. We aim to improve upon the current state of Point Spread Function Modeling by using Julia to leverage performance gains, use a different mathematical formulation than the literature to provide more robust analytic and pixel grid fits, improve the diagnostic plots, and add features such as wavelets and shapelets. At this projects conclusion we will compare to existing software such as PIFF and PSFex. Work done under [McCleary's Group](https://github.com/mcclearyj).
 
+### Analytic Profile Fits
+We adopt the following reparameterization to ensure our gradient steps never take us outside of our constraints
+
+
+### Pixel Grid Fits
+For doing Pixel Grid Fits we use an autoencoder model to reconstruct the Star
+![Alternative Text](READMEassets/nn.svg)
+
+
 ## Inputs and Outputs
 Currently, the inputs are JWST Point Spread Functions source catalogs. The current outputs are images of these Point Spread Functions, Learned Analytic Fits, Learned Pixel Grid Fits, Residual Maps, Loss versus iteration charts, and p-value statisitcs. Not all functionality is working in its current state. Planned functionality for more Shear checkplots.
 
