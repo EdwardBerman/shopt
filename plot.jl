@@ -292,13 +292,15 @@ function plot_hm()#p
 
   #Plots.savefig(Plots.plot(hm, hm6, hm7, layout = (1,3), size = (1920,1080)), joinpath("outdir", "pixelGridFit.pdf"))
   
+  #=
   Plots.savefig(Plots.plot(s1, 
                            s2, 
                            s3, 
                            layout = (1,3),
                            size = (1920,1080)), 
                            joinpath("outdir", "3dPixelGridFit.pdf"))
-  
+  =#
+
   Plots.savefig(Plots.plot(s1, 
                            s2, 
                            s3, 

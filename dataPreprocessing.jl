@@ -5,7 +5,7 @@ function cataloging()
   import numpy as np
   from astropy.io import fits
   from astropy.table import Table, hstack, vstack
-  f = fits.open('/home/eddieberman/research/mcclearygroup/shopt/datadir/mosaic_nircam_f444w_COSMOS-Web_60mas_v0_1_starcat.fits')
+  f = fits.open('/home/eddieberman/research/mcclearygroup/mosaic_nircam_f444w_COSMOS-Web_60mas_v0_1_starcat.fits')
   vignets = f[1].data['VIGNET']
   l = len(vignets)
   """
