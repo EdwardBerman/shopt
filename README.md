@@ -9,7 +9,7 @@ We adopt the following reparameterization to ensure our gradient steps never tak
                                                                                                                            
 ### Pixel Grid Fits                                                                                                        
 For doing Pixel Grid Fits we use an autoencoder model to reconstruct the Star                                              
-![Alternative Text](READMEassets/nn.svg) 
+![image](READMEassets/nn.png) 
 
 ## Inputs and Outputs
 Currently, the inputs are JWST Point Spread Functions source catalogs. The current outputs are images of these Point Spread Functions, Learned Analytic Fits, Learned Pixel Grid Fits, Residual Maps, Loss versus iteration charts, and p-value statisitcs. Not all functionality is working in its current state. Planned functionality for more Shear checkplots.
