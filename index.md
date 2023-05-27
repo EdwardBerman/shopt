@@ -10,7 +10,6 @@ We adopt the following procedure to ensure our gradient steps never take us outs
 
 ![image](READMEassets/reparameterization.png)
 
-
 ### Pixel Grid Fits                                                                                                        
 For doing Pixel Grid Fits we use an autoencoder model to reconstruct the Star
 ![image](READMEassets/nn.png)
