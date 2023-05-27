@@ -1,4 +1,4 @@
- [About](#about) | [Inputs and Outputs](#inputsandoutputs) | [Running](#running) | [Program Architecture](#programarchitecture) | [Known Issues](#knownissues) | [Contributors](#contributors) | [Further Acknowledgements](#furtheracknowledgements)
+ [About](#about) | [Inputs and Outputs](#inputs-and-outputs) | [Running](#running) | [Program Architecture](#program-architecture) | [Known Issues](#known-issues) | [Contributors](#contributors) | [Further Acknowledgements](#further-acknowledgements)
 
 
 ## About
