@@ -9,9 +9,9 @@
 We adopt the following reparameterization to ensure our gradient steps never take us outside of our constraints
 
 
-### Pixel Grid Fits
+### Pixel Grid Fits                                                                                                        
 For doing Pixel Grid Fits we use an autoencoder model to reconstruct the Star
-![Alternative Text](READMEassets/nn.svg)
+![image](READMEassets/nn.png)
 
 
 ## Inputs and Outputs
