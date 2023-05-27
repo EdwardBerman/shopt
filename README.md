@@ -1,9 +1,10 @@
-|                  |                            |              |                        |              |             |                           |
-|------------------|----------------------------|--------------|------------------------|--------------|-------------|---------------------------|
-| [About](#about)             | [Inputs and Outputs](#inputs-and-outputs) | [Running](#running) | [Program Architecture](#program-architecture) | [Known Issues](#known-issues) | [Contributors](#contributors) | [Further Acknowledgements](#further-acknowledgements) |
-| [Analytic Profile Fits](#apf) | [Inputs](#inputs) | [Command](#cmd)| | | | |
-| [Pixel Grid Fits](#pgf) | [Outputs](#outputs) | [Dependencies](#dpnd) | | | | |
-|  | | [Set Up](#su) | | | | |
+| |                  |                            |              |                        |              |             |                           |
+|-|------------------|----------------------------|--------------|------------------------|--------------|-------------|---------------------------|
+| | [About](#about)             | [Inputs and Outputs](#inputs-and-outputs) | [Running](#running) | [Program Architecture](#program-architecture) | [Known Issues](#known-issues) | [Contributors](#contributors) | [Further Acknowledgements](#further-acknowledgements) |
+| | | | | | | | |
+|(1) | [Analytic Profile Fits](#apf) | [Inputs](#inputs) | [Command](#cmd)| | | | |
+|(2)| [Pixel Grid Fits](#pgf) | [Outputs](#outputs) | [Dependencies](#dpnd) | | | | |
+|(3) |  | | [Set Up](#su) | | | | |
 
 ## About
  [![License](https://img.shields.io/pypi/l/jax-cosmo)](https://github.com/EdwardBerman/shopt/blob/main/LICENSE) [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors)
