@@ -1,36 +1,28 @@
-| |                  |                            |              |                        |              |             |                           |
-|-|------------------|----------------------------|--------------|------------------------|--------------|-------------|---------------------------|
-| | [About](#about)             | [Inputs and Outputs](#inputs-and-outputs) | [Running](#running) | [Program Architecture](#program-architecture) | [Known Issues](#known-issues) | [Contributors](#contributors) | [Further Acknowledgements](#further-acknowledgements) |
-| | | | | | | | |
-|(1) | [Analytic Profile Fits](#apf) | [Inputs](#inputs) | [Command](#cmd)| | | | |
-|(2)| [Pixel Grid Fits](#pgf) | [Outputs](#outputs) | [Dependencies](#dpnd) | | | | |
-|(3) |  | | [Set Up](#su) | | | | |
-
 ## About
  [![License](https://img.shields.io/pypi/l/jax-cosmo)](https://github.com/EdwardBerman/shopt/blob/main/LICENSE) [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors)
 
 **Shear Optimization** with **Shopt.jl**, a julia library for empirical point spread function characterizations. We aim to improve upon the current state of Point Spread Function Modeling by using Julia to leverage performance gains, use a different mathematical formulation than the literature to provide more robust analytic and pixel grid fits, improve the diagnostic plots, and add features such as wavelets and shapelets. At this projects conclusion we will compare to existing software such as PIFF and PSFex. Work done under [McCleary's Group](https://github.com/mcclearyj).
 
-### Analytic Profile Fits {#apf}
+### Analytic Profile Fits 
 We adopt the following procedure to ensure our gradient steps never take us outside of our constraints
 
 ![image](READMEassets/reparameterization.png)
 
-### Pixel Grid Fits {#pgf}                                                                                                       
+### Pixel Grid Fits                                                                                                        
 For doing Pixel Grid Fits we use an autoencoder model to reconstruct the Star                                              
 ![image](READMEassets/nn.png) 
 
 ## Inputs and Outputs
 Currently, the inputs are JWST Point Spread Functions source catalogs. The current outputs are images of these Point Spread Functions, Learned Analytic Fits, Learned Pixel Grid Fits, Residual Maps, Loss versus iteration charts, and p-value statisitcs. Not all functionality is working in its current state. Planned functionality for more Shear checkplots.
 
-### Inputs {#inputs}
+### Inputs 
 
 | Image                             | Description                        |
 |-----------------------------------|------------------------------------|
 | ![image](READMEassets/input.png)  | Star Taken From Input Catalog      |
 
 
-### Outputs {#outputs}
+### Outputs
 
 | Image                                              | Description                                                                                                                         |
 |----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
@@ -46,7 +38,7 @@ Currently, the inputs are JWST Point Spread Functions source catalogs. The curre
 | ![image](READMEassets/shoptFile.png)               | An image of the output .shopt file (a wrapper for a DataFrame turned into a CSV)                                                    |
 
 ## Running
-### Command {#cmd}
+### Command 
 To run `shopt.jl`
 
 First use Source Extractor to create a catalog for Shopt to accept and save this catalog in the appropriate directory
@@ -55,7 +47,7 @@ Run ```julia shopt.jl [configdir] [outdir] [datadir]```
 
 There is also a shell script that runs this command so that the user may call shopt from a larger program they are running
 
-### Dependencies {#dpnd}
+### Dependencies 
 Not all of these will be strictly necessary depending on the checkplots you produce, but for full functionality of Shopt the following are necessary. Source Extractor is also not a strict dependency, but in practice one will inevitably install.
 
 | Julia            | Python   | Binaries | Julia          |
@@ -70,7 +62,7 @@ Not all of these will be strictly necessary depending on the checkplots you prod
 | IterativeSolvers |          |          | PyCall         |
 | QuadGK           |          |          | Flux           |
 
-### Set Up {#su}
+### Set Up 
 The dependencies can be installed in the Julia REPL. For example:
 ```julia
 import Pkg; Pkg.add("PyCall")
