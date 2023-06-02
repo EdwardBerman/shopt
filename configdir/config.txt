@@ -1,9 +1,0 @@
-#Radial Profile
-#Pixel Sampling
-#SnR
-# Which Checkplots to output
-# Catalog / Image Names
-# Overrides to config file
-#print statements
-#Unicode Plots
-#Epochs
