@@ -53,14 +53,17 @@ include("outliers.jl")
 include("dataOutprocessing.jl")
 include("powerSpectrum.jl")
 include("kaisserSquires.jl")
+include("webbpsfProcessing.jl")
 
 # ---------------------------------------------------------#
 fancyPrint("Running Source Extractor")
 # ---------------------------------------------------------#
 
 fancyPrint("Processing Data for Fit")
-starCatalog, r, c, itr = cataloging()
+starCatalog, errVignets, r, c, itr = cataloging(ARGS)
 starCatalog = starCatalog[1:25]
+#starCatalog, r,c, itr = catalogingWEBBPSF()
+#errVignets = errVignets[1:25]
 itr = length(starCatalog)
 
 starData = zeros(r, c)
@@ -203,7 +206,11 @@ pixelGridFits = []
 
     # Define the loss function (mean squared error)
     loss(autoencoder, x, x̂) = Flux.mse(autoencoder(x), x̂)
-  
+    
+    function relative_error_loss(autoencoder, x, x̂)
+      relative_error = abs.(x - autoencoder(x̂)) ./ (x .+ 1e-10)  # Add a small value to avoid division by zero
+      mean(relative_error)
+    end
     # Format some random image data
     data = reshape(starCatalog[i], length(starCatalog[i]))
   
@@ -213,7 +220,7 @@ pixelGridFits = []
     # Train the autoencoder
     try
       for epoch in 1:1000
-        Flux.train!(loss, autoencoder, [(data, data)], opt) #Flux.params(autoencoder))
+        Flux.train!(loss, autoencoder, [(data, data)], opt) #loss #Flux.params(autoencoder))
       end
       # Take a sample input image
       input_image = reshape(starCatalog[i], length(starCatalog[i]))
@@ -223,7 +230,8 @@ pixelGridFits = []
 
       #pg = optimize(pgCost, pg_g!, rand(r*c), ConjugateGradient())
       #push!(pixelGridFits ,reshape(pg.minimizer, (r, c)))
-      push!(pixelGridFits, reshape(reconstructed_image, (r, c)))
+      pgf_current = reshape(reconstructed_image, (r, c))./sum(reshape(reconstructed_image, (r, c)))
+      push!(pixelGridFits, pgf_current)
     catch
       println("Star $i failed")
       push!(failedStars, i)
@@ -378,6 +386,7 @@ failedStars = unique(failedStars)
 
 for i in sort(failedStars, rev=true)
   splice!(starCatalog, i)
+  splice!(errVignets, i)
   splice!(pixelGridFits, i)
   splice!(s_model, i)
   splice!(s_data, i)
@@ -423,13 +432,39 @@ b = pixelGridFits[starSample]
 cmx = maximum([maximum(a), maximum(b)])
 cmn = minimum([minimum(a), minimum(b)])
 
-println(UnicodePlots.heatmap(a, cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of star $starSample"))
-println(UnicodePlots.heatmap(b, cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
-println(UnicodePlots.heatmap(a - b, colormap=:inferno, title="Heatmap of Residuals"))
+function get_middle_15x15(array::Array{T, 2}) where T
+    rows, cols = size(array)
+    row_start = div(rows, 2) - 7
+    col_start = div(cols, 2) - 7
+    
+    return array[row_start:(row_start+14), col_start:(col_start+14)]
+end
+
+
+println(UnicodePlots.heatmap(get_middle_15x15(a), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of star $starSample"))
+println(UnicodePlots.heatmap(get_middle_15x15(b), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
+println(UnicodePlots.heatmap(get_middle_15x15(a - b), colormap=:inferno, title="Heatmap of Residuals"))
 # ---------------------------------------------------------#
 fancyPrint("Done! =]")
-#=
+
 using CairoMakie
+
+function nanMask(arr)
+  dummyArr = zeros(size(arr,1),size(arr,2))
+  for i in 1:size(arr,1)
+    for j in 1:size(arr,2)
+      if arr[i,j] < 0
+        dummyArr[i,j] = NaN
+      else
+        dummyArr[i,j] = arr[i,j]
+      end
+    end
+  end
+  return dummyArr
+end
+
+a = nanMask(a)
+b = nanMask(b)
 
 let
     # cf. https://github.com/JuliaPlots/Makie.jl/issues/822#issuecomment-769684652
@@ -448,7 +483,8 @@ let
         vals
     end
     custom_formatter(values) = map(v -> "10" * Makie.UnicodeFun.to_superscript(round(Int64, v    )), values)
-      data = star
+      data = a
+      starData = b
       fig = Figure(resolution = (1800, 1800))
       ax_a, hm = CairoMakie.heatmap(fig[1, 1], log10.(data),
       axis=(; xminorticksvisible=true,
@@ -464,7 +500,7 @@ let
       ax_b.ylabel = "V"
       ax_b.aspect = DataAspect()
     
-      ax_c, hm = CairoMakie.heatmap(fig[1, 3], log10.(abs.(star - starData)),
+      ax_c, hm = CairoMakie.heatmap(fig[1, 3], log10.(abs.(data - starData)),
       axis=(; xminorticksvisible=true,
          xminorticks=IntervalsBetween(9)))
       ax_c.xlabel = "U"
@@ -480,4 +516,4 @@ let
       ax_c.title = "Log Scale Absolute Value of Residuals"
       save(joinpath("outdir", "logScale.pdf"), fig)
 end
-=#
+

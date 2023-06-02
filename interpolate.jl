@@ -19,15 +19,16 @@ interpCost = (p) -> interpCost(p, truth) #truth = pik
 
 
 function polyG!(storage, p)
-  storage[1] = ForwardDiff.gradient(interpCost, p)[1]
-  storage[2] = ForwardDiff.gradient(interpCost, p)[2]
-  storage[3] = ForwardDiff.gradient(interpCost, p)[3]
-  storage[5] = ForwardDiff.gradient(interpCost, p)[4]
-  storage[5] = ForwardDiff.gradient(interpCost, p)[5]
-  storage[6] = ForwardDiff.gradient(interpCost, p)[6]
-  storage[7] = ForwardDiff.gradient(interpCost, p)[7]
-  storage[8] = ForwardDiff.gradient(interpCost, p)[8]
-  storage[9] = ForwardDiff.gradient(interpCost, p)[9]
-  storage[10] = ForwardDiff.gradient(interpCost, p)[10]
+  grad_cost = ForwardDiff.gradient(interpCost, p)
+  storage[1] = grad_cost[1]
+  storage[2] = grad_cost[2]
+  storage[3] = grad_cost[3]
+  storage[4] = grad_cost[4]
+  storage[5] = grad_cost[5]
+  storage[6] = grad_cost[6]
+  storage[7] = grad_cost[7]
+  storage[8] = grad_cost[8]
+  storage[9] = grad_cost[9]
+  storage[10] = grad_cost[10]
 end
 

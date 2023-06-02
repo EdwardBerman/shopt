@@ -6,8 +6,8 @@ outdir
 configdir
 /home/eddieberman/research/mcclearygroup/shopt/configdir
 
+datadir
+/home/eddieberman/research/mcclearygroup/shopt/outdir/mosaic_nircam_f115w_COSMOS-Web_starcat.fits
 
-
-
-
-
+run shopt
+julia shopt.jl /home/eddieberman/research/mcclearygroup/shopt/configdir /home/eddieberman/research/mcclearygroup/shopt/outdir /home/eddieberman/research/mcclearygroup/shopt/outdir/mosaic_nircam_f115w_COSMOS-Web_starcat.fits

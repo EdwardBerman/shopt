@@ -119,8 +119,8 @@ function plot_err()
                    [std(s_model)/sqrt(n_s), std(g1_model)/sqrt(n_g1), std(g2_model)/sqrt(n_g2)],
                    [std(s_data)/sqrt(n_sD), std(g1_data)/sqrt(n_g1D), std(g2_data)/sqrt(n_g2D)],
                    "Learned vs True Parameters Outliers Removed")
-  Plots.savefig(Plots.plot(ps1, ps2, layout=(1,2), size = (1920, 1080)), joinpath("outdir", "parametersScatterplot.pdf"))
-  Plots.savefig(Plots.plot(ps1, ps2, layout=(1,2), size = (1920, 1080)), joinpath("outdir", "parametersScatterplot.png"))
+  Plots.savefig(Plots.plot(ps1, size = (1920, 1080)), joinpath("outdir", "parametersScatterplot.pdf"))
+  Plots.savefig(Plots.plot(ps1, size = (1920, 1080)), joinpath("outdir", "parametersScatterplot.png"))
 end
 
 function hist_1(x::Array{T, 1}, y::Array{T, 1}, t1, t2) where T<:Real
@@ -167,7 +167,7 @@ function plot_hist()
   hist2 = hist_2(g1_model, g1_data, "g1 Model", "g1 Data")
   hist3 = hist_2(g2_model, g2_data, "g2 Model", "g2 Data")
   bin_edges = range(-1, stop=1, step=0.1)
-  hist4 = Plots.histogram(s_model - s_data, 
+  hist4 = Plots.histogram(s_model - s_data,
                           alpha=0.5, 
                           label="S Model and Data Residuals")
   hist5 = Plots.histogram(g1_model - g1_data, 
@@ -218,7 +218,8 @@ function plot_hm()#p
 
   for i in 1:3
     chiSquareTemplate = Float64.(starCatalog[sampled_indices[i]]) - pixelGridFits[sampled_indices[i]].^2
-    chiSquareTemplate = chiSquareTemplate./var(vec(Float64.(starCatalog[sampled_indices[i]])))
+    chiSquareTemplate = chiSquareTemplate./(errVignets[sampled_indices[i]].^2)
+    #err cutout , divide matrices pointwise
     push!(chiSquare, chiSquareTemplate)                              
   end
 

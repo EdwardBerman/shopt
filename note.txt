@@ -1,4 +1,0 @@
- cmd = ' '.join(['piffify', piff_config_arg, image_arg, coord_arg, psfcat_arg, output_arg
-
-     ERROR: LoadError: AssertionError: isfinite(phi_d) && isfinite(gphi)
-

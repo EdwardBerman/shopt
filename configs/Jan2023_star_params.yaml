@@ -1,0 +1,23 @@
+##
+## Star params
+##
+## Code should verify that there are same number of params as there are
+##
+filter_names: 'f115w','f150w','f277w', 'f444w'
+
+class_star_thresh: 0.85
+
+filter_params:
+  f115w:
+
+  fwhms = [0.058, 0.0628, 0.125, 0.165]
+min_size = [0.88, 1, 1.83, 2.33]
+max_size = [1.7, 1.5, 2.75, 3.2]
+max_mag = [27.4, 28, 27, 27.1]
+min_mag = [19, 19, 19, 19]
+
+star_params = Table([filter_names, fwhms, min_size,\
+                    max_size, max_mag, min_mag],
+                    names=['filter_name', 'star_fwhm', 'min_size',\
+                    'max_size', 'max_mag', 'min_mag']
+                    )
