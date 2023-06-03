@@ -1,6 +1,6 @@
 using PyCall
 
-function cataloging(args)
+function cataloging(args; nm=nanMask, nz=nanToZero)
   datadir = args[3]
   py"""
   import numpy as np
@@ -23,6 +23,12 @@ function cataloging(args)
   for i in 1:length(catalog)
     #filtered_array = [filter(!isnan, row) for row in eachrow(catalog[i])]
     push!(catalogNew, catalog[i]./sum(catalog[i]))
+    #=
+    push!(catalogNew, nm(catalog[i])./sum(nz(nm(catalog[i]))))
+    if i < 25
+      println(sum(nm(catalog[i])./sum(nz(nm(catalog[i])))))
+    end
+    =#
   end
   return catalogNew, errVignets, r, c, length(catalog)
 end

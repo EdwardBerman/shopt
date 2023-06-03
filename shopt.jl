@@ -42,12 +42,16 @@ using Measures
 using ProgressBars
 using UnicodePlots
 using Flux
+using Flux.Optimise
+using Flux: onehotbatch, throttle, @epochs, mse
+
 # ---------------------------------------------------------#
 fancyPrint("Reading .jl Files")
 include("plot.jl")
 include("analyticCGD.jl")
 include("radialProfiles.jl")
 include("pixelGridCGD.jl")
+include("masks.jl")
 include("dataPreprocessing.jl")
 include("outliers.jl")
 include("dataOutprocessing.jl")
@@ -205,22 +209,28 @@ pixelGridFits = []
     autoencoder = Chain(encoder, decoder)
 
     # Define the loss function (mean squared error)
-    loss(autoencoder, x, x̂) = Flux.mse(autoencoder(x), x̂)
+    #loss(nanToZero, autoencoder, x, x̂) = Flux.mse(nanToZero(autoencoder(x)), nanToZero(x̂))
+    
     
     function relative_error_loss(autoencoder, x, x̂)
-      relative_error = abs.(x - autoencoder(x̂)) ./ (x .+ 1e-10)  # Add a small value to avoid division by zero
+      relative_error = nanToZero(abs.(x - autoencoder(x̂)) ./ (x .+ 1e-10))  # Add a small value to avoid division by zero
       mean(relative_error)
     end
+
+    #x̂ = autoencoder(x)
+    loss(x) = mse(autoencoder(x), x)
+
+    optimizer = ADAM()
+
+    
     # Format some random image data
     data = reshape(starCatalog[i], length(starCatalog[i]))
-  
-    #opt = ADAM()
-    opt = Flux.setup(Adam(), autoencoder)
+    
    
     # Train the autoencoder
     try
       for epoch in 1:1000
-        Flux.train!(loss, autoencoder, [(data, data)], opt) #loss #Flux.params(autoencoder))
+        Flux.train!(loss, Flux.params(autoencoder), [(data,)], optimizer) #Flux.params(autoencoder))
       end
       # Take a sample input image
       input_image = reshape(starCatalog[i], length(starCatalog[i]))
@@ -232,7 +242,8 @@ pixelGridFits = []
       #push!(pixelGridFits ,reshape(pg.minimizer, (r, c)))
       pgf_current = reshape(reconstructed_image, (r, c))./sum(reshape(reconstructed_image, (r, c)))
       push!(pixelGridFits, pgf_current)
-    catch
+    catch ex
+      println(ex)
       println("Star $i failed")
       push!(failedStars, i)
       push!(pixelGridFits, zeros(r,c))
