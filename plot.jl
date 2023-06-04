@@ -224,17 +224,42 @@ function plot_hm()#p
   end
 
 
-  hm11 = generate_heatmap_sp_t(starCatalog[star1], "Model", minimum([minimum(starCatalog[star1]), minimum(pixelGridFits[star1])]), maximum([maximum(starCatalog[star1]), maximum(pixelGridFits[star1])]))
-  hm12 = generate_heatmap_sp_t(pixelGridFits[star1], "Data", minimum([minimum(starCatalog[star1]), minimum(pixelGridFits[star1])]), maximum([maximum(starCatalog[star1]), maximum(pixelGridFits[star1])]))
-  hm13 = generate_heatmap_sp_t(chiSquare[1], "ChiSquare", minimum(chiSquare[1]), maximum(chiSquare[1]))
+  hm11 = generate_heatmap_sp_t(get_middle_15x15(starCatalog[star1]), 
+                               "Model",
+                               minimum([minimum(starCatalog[star1]), minimum(pixelGridFits[star1])]), 
+                               maximum([maximum(starCatalog[star1]), maximum(pixelGridFits[star1])]))
+  hm12 = generate_heatmap_sp_t(get_middle_15x15(pixelGridFits[star1]), 
+                               "Data", 
+                               minimum([minimum(starCatalog[star1]), minimum(pixelGridFits[star1])]), 
+                               maximum([maximum(starCatalog[star1]), maximum(pixelGridFits[star1])]))
+  hm13 = generate_heatmap_sp_t(get_middle_15x15(chiSquare[1]), 
+                               "ChiSquare", 
+                               minimum(chiSquare[1]), 
+                               maximum(chiSquare[1]))
   
-  hm21 = generate_heatmap_sp(starCatalog[star2], minimum([minimum(starCatalog[star2]), minimum(pixelGridFits[star2])]), maximum([maximum(starCatalog[star2]), maximum(pixelGridFits[star2])]))
-  hm22 = generate_heatmap_sp(pixelGridFits[star2], minimum([minimum(starCatalog[star2]), minimum(pixelGridFits[star2])]), maximum([maximum(starCatalog[star2]), maximum(pixelGridFits[star2])]))
-  hm23 = generate_heatmap_sp(chiSquare[2], minimum(chiSquare[2]), maximum(chiSquare[2]))
+  hm21 = generate_heatmap_sp(get_middle_15x15(starCatalog[star2]), 
+                             minimum([minimum(starCatalog[star2]), minimum(pixelGridFits[star2])]), 
+                             maximum([maximum(starCatalog[star2]), maximum(pixelGridFits[star2])]))
 
-  hm31 = generate_heatmap_sp(starCatalog[star3], minimum([minimum(starCatalog[star3]), minimum(pixelGridFits[star3])]), maximum([maximum(starCatalog[star3]), maximum(pixelGridFits[star3])]))
-  hm32 = generate_heatmap_sp(pixelGridFits[star3], minimum([minimum(starCatalog[star3]), minimum(pixelGridFits[star3])]), maximum([maximum(starCatalog[star3]), maximum(pixelGridFits[star3])]))
-  hm33 = generate_heatmap_sp(chiSquare[3], minimum(chiSquare[3]), maximum(chiSquare[3]))
+  hm22 = generate_heatmap_sp(get_middle_15x15(pixelGridFits[star2]), 
+                             minimum([minimum(starCatalog[star2]), minimum(pixelGridFits[star2])]), 
+                             maximum([maximum(starCatalog[star2]), maximum(pixelGridFits[star2])]))
+  
+  hm23 = generate_heatmap_sp(get_middle_15x15(chiSquare[2]), 
+                             minimum(chiSquare[2]), 
+                             maximum(chiSquare[2]))
+
+  hm31 = generate_heatmap_sp(get_middle_15x15(starCatalog[star3]), 
+                             minimum([minimum(starCatalog[star3]), minimum(pixelGridFits[star3])]), 
+                             maximum([maximum(starCatalog[star3]), maximum(pixelGridFits[star3])]))
+  
+  hm32 = generate_heatmap_sp(get_middle_15x15(pixelGridFits[star3]), 
+                             minimum([minimum(starCatalog[star3]), minimum(pixelGridFits[star3])]), 
+                             maximum([maximum(starCatalog[star3]), maximum(pixelGridFits[star3])]))
+  
+  hm33 = generate_heatmap_sp(get_middle_15x15(chiSquare[3]), 
+                             minimum(chiSquare[3]), 
+                             maximum(chiSquare[3]))
 #=
   hm41 = generate_heatmap_sp(starCatalog[star4], minimum([minimum(starCatalog[star1]), minimum(pixelGridFits[star4])]), maximum([maximum(starCatalog[star4]), maximum(pixelGridFits[star4])]))
   hm42 = generate_heatmap_sp(pixelGridFits[star4], minimum([minimum(starCatalog[star4]), minimum(pixelGridFits[star4])]), maximum([maximum(starCatalog[star4]), maximum(pixelGridFits[star4])]))

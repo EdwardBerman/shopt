@@ -26,7 +26,11 @@ function cost(params; r = r, c= c, starL=starCatalog[iteration], radial=fGaussia
   
   for u in 1:r
     for v in 1:c
-      Totalcost += 0.5*(A_guess*radial(u, v, g1_guess, g2_guess, s_guess, r/2, c/2) - starL[u, v])^2
+      if isnan(starL[u,v])
+        Totalcost += 0
+      else
+        Totalcost += 0.5*(A_guess*radial(u, v, g1_guess, g2_guess, s_guess, r/2, c/2) - starL[u, v])^2
+      end
     end
   end
   return Totalcost
@@ -59,10 +63,10 @@ function costD(params; r = r, c= c, starL = pixelGridFits[iteration], radial = f
   
   for u in 1:r
     for v in 1:c
-      try
-        Totalcost += 0.5*(A_guess*radial(u, v, g1_guess, g2_guess, s_guess, r/2, c/2) - starL[u, v])^2
-      catch
+      if isnan(starL[u,v])
         Totalcost += 0
+      else
+        Totalcost += 0.5*(A_guess*radial(u, v, g1_guess, g2_guess, s_guess, r/2, c/2) - starL[u, v])^2
       end
     end
   end

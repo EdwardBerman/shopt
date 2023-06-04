@@ -212,13 +212,14 @@ pixelGridFits = []
     #loss(nanToZero, autoencoder, x, x̂) = Flux.mse(nanToZero(autoencoder(x)), nanToZero(x̂))
     
     
-    function relative_error_loss(autoencoder, x, x̂)
-      relative_error = nanToZero(abs.(x - autoencoder(x̂)) ./ (x .+ 1e-10))  # Add a small value to avoid division by zero
+    function relative_error_loss(x)
+      relative_error = abs.(x - autoencoder(x)) ./ (x .+ 1e-10)  # Add a small value to avoid division by zero
       mean(relative_error)
     end
 
     #x̂ = autoencoder(x)
     loss(x) = mse(autoencoder(x), x)
+    #loss(x; model=autoencoder, filter = nanToZero) = mse(filter(model(x)), filter(x))
 
     optimizer = ADAM()
 
@@ -354,44 +355,6 @@ println("failed stars: ", failedStars)
 # ---------------------------------------------------------#
 fancyPrint("Plotting")
 
-analyticModel = zeros(r, c)
-
-for u in 1:r
-  for v in 1:c
-    analyticModel[u,v] = fGaussian(u, v, g1_model[10], g2_model[10], s_model[10], r/2, c/2)
-  end
-end
-A_model = 1/sum(analyticModel)
-
-for u in 1:r
-  for v in 1:c
-    starData[u,v] = A_model*analyticModel[u,v]
-  end
-end
-
-Residuals = starCatalog[10] - starData
-costSquaredError = Residuals.^2 
-
-fft_image = fft(complex.(Residuals))
-fft_image = abs2.(fft_image)
-pk = []
-for i in 1:10
-  radius = range(1, max(r/2, c/2) - 1, length=10)
-  push!(pk, powerSpectrum(fft_image, radius[i]))
-end
-
-
-#ksMatrix , b = ks 
-
-fftmin = minimum(fft_image)
-fftmax = maximum(fft_image)
-
-#=
-dof = r*c - 3
-p = 1 - cdf(Chisq(dof), sum(chiSquare))#ccdf = 1 - cdf
-p = string(p)
-println("p-value: ", p, "\n")
-=#
 
 failedStars = unique(failedStars)
 
@@ -416,10 +379,44 @@ sampled_indices = sort(sample_indices(starCatalog, 3))
 
 println("Sampled indices: ", sampled_indices)
 
+function get_middle_15x15(array::Array{T, 2}) where T
+    rows, cols = size(array)
+    row_start = div(rows, 2) - 7
+    col_start = div(cols, 2) - 7
+    
+    return array[row_start:(row_start+14), col_start:(col_start+14)]
+end
+
+starSample = rand(1:(itr - length(failedStars)))
+a = starCatalog[starSample]
+b = pixelGridFits[starSample]
+
+Residuals = a - b
+costSquaredError = Residuals.^2 
+
+fft_image = fft(complex.(Residuals))
+fft_image = abs2.(fft_image)
+
+pk = []
+for i in 1:10
+  radius = range(1, max(r/2, c/2) - 1, length=10)
+  push!(pk, powerSpectrum(fft_image, radius[i]))
+end
+
+
+#ksMatrix , b = ks 
+
+fftmin = minimum(fft_image)
+fftmax = maximum(fft_image)
+
+cmx = maximum([maximum(a), maximum(b)])
+cmn = minimum([minimum(a), minimum(b)])
+
 plot_hm()
 plot_hist()
 plot_err()
 
+fancyPrint("Transforming (x,y) -> (u,v) | Interpolation Across the Field of View")
 # ---------------------------------------------------------#
 fancyPrint("Saving DataFrame to df.shopt")
 writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
@@ -436,21 +433,6 @@ println(UnicodePlots.histogram(g1_data, vertical=true, title="Histogram of g1 da
 println(UnicodePlots.histogram(g2_model, vertical=true, title="Histogram of g2 model"))
 println(UnicodePlots.histogram(g2_data, vertical=true, title="Histogram of g2 data"))
 =#
-starSample = rand(1:(itr - length(failedStars)))
-a = starCatalog[starSample]
-b = pixelGridFits[starSample]
-
-cmx = maximum([maximum(a), maximum(b)])
-cmn = minimum([minimum(a), minimum(b)])
-
-function get_middle_15x15(array::Array{T, 2}) where T
-    rows, cols = size(array)
-    row_start = div(rows, 2) - 7
-    col_start = div(cols, 2) - 7
-    
-    return array[row_start:(row_start+14), col_start:(col_start+14)]
-end
-
 
 println(UnicodePlots.heatmap(get_middle_15x15(a), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of star $starSample"))
 println(UnicodePlots.heatmap(get_middle_15x15(b), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
@@ -460,22 +442,8 @@ fancyPrint("Done! =]")
 
 using CairoMakie
 
-function nanMask(arr)
-  dummyArr = zeros(size(arr,1),size(arr,2))
-  for i in 1:size(arr,1)
-    for j in 1:size(arr,2)
-      if arr[i,j] < 0
-        dummyArr[i,j] = NaN
-      else
-        dummyArr[i,j] = arr[i,j]
-      end
-    end
-  end
-  return dummyArr
-end
-
-a = nanMask(a)
-b = nanMask(b)
+a = nanMask2(a)
+b = nanMask2(b)
 
 let
     # cf. https://github.com/JuliaPlots/Makie.jl/issues/822#issuecomment-769684652
@@ -526,5 +494,6 @@ let
       ax_b.title = "Log Scale Learned PSF"
       ax_c.title = "Log Scale Absolute Value of Residuals"
       save(joinpath("outdir", "logScale.pdf"), fig)
+      save(joinpath("outdir", "logScale.png"), fig)
 end
 

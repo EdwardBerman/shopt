@@ -1,9 +1,9 @@
 #f(u, v) = a1u^3 + a2v^3 + a3u^2v + a4v^2u + a5u^2 + a6v^2 + a7uv + a8u + a9v + a10
 #Just use optim again
 
-using Optim
-using Plots
-using ForwardDiff
+#using Optim
+#using Plots
+#using ForwardDiff
 
 my_truth = zeros(10,10)
 
@@ -13,7 +13,7 @@ for i in 1:10
   end
 end
 
-plot(heatmap(my_truth))
+#plot(heatmap(my_truth))
 
 function convert_array_to_tuples(arr)
     tuples_list = []
@@ -54,6 +54,7 @@ function polyG!(storage, p)
   storage[10] = grad_cost[10]
 end
 
+#=
 I = optimize(interpCost, polyG!, rand(10), ConjugateGradient())
 learnedPolynomial = zeros(10,10)
 IC = I.minimizer
@@ -65,4 +66,4 @@ for i in 1:10
 end
 
 plot(heatmap(my_truth), heatmap(learnedPolynomial), heatmap(my_truth - learnedPolynomial))
-
+=#
