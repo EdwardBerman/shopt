@@ -167,9 +167,3 @@ _config.yml
 + The Northeastern Physics Department and Northeastern Undergraduate Research and Fellowships, for making this project possible with funding from the Northeastern Physics Co-Op Fellowship and PEAK Ascent Award respectively   
 + [David Rosen](https://github.com/david-m-rosen), who gave valuable input in the early stages of this project and during his course Math 7223, Riemannian Optimization
 
-## How Can I Help?
-Please note that this project is still in early development and many key features need to be fully finished before accepting any major changes from the community. However, if you subscribe to the principles that this project stands for and you would like to contribute, you may do so in the following ways. Good science isn't done in isolation and I would welcome any and all input! 
-
-+ Contact berman.ed@northeastern.edu 
-+ Submit a Pull Request
-+ Fork this Repository
