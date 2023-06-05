@@ -1,17 +1,19 @@
 # ---------------------------------------------------------#
 include("argparser.jl")
 include("fancyPrint.jl")
+
 try
   process_arguments(ARGS)
 catch err
   println("Error: ", err)
-  println("Usage: julia shopt.jl <configdir> <outdir> <datadir>")
+  println("Usage: julia shopt.jl <configdir> <outdir> <catalog> <sci>")
   exit(1)
 end
 
 configdir = ARGS[1]
 outdir = ARGS[2]
-datadir = ARGS[3]
+catalog = ARGS[3]
+sci = ARGS[4]
 
 if isdir(outdir)
   println("\tOutdir found")
@@ -23,6 +25,7 @@ end
 # ---------------------------------------------------------#
 fancyPrint("Handling Imports")
 using Base: initarray!
+using YAML
 using BenchmarkTools
 using Plots
 using ForwardDiff

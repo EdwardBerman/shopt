@@ -1,4 +1,13 @@
-function cataloging(args; nm=nanMask, nz=nanToZero)
+config = YAML.load_file(joinpath(configdir, "shopt.yml"))
+
+function signal_to_noise(I, e; nm=nanMask, nz=nanToZero)
+  signal_power = sum(nz(nm(I)).^2)
+  noise_power = sum(e.^2)
+  snr = 10*log10(signal_power/noise_power)
+  return snr
+end
+
+function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=outliers_filter)
   datadir = args[3]
   py"""
   import numpy as np
@@ -18,14 +27,15 @@ function cataloging(args; nm=nanMask, nz=nanToZero)
   r = size(catalog[1], 1)
   c = size(catalog[1], 2)
   catalogNew = []
+  signal2noiseRatios = []
   for i in 1:length(catalog)
     #push!(catalogNew, catalog[i]./sum(catalog[i]))
     push!(catalogNew, nm(catalog[i])./sum(nz(nm(catalog[i]))))
-    if i < 25
-      a = nz(nm(catalog[i]))
-    end
+    push!(signal2noiseRatios, snr(catalog[i], errVignets[i]))
   end
-  return catalogNew, errVignets, r, c, length(catalog)
+  catalogNew, errVignets = dout(signal2noiseRatios, catalogNew, errVignets)
+  println("Removed $(length(catalog) - length(catalogNew)) outliers on the basis of Signal to Noise Ratio")
+  return catalogNew, errVignets, r, c, length(catalogNew)
 end
 
 
