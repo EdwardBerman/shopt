@@ -1,33 +1,7 @@
 #f(u, v) = a1u^3 + a2v^3 + a3u^2v + a4v^2u + a5u^2 + a6v^2 + a7uv + a8u + a9v + a10
-#Just use optim again
 
-#using Optim
-#using Plots
-#using ForwardDiff
 
-my_truth = zeros(10,10)
-
-for i in 1:10
-  for j in 1:10
-    my_truth[i,j] = (i)^2 + (j)^2
-  end
-end
-
-#plot(heatmap(my_truth))
-
-function convert_array_to_tuples(arr)
-    tuples_list = []
-    for i in 1:size(arr, 1)
-        for j in 1:size(arr, 2)
-            push!(tuples_list, (i, j, arr[i, j]))
-        end
-    end
-    return tuples_list
-end
-
-my_truth_new = convert_array_to_tuples(my_truth)
-
-function interpCost(p; truth=my_truth_new)
+function interpCost(p; truth=h_uv_data)
   I(u, v) = p[1]*u^3 + p[2]*v^3 + p[3]*u^2*v + p[4]*v^2*u + p[5]*u^2 + p[6]*v^2 + p[7]*u*v + p[8]*u + p[9]*v + p[10]
   t = truth
   function sumLoss(f, t)

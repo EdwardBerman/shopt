@@ -47,6 +47,7 @@ using UnicodePlots
 using Flux
 using Flux.Optimise
 using Flux: onehotbatch, throttle, @epochs, mse
+using CairoMakie
 
 # ---------------------------------------------------------#
 fancyPrint("Reading .jl Files")
@@ -61,16 +62,20 @@ include("dataOutprocessing.jl")
 include("powerSpectrum.jl")
 include("kaisserSquires.jl")
 include("webbpsfProcessing.jl")
+include("interpolate.jl")
 
 # ---------------------------------------------------------#
 fancyPrint("Running Source Extractor")
 # ---------------------------------------------------------#
 
 fancyPrint("Processing Data for Fit")
-starCatalog, errVignets, r, c, itr = cataloging(ARGS)
+starCatalog, errVignets, r, c, itr, u_coordinates, v_coordinates = cataloging(ARGS)
 starCatalog = starCatalog[1:25]
 #starCatalog, r,c, itr = catalogingWEBBPSF()
-#errVignets = errVignets[1:25]
+errVignets = errVignets[1:25]
+u_coordinates = u_coordinates[1:25]
+v_coordinates = v_coordinates[1:25]
+
 itr = length(starCatalog)
 
 starData = zeros(r, c)
@@ -371,6 +376,8 @@ for i in sort(failedStars, rev=true)
   splice!(g1_data, i)
   splice!(g2_model, i)
   splice!(g2_data, i)
+  splice!(u_coordinates, i)
+  splice!(v_coordinates, i)
 end
 
 function sample_indices(array, k)
@@ -419,15 +426,15 @@ plot_hm()
 plot_hist()
 plot_err()
 
-fancyPrint("Transforming (x,y) -> (u,v) | Interpolation Across the Field of View")
-# ---------------------------------------------------------#
-fancyPrint("Saving DataFrame to df.shopt")
-writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
-println(readData())
+a = nanMask2(a)
+b = nanMask2(b)
 
-println(UnicodePlots.boxplot(["s model", "s data", "g1 model", "g1 data", "g2 model", "g2 data"], 
-                             [s_model, s_data, g1_model, g1_data, g2_model, g2_data],
-                            title="Boxplot of df.shopt"))
+#=
+println(UnicodePlots.heatmap(get_middle_15x15(a), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of star $starSample"))
+println(UnicodePlots.heatmap(get_middle_15x15(b), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
+println(UnicodePlots.heatmap(get_middle_15x15(a - b), colormap=:inferno, title="Heatmap of Residuals"))
+=#
+
 #=
 println(UnicodePlots.histogram(s_model, vertical=true, title="Histogram of s model"))
 println(UnicodePlots.histogram(s_data, vertical=true, title="Histogram of s data"))
@@ -437,16 +444,69 @@ println(UnicodePlots.histogram(g2_model, vertical=true, title="Histogram of g2 m
 println(UnicodePlots.histogram(g2_data, vertical=true, title="Histogram of g2 data"))
 =#
 
-println(UnicodePlots.heatmap(get_middle_15x15(a), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of star $starSample"))
-println(UnicodePlots.heatmap(get_middle_15x15(b), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
-println(UnicodePlots.heatmap(get_middle_15x15(a - b), colormap=:inferno, title="Heatmap of Residuals"))
+# ---------------------------------------------------------#
+fancyPrint("Transforming (x,y) -> (u,v) | Interpolation Across the Field of View")
+s_tuples = []
+for i in 1:length(s_data)
+  push!(s_tuples, (u_coordinates[i], v_coordinates[i], s_data[i]))
+end
+
+h_uv_data = s_tuples
+
+s_fov = optimize(interpCost, polyG!, rand(10), ConjugateGradient())
+IC = s_fov.minimizer
+println("IC: ", IC)
+
+s(u,v) = IC[1]*u^3 + IC[2]*v^3 + IC[3]*u^2*v + IC[4]*v^2*u + IC[5]*u^2 + IC[6]*v^2 + IC[7]*u*v + IC[8]*u + IC[9]*v + IC[10]
+ds_du(u,v) = IC[1]*3*u^2 + IC[3]*2*u*v + IC[4]*v^2 + IC[5]*2*u + IC[7]*v + IC[8]
+ds_dv(u,v) = IC[2]*3*v^2 + IC[3]*u^2 + IC[4]*2*u*v + IC[6]*2*v + IC[7]*u + IC[9]
+
+testField(u, v) = Point2f(ds_du(u,v), ds_dv(u,v)) # x'(t) = -x, y'(t) = 2y
+u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
+v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
+
+z = [s(u,v) for u in u, v in v]
+ 
+fig = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
+ax = fig[1, 1] = CairoMakie.Axis(fig, xlabel = L"u", ylabel = L"v")
+fs = CairoMakie.heatmap!(ax, u, v, z, colormap = Reverse(:plasma))
+CairoMakie.streamplot!(ax,
+            testField,
+            u,
+            v,
+            colormap = Reverse(:plasma),
+            gridsize = (32, 32),
+            density = 0.25,
+            arrow_size = 10)
+
+CairoMakie.Colorbar(fig[1, 2],
+                    fs,
+                    label = L"s(u,v)",
+                    width = 20,
+                    labelsize = 14,
+                    ticklabelsize = 14)
+ 
+CairoMakie.colgap!(fig.layout, 5)
+ 
+save(joinpath("outdir", "vectorfield.png"), fig)
+
+g1_tuples = []
+for i in 1:length(g1_data)
+  push!(g1_tuples, (u_coordinates[i], v_coordinates[i], g1_data[i]))
+end
+h_uv_data = g1_tuples
+
+# ---------------------------------------------------------#
+fancyPrint("Saving DataFrame to df.shopt")
+writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
+println(readData())
+
+println(UnicodePlots.boxplot(["s model", "s data", "g1 model", "g1 data", "g2 model", "g2 data"], 
+                             [s_model, s_data, g1_model, g1_data, g2_model, g2_data],
+                            title="Boxplot of df.shopt"))
+
 # ---------------------------------------------------------#
 fancyPrint("Done! =]")
-
-using CairoMakie
-
-a = nanMask2(a)
-b = nanMask2(b)
 
 let
     # cf. https://github.com/JuliaPlots/Makie.jl/issues/822#issuecomment-769684652
