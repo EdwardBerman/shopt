@@ -1,10 +1,33 @@
+function truncate_to_square(mat1::Matrix{T}, mat2::Matrix{T}) where {T}
+    # Step 1: Get the size of the matrices
+    size1 = size(mat1)
+    size2 = size(mat2)
+    
+    # Step 2: Determine the minimum dimension
+    min_dim = min(size1[1], size1[2], size2[1], size2[2])
+    
+    # Step 3: Create new square matrices
+    square_mat1 = Matrix{T}(undef, min_dim, min_dim)
+    square_mat2 = Matrix{T}(undef, min_dim, min_dim)
+    
+    # Step 4: Assign corresponding elements
+    for i in 1:min_dim, j in 1:min_dim
+        square_mat1[i, j] = mat1[i, j]
+        square_mat2[i, j] = mat2[i, j]
+    end
+    
+    return square_mat1, square_mat2
+end
+
+
 function meshgrid(x, y)
     X = [i for i in x, j in 1:length(y)]
     Y = [j for i in 1:length(x), j in y]
     return X, Y
 end
 
-function ks(g1Map, g2Map)
+function ks(g1Map, g2Map; meshgrid = meshgrid, ts = truncate_to_square)
+  g1Map, g2Map = ts(g1Map, g2Map)
   x, y = size(g1Map)
   k1, k2 = meshgrid(fftfreq(y), fftfreq(x))
 
@@ -24,20 +47,3 @@ function ks(g1Map, g2Map)
 
   return kE, kB
 end
-
-scale = 1/0.29
-ks93, k0 = ks(rand(10,10),rand(10,10))
-ksCosmos = imfilter(ks93, Kernel.gaussian(scale))
-kshm = Plots.heatmap(ksCosmos, 
-                      title="Kaisser-Squires", 
-                      xlabel="u", 
-                      ylabel="v",
-                      xlims=(0.5, size(ksCosmos, 2) + 0.5),  # set the x-axis limits to include the full cells
-                      ylims=(0.5, size(ksCosmos, 1) + 0.5),  # set the y-axis limits to include the full cells
-                      aspect_ratio=:equal,
-                      ticks=:none,  # remove the ticks
-                      frame=:box,  # draw a box around the plot
-                      grid=:none,  # remove the grid lines
-                      size=(1920,1080))
-
-Plots.savefig(kshm, joinpath("outdir","ks.png"))

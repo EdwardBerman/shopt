@@ -360,9 +360,6 @@ fancyPrint("Analytic Profile Fit for Learned Star")
 end
 
 println("failed stars: ", failedStars)
-# ---------------------------------------------------------#
-fancyPrint("Plotting")
-
 
 failedStars = unique(failedStars)
 
@@ -379,6 +376,65 @@ for i in sort(failedStars, rev=true)
   splice!(u_coordinates, i)
   splice!(v_coordinates, i)
 end
+
+# ---------------------------------------------------------#
+fancyPrint("Transforming (x,y) -> (u,v) | Interpolation Across the Field of View")
+
+s_tuples = []
+for i in 1:length(s_data)
+  push!(s_tuples, (u_coordinates[i], v_coordinates[i], s_data[i]))
+end
+
+s_fov = optimize(interpCostS, polyG_s!, rand(10), ConjugateGradient())
+sC = s_fov.minimizer
+println("s(u,v): $(sC[1])u^3 + $(sC[2])v^3 + $(sC[3])u^2v + $(sC[4])v^2u + $(sC[5])u^2 + $(sC[6])v^2 + $(sC[7])uv + $(sC[8])u + $(sC[9])v + $(sC[10])")
+
+s(u,v) = sC[1]*u^3 + sC[2]*v^3 + sC[3]*u^2*v + sC[4]*v^2*u + sC[5]*u^2 + sC[6]*v^2 + sC[7]*u*v + sC[8]*u + sC[9]*v + sC[10]
+ds_du(u,v) = sC[1]*3*u^2 + sC[3]*2*u*v + sC[4]*v^2 + sC[5]*2*u + sC[7]*v + sC[8]
+ds_dv(u,v) = sC[2]*3*v^2 + sC[3]*u^2 + sC[4]*2*u*v + sC[6]*2*v + sC[7]*u + sC[9]
+
+g1_tuples = []
+for i in 1:length(g1_data)
+  push!(g1_tuples, (u_coordinates[i], v_coordinates[i], g1_data[i]))
+end
+
+g1_fov = optimize(interpCostg1, polyG_g1!, rand(10), ConjugateGradient())
+g1C = g1_fov.minimizer
+println("g1(u,v): $(g1C[1])u^3 + $(g1C[2])v^3 + $(g1C[3])u^2v + $(g1C[4])v^2u + $(g1C[5])u^2 + $(g1C[6])v^2 + $(g1C[7])uv + $(g1C[8])u + $(g1C[9])v + $(g1C[10])")
+
+g1(u,v) = g1C[1]*u^3 + g1C[2]*v^3 + g1C[3]*u^2*v + g1C[4]*v^2*u + g1C[5]*u^2 + g1C[6]*v^2 + g1C[7]*u*v + g1C[8]*u + g1C[9]*v + g1C[10]
+dg1_du(u,v) = g1C[1]*3*u^2 + g1C[3]*2*u*v + g1C[4]*v^2 + g1C[5]*2*u + g1C[7]*v + g1C[8]
+dg1_dv(u,v) = g1C[2]*3*v^2 + g1C[3]*u^2 + g1C[4]*2*u*v + g1C[6]*2*v + g1C[7]*u + g1C[9]
+
+g2_tuples = []
+for i in 1:length(g2_data)
+  push!(g2_tuples, (u_coordinates[i], v_coordinates[i], g2_data[i]))
+end
+h_uv_data = g2_tuples
+
+g2_fov = optimize(interpCostg2, polyG_g2!, rand(10), ConjugateGradient())
+g2C = g2_fov.minimizer
+println("g2(u,v): $(g2C[1])u^3 + $(g2C[2])v^3 + $(g2C[3])u^2v + $(g2C[4])v^2u + $(g2C[5])u^2 + $(g2C[6])v^2 + $(g2C[7])uv + $(g2C[8])u + $(g2C[9])v + $(g2C[10])")
+
+g2(u,v) = g2C[1]*u^3 + g2C[2]*v^3 + g2C[3]*u^2*v + g2C[4]*v^2*u + g2C[5]*u^2 + g2C[6]*v^2 + g2C[7]*u*v + g2C[8]*u + g2C[9]*v + g2C[10]
+dg2_du(u,v) = g2C[1]*3*u^2 + g2C[3]*2*u*v + g2C[4]*v^2 + g2C[5]*2*u + g2C[7]*v + g2C[8]
+dg2_dv(u,v) = g2C[2]*3*v^2 + g2C[3]*u^2 + g2C[4]*2*u*v + g2C[6]*2*v + g2C[7]*u + g2C[9]
+
+PolynomialMatrix = ones(r,c)
+@time begin
+  for i in 1:r
+    for j in 1:c
+      #Create Optimization Scheme with Truh Values from the PixelGridFits
+      PolynomialMatrix[i,j] = #polynomial coefficients at (u,v)
+    end
+  end 
+
+end
+
+
+
+# ---------------------------------------------------------#
+fancyPrint("Plotting")
 
 function sample_indices(array, k)
     indices = collect(1:length(array))  # Create an array of indices
@@ -444,33 +500,16 @@ println(UnicodePlots.histogram(g2_model, vertical=true, title="Histogram of g2 m
 println(UnicodePlots.histogram(g2_data, vertical=true, title="Histogram of g2 data"))
 =#
 
-# ---------------------------------------------------------#
-fancyPrint("Transforming (x,y) -> (u,v) | Interpolation Across the Field of View")
-s_tuples = []
-for i in 1:length(s_data)
-  push!(s_tuples, (u_coordinates[i], v_coordinates[i], s_data[i]))
-end
-
-h_uv_data = s_tuples
-
-s_fov = optimize(interpCost, polyG!, rand(10), ConjugateGradient())
-IC = s_fov.minimizer
-println("IC: ", IC)
-
-s(u,v) = IC[1]*u^3 + IC[2]*v^3 + IC[3]*u^2*v + IC[4]*v^2*u + IC[5]*u^2 + IC[6]*v^2 + IC[7]*u*v + IC[8]*u + IC[9]*v + IC[10]
-ds_du(u,v) = IC[1]*3*u^2 + IC[3]*2*u*v + IC[4]*v^2 + IC[5]*2*u + IC[7]*v + IC[8]
-ds_dv(u,v) = IC[2]*3*v^2 + IC[3]*u^2 + IC[4]*2*u*v + IC[6]*2*v + IC[7]*u + IC[9]
-
 testField(u, v) = Point2f(ds_du(u,v), ds_dv(u,v)) # x'(t) = -x, y'(t) = 2y
 u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
 v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
 
-z = [s(u,v) for u in u, v in v]
+s_map = [s(u,v) for u in u, v in v]
  
-fig = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
-ax = fig[1, 1] = CairoMakie.Axis(fig, xlabel = L"u", ylabel = L"v")
-fs = CairoMakie.heatmap!(ax, u, v, z, colormap = Reverse(:plasma))
-CairoMakie.streamplot!(ax,
+fig1 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
+ax1 = fig1[1, 1] = CairoMakie.Axis(fig1, xlabel = L"u", ylabel = L"v")
+fs1 = CairoMakie.heatmap!(ax1, u, v, s_map, colormap = Reverse(:plasma))
+CairoMakie.streamplot!(ax1,
             testField,
             u,
             v,
@@ -479,34 +518,93 @@ CairoMakie.streamplot!(ax,
             density = 0.25,
             arrow_size = 10)
 
-CairoMakie.Colorbar(fig[1, 2],
-                    fs,
+CairoMakie.Colorbar(fig1[1, 2],
+                    fs1,
                     label = L"s(u,v)",
                     width = 20,
                     labelsize = 14,
                     ticklabelsize = 14)
  
-CairoMakie.colgap!(fig.layout, 5)
+CairoMakie.colgap!(fig1.layout, 5)
  
-save(joinpath("outdir", "vectorfield.png"), fig)
+save(joinpath("outdir", "s_uv.png"), fig1)
 
-g1_tuples = []
-for i in 1:length(g1_data)
-  push!(g1_tuples, (u_coordinates[i], v_coordinates[i], g1_data[i]))
-end
-h_uv_data = g1_tuples
+testField(u, v) = Point2f(dg1_du(u,v), dg1_dv(u,v)) # x'(t) = -x, y'(t) = 2y
+u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
+v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
 
-# ---------------------------------------------------------#
-fancyPrint("Saving DataFrame to df.shopt")
-writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
-println(readData())
+g1_map = [g1(u,v) for u in u, v in v]
+ 
+fig2 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
+ax2 = fig2[1, 1] = CairoMakie.Axis(fig2, xlabel = L"u", ylabel = L"v")
+fs2 = CairoMakie.heatmap!(ax2, u, v, g1_map, colormap = Reverse(:plasma))
+CairoMakie.streamplot!(ax2,
+            testField,
+            u,
+            v,
+            colormap = Reverse(:plasma),
+            gridsize = (32, 32),
+            density = 0.25,
+            arrow_size = 10)
 
-println(UnicodePlots.boxplot(["s model", "s data", "g1 model", "g1 data", "g2 model", "g2 data"], 
-                             [s_model, s_data, g1_model, g1_data, g2_model, g2_data],
-                            title="Boxplot of df.shopt"))
+CairoMakie.Colorbar(fig2[1, 2],
+                    fs2,
+                    label = L"g1(u,v)",
+                    width = 20,
+                    labelsize = 14,
+                    ticklabelsize = 14)
+ 
+CairoMakie.colgap!(fig2.layout, 5)
+ 
+save(joinpath("outdir", "g1_uv.png"), fig2)
 
-# ---------------------------------------------------------#
-fancyPrint("Done! =]")
+testField(u, v) = Point2f(dg2_du(u,v), dg2_dv(u,v)) # x'(t) = -x, y'(t) = 2y
+u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
+v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
+
+g2_map = [g2(u,v) for u in u, v in v]
+
+fig3 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
+ax3 = fig3[1, 1] = CairoMakie.Axis(fig3, xlabel = L"u", ylabel = L"v")
+fs3 = CairoMakie.heatmap!(ax3, u, v, g2_map, colormap = Reverse(:plasma))
+CairoMakie.streamplot!(ax3,
+            testField,
+            u,
+            v,
+            colormap = Reverse(:plasma),
+            gridsize = (32, 32),
+            density = 0.25,
+            arrow_size = 10)
+
+CairoMakie.Colorbar(fig3[1, 2],
+                    fs3,
+                    label = L"g2(u,v)",
+                    width = 20,
+                    labelsize = 14,
+                    ticklabelsize = 14)
+ 
+CairoMakie.colgap!(fig3.layout, 5)
+ 
+save(joinpath("outdir", "g2_uv.png"), fig3)
+
+scale = 1/0.29
+ks93, k0 = ks(g1_map, g2_map)
+ksCosmos = imfilter(ks93, Kernel.gaussian(scale))
+kshm = Plots.heatmap(ksCosmos,
+                     title="Kaisser-Squires", 
+                     xlabel="u", 
+                     ylabel="v",
+                     xlims=(0.5, size(ksCosmos, 2) + 0.5),  # set the x-axis limits to include the full cells
+                     ylims=(0.5, size(ksCosmos, 1) + 0.5),  # set the y-axis limits to include the full cells
+                     aspect_ratio=:equal,
+                     ticks=:none,  # remove the ticks
+                     frame=:box,  # draw a box around the plot
+                     grid=:none,  # remove the grid lines
+                     size=(1920,1080))
+
+Plots.savefig(kshm, joinpath("outdir","kaisserSquires.png"))
+
+
 
 let
     # cf. https://github.com/JuliaPlots/Makie.jl/issues/822#issuecomment-769684652
@@ -559,4 +657,16 @@ let
       save(joinpath("outdir", "logScale.pdf"), fig)
       save(joinpath("outdir", "logScale.png"), fig)
 end
+
+# ---------------------------------------------------------#
+fancyPrint("Saving DataFrame to df.shopt")
+writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
+println(readData())
+
+println(UnicodePlots.boxplot(["s model", "s data", "g1 model", "g1 data", "g2 model", "g2 data"], 
+                             [s_model, s_data, g1_model, g1_data, g2_model, g2_data],
+                            title="Boxplot of df.shopt"))
+
+# ---------------------------------------------------------#
+fancyPrint("Done! =]")
 
