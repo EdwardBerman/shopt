@@ -28,7 +28,7 @@ Currently, the inputs are JWST Point Spread Functions source catalogs. The curre
 |----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | ![image](READMEassets/pgf9.png)                    | Pixel Grid Fit for the Star Above                                                                                                   |
 | ![image](READMEassets/hmresid.png)                 | Residual Map for Above Model and Fit                                                                                                |
-| ![image](READMEassets/s_uv.png.png)                | s varying across the field of view                                                                                                  |
+| ![image](READMEassets/s_uv.png)                    | s varying across the field of view                                                                                                  |
 | ![image](READMEassets/g1_uv.png)                   | g1 varying across the field of view                                                                                                 |
 | ![image](READMEassets/g2_uv.png)                   | g2 varying across the field of view                                                                                                 |
 | ![image](READMEassets/3dAnalyticFit.png)           | 3D map to easily show where PSF is over and under subtracted                                                                        |
