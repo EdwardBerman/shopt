@@ -420,17 +420,63 @@ g2(u,v) = g2C[1]*u^3 + g2C[2]*v^3 + g2C[3]*u^2*v + g2C[4]*v^2*u + g2C[5]*u^2 + g
 dg2_du(u,v) = g2C[1]*3*u^2 + g2C[3]*2*u*v + g2C[4]*v^2 + g2C[5]*2*u + g2C[7]*v + g2C[8]
 dg2_dv(u,v) = g2C[2]*3*v^2 + g2C[3]*u^2 + g2C[4]*2*u*v + g2C[6]*2*v + g2C[7]*u + g2C[9]
 
-PolynomialMatrix = ones(r,c)
+PolynomialMatrix = ones(r,c, 10)
 @time begin
   for i in 1:r
+    #pb = tqdm(1:c)
     for j in 1:c
+      #set_description(pb, "Working on Pixel ($i, $j)")
+      p_tuples = []
+      for k in 1:length(pixelGridFits)
+        push!(p_tuples, (u_coordinates[k], v_coordinates[k], pixelGridFits[k][i, j]))
+      end
+
+      function interpCostP(p; truth=p_tuples)
+        I(u, v) = p[1]*u^3 + p[2]*v^3 + p[3]*u^2*v + p[4]*v^2*u + p[5]*u^2 + p[6]*v^2 + p[7]*u*v + p[8]*u + p[9]*v + p[10]
+        t = truth
+        function sumLoss(f, t)
+          totalLoss = 0
+          for i in 1:length(t)  #t = [(u,v, I), ...     ]
+            totalLoss += (f(t[i][1], t[i][2]) - t[i][3])^2
+          end
+          return totalLoss
+        end
+        return sumLoss(I, t)
+      end
+
+      function polyG_P!(storage, p)
+        grad_cost = ForwardDiff.gradient(interpCostP, p)
+        storage[1] = grad_cost[1]
+        storage[2] = grad_cost[2]
+        storage[3] = grad_cost[3]
+        storage[4] = grad_cost[4]
+        storage[5] = grad_cost[5]
+        storage[6] = grad_cost[6]
+        storage[7] = grad_cost[7]
+        storage[8] = grad_cost[8]
+        storage[9] = grad_cost[9]
+        storage[10] = grad_cost[10]
+      end
+
+      p_fov = optimize(interpCostP, polyG_P!, rand(10), ConjugateGradient())
+      pC = p_fov.minimizer
+
       #Create Optimization Scheme with Truh Values from the PixelGridFits
-      PolynomialMatrix[i,j] = #polynomial coefficients at (u,v)
+      PolynomialMatrix[i,j,1] = pC[1]
+      PolynomialMatrix[i,j,2] = pC[2]
+      PolynomialMatrix[i,j,3] = pC[3]
+      PolynomialMatrix[i,j,4] = pC[4]
+      PolynomialMatrix[i,j,5] = pC[5]
+      PolynomialMatrix[i,j,6] = pC[6]
+      PolynomialMatrix[i,j,7] = pC[7]
+      PolynomialMatrix[i,j,8] = pC[8]
+      PolynomialMatrix[i,j,9] = pC[9]
+      PolynomialMatrix[i,j,10] = pC[10]
     end
   end 
 
 end
-
+#println("Polynomial Matrix: $(PolynomialMatrix)")
 
 
 # ---------------------------------------------------------#
@@ -589,7 +635,7 @@ save(joinpath("outdir", "g2_uv.png"), fig3)
 
 scale = 1/0.29
 ks93, k0 = ks(g1_map, g2_map)
-ksCosmos = imfilter(ks93, Kernel.gaussian(scale))
+ksCosmos = get_middle_15x15(imfilter(ks93, Kernel.gaussian(scale)))
 kshm = Plots.heatmap(ksCosmos,
                      title="Kaisser-Squires", 
                      xlabel="u", 
