@@ -28,8 +28,9 @@ Currently, the inputs are JWST Point Spread Functions source catalogs. The curre
 |----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | ![image](READMEassets/pgf9.png)                    | Pixel Grid Fit for the Star Above                                                                                                   |
 | ![image](READMEassets/hmresid.png)                 | Residual Map for Above Model and Fit                                                                                                |
-| ![image](READMEassets/lossTimeModel.png)           | Loss versus iteration for matching analytic profile to the Model Star                                                               |
-| ![image](READMEassets/lossTimeData.png)            | Loss versus iteration for matching analytic profile to the Star Learned by a Pixel Grid Fit                                         |
+| ![image](READMEassets/s_uv.png.png)                | s varying across the field of view                                                                                                  |
+| ![image](READMEassets/g1_uv.png)                   | g1 varying across the field of view                                                                                                 |
+| ![image](READMEassets/g2_uv.png)                   | g2 varying across the field of view                                                                                                 |
 | ![image](READMEassets/3dAnalyticFit.png)           | 3D map to easily show where PSF is over and under subtracted                                                                        |
 | ![image](READMEassets/pixelGridFit.png)            | Pixel Grid fit for Model Star                                                                                                       |
 | ![image](READMEassets/parametersHistogram.png)     | Histogram for learned profiles for each star in an analytic fit with their residuals                                                |
@@ -43,7 +44,7 @@ To run `shopt.jl`
 
 First use Source Extractor to create a catalog for Shopt to accept and save this catalog in the appropriate directory
 
-Run ```julia shopt.jl [configdir] [outdir] [datadir]```
+Run ```julia shopt.jl [configdir] [outdir] [catalog] [scifile]```
 
 There is also a shell script that runs this command so that the user may call shopt from a larger program they are running
 
@@ -88,7 +89,7 @@ run(`$(PyCall.python) -m pip install astropy`)
 
 Once all dependencies are handled, the user now should clone this repository to obtain its file contents. There are future plans to release shopt onto the julia package repository, but for now the user needs these files contents.
 
-After the file contents are downloaded the user can run ```julia shopt.jl [configdir] [outdir] [datadir]``` as stated above. Alternatively, they can run the shellscript that calls shopt in whatever program they are working with to create their catalog. For example, in a julia program you may use ```run(`./runshopt.sh [configdir] [outdir] [datadir]`)```
+After the file contents are downloaded the user can run ```julia shopt.jl [configdir] [outdir] [catalog] [scifile]``` as stated above. Alternatively, they can run the shellscript that calls shopt in whatever program they are working with to create their catalog. For example, in a julia program you may use ```run(`./runshopt.sh [configdir] [outdir] [datadir]`)```
 
 ## Program Architecture
 
