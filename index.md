@@ -47,7 +47,6 @@ Currently, the inputs are JWST Point Spread Functions source catalogs. The curre
 | ![image](READMEassets/parametersHistogram.png)     | Histogram for learned profiles for each star in an analytic fit with their residuals                                                |
 | ![image](READMEassets/parametersScatterplot.png)   | Same data recorded as a scatterplot with and without outliers removed and with error bars                                           |
 | ![image](READMEassets/fftResiduals.png)            | The complex magnitude squared of each pixel of the Fourier transform of the residual map side by side with the Power spectrum graph |
-| ![image](READMEassets/shoptFile.png)               | An image of the output .shopt file (a wrapper for a DataFrame turned into a CSV)                                                    |
 
 ## Running
 ### Command {#cmd}

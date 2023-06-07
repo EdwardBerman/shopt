@@ -80,12 +80,10 @@ itr = length(starCatalog)
 
 starData = zeros(r, c)
 
-
 A_model = zeros(itr)
 s_model = zeros(itr)
 g1_model = zeros(itr)
 g2_model = zeros(itr)
-
 
 A_data = zeros(itr)
 s_data = zeros(itr)
@@ -198,12 +196,12 @@ println("\n\t \t Number of outliers in g2: ", ng2[1])
 
 s_blacklist = []
 for i in 1:length(s_model)
-  if s_model[i] < 0.05
+  if (s_model[i] < 0.05 || s_model[i] > 1) #i in failedStars is optional Since Failed Stars are assigned s=0 
     push!(s_blacklist, i)
   end
 end
 
-println("\nBlacklisted $(length(s_blacklist)) stars on the basis of s < 0.05" )
+println("\nBlacklisted $(length(s_blacklist)) stars on the basis of s < 0.05 or s > 1 (Failed Stars Assigned 0)" )
 
 for i in sort(s_blacklist, rev=true)
   splice!(starCatalog, i)
@@ -215,13 +213,15 @@ for i in sort(s_blacklist, rev=true)
   splice!(v_coordinates, i)
 end
 
+failedStars = []
+
 # ---------------------------------------------------------#
 fancyPrint("Pixel Grid Fit")
 pixelGridFits = []
 @time begin
   pb = tqdm(1:length(starCatalog))
   for i in pb
-    set_description(pb, "Star $i/$itr Complete")
+    set_description(pb, "Star $i/$(length(starCatalog)) Complete")
     global iteration = i
     encoder = Chain(
                     Dense(r*c, 128, relu),
@@ -293,10 +293,10 @@ ltdPlots = []
 fancyPrint("Analytic Profile Fit for Learned Star")
 #Copy Star Catalog then replace it with the learned pixel grid stars
 @time begin
-  pb = tqdm(1:itr)
+  pb = tqdm(1:length(starCatalog))
   for i in pb
     initial_guess = rand(3) #println("\t initial guess [σ, e1, e2]: ", initial_guess)
-    set_description(pb, "Star $i/$itr Complete")
+    set_description(pb, "Star $i/$(length(starCatalog)) Complete")
      
     it = []
     loss = []
@@ -381,66 +381,73 @@ fancyPrint("Analytic Profile Fit for Learned Star")
   end
 end
 
+
 println("failed stars: ", failedStars)
 
 failedStars = unique(failedStars)
 
 for i in sort(failedStars, rev=true)
-  splice!(starCatalog, i)
-  splice!(errVignets, i)
   splice!(pixelGridFits, i)
-  splice!(s_model, i)
   splice!(s_data, i)
-  splice!(g1_model, i)
   splice!(g1_data, i)
-  splice!(g2_model, i)
   splice!(g2_data, i)
+  splice!(s_model, i)
+  splice!(g1_model, i)
+  splice!(g2_model, i)
   splice!(u_coordinates, i)
   splice!(v_coordinates, i)
+  splice!(starCatalog, i)
+  splice!(errVignets, i)
 end
 
 # ---------------------------------------------------------#
 fancyPrint("Transforming (x,y) -> (u,v) | Interpolation Across the Field of View")
 
+s_data = s_data[1:length(pixelGridFits)]
+g1_data = g1_data[1:length(pixelGridFits)]
+g2_data = g2_data[1:length(pixelGridFits)]
+
 s_tuples = []
-for i in 1:length(s_data)
+for i in 1:length(starCatalog)
   push!(s_tuples, (u_coordinates[i], v_coordinates[i], s_data[i]))
 end
 
 s_fov = optimize(interpCostS, polyG_s!, rand(10), ConjugateGradient())
 sC = s_fov.minimizer
-println("s(u,v): $(sC[1])u^3 + $(sC[2])v^3 + $(sC[3])u^2v + $(sC[4])v^2u + $(sC[5])u^2 + $(sC[6])v^2 + $(sC[7])uv + $(sC[8])u + $(sC[9])v + $(sC[10])")
+println("\ns(u,v): $(sC[1])u^3 + $(sC[2])v^3 + $(sC[3])u^2v + $(sC[4])v^2u + $(sC[5])u^2 + $(sC[6])v^2 + $(sC[7])uv + $(sC[8])u + $(sC[9])v + $(sC[10])\n")
 
 s(u,v) = sC[1]*u^3 + sC[2]*v^3 + sC[3]*u^2*v + sC[4]*v^2*u + sC[5]*u^2 + sC[6]*v^2 + sC[7]*u*v + sC[8]*u + sC[9]*v + sC[10]
 ds_du(u,v) = sC[1]*3*u^2 + sC[3]*2*u*v + sC[4]*v^2 + sC[5]*2*u + sC[7]*v + sC[8]
 ds_dv(u,v) = sC[2]*3*v^2 + sC[3]*u^2 + sC[4]*2*u*v + sC[6]*2*v + sC[7]*u + sC[9]
 
 g1_tuples = []
-for i in 1:length(g1_data)
+for i in 1:length(starCatalog)
   push!(g1_tuples, (u_coordinates[i], v_coordinates[i], g1_data[i]))
 end
 
 g1_fov = optimize(interpCostg1, polyG_g1!, rand(10), ConjugateGradient())
 g1C = g1_fov.minimizer
-println("g1(u,v): $(g1C[1])u^3 + $(g1C[2])v^3 + $(g1C[3])u^2v + $(g1C[4])v^2u + $(g1C[5])u^2 + $(g1C[6])v^2 + $(g1C[7])uv + $(g1C[8])u + $(g1C[9])v + $(g1C[10])")
+println("\ng1(u,v): $(g1C[1])u^3 + $(g1C[2])v^3 + $(g1C[3])u^2v + $(g1C[4])v^2u + $(g1C[5])u^2 + $(g1C[6])v^2 + $(g1C[7])uv + $(g1C[8])u + $(g1C[9])v + $(g1C[10])\n")
 
 g1(u,v) = g1C[1]*u^3 + g1C[2]*v^3 + g1C[3]*u^2*v + g1C[4]*v^2*u + g1C[5]*u^2 + g1C[6]*v^2 + g1C[7]*u*v + g1C[8]*u + g1C[9]*v + g1C[10]
 dg1_du(u,v) = g1C[1]*3*u^2 + g1C[3]*2*u*v + g1C[4]*v^2 + g1C[5]*2*u + g1C[7]*v + g1C[8]
 dg1_dv(u,v) = g1C[2]*3*v^2 + g1C[3]*u^2 + g1C[4]*2*u*v + g1C[6]*2*v + g1C[7]*u + g1C[9]
 
 g2_tuples = []
-for i in 1:length(g2_data)
+for i in 1:length(starCatalog)
   push!(g2_tuples, (u_coordinates[i], v_coordinates[i], g2_data[i]))
 end
 h_uv_data = g2_tuples
 
 g2_fov = optimize(interpCostg2, polyG_g2!, rand(10), ConjugateGradient())
 g2C = g2_fov.minimizer
-println("g2(u,v): $(g2C[1])u^3 + $(g2C[2])v^3 + $(g2C[3])u^2v + $(g2C[4])v^2u + $(g2C[5])u^2 + $(g2C[6])v^2 + $(g2C[7])uv + $(g2C[8])u + $(g2C[9])v + $(g2C[10])")
+println("\ng2(u,v): $(g2C[1])u^3 + $(g2C[2])v^3 + $(g2C[3])u^2v + $(g2C[4])v^2u + $(g2C[5])u^2 + $(g2C[6])v^2 + $(g2C[7])uv + $(g2C[8])u + $(g2C[9])v + $(g2C[10])\n")
 
 g2(u,v) = g2C[1]*u^3 + g2C[2]*v^3 + g2C[3]*u^2*v + g2C[4]*v^2*u + g2C[5]*u^2 + g2C[6]*v^2 + g2C[7]*u*v + g2C[8]*u + g2C[9]*v + g2C[10]
 dg2_du(u,v) = g2C[1]*3*u^2 + g2C[3]*2*u*v + g2C[4]*v^2 + g2C[5]*2*u + g2C[7]*v + g2C[8]
 dg2_dv(u,v) = g2C[2]*3*v^2 + g2C[3]*u^2 + g2C[4]*2*u*v + g2C[6]*2*v + g2C[7]*u + g2C[9]
+
+println("\n** Adding a Progress Bar Dramatically Increases the Run Time, but note that Interpolation across the FOV is taking place! **\n")
 
 PolynomialMatrix = ones(r,c, 10)
 @time begin
@@ -734,6 +741,7 @@ println(readData())
 println(UnicodePlots.boxplot(["s model", "s data", "g1 model", "g1 data", "g2 model", "g2 data"], 
                              [s_model, s_data, g1_model, g1_data, g2_model, g2_data],
                             title="Boxplot of df.shopt"))
+writeFitsData()
 
 # ---------------------------------------------------------#
 fancyPrint("Done! =]")
