@@ -65,7 +65,7 @@ include("webbpsfProcessing.jl")
 include("interpolate.jl")
 
 # ---------------------------------------------------------#
-fancyPrint("Running Source Extractor")
+#fancyPrint("Running Source Extractor")
 # ---------------------------------------------------------#
 
 fancyPrint("Processing Data for Fit")
@@ -185,19 +185,41 @@ end
 
 
 println("\t \t Outliers in s: ", detect_outliers(s_model))
+println("\n\t \t Outliers in g1: ", detect_outliers(g1_model))
+println("\n\t \t Outliers in g2: ", detect_outliers(g2_model))
+
 ns = length(detect_outliers(s_model))
 ng1 = length(detect_outliers(g1_model))
 ng2 = length(detect_outliers(g2_model))
 
-println("\t \t Number of outliers in s: ", ns[1])
-println("\t \t Number of outliers in g1: ", ng1[1])
-println("\t \t Number of outliers in g2: ", ng2[1])
+println("\n\t \t Number of outliers in s: ", ns[1])
+println("\n\t \t Number of outliers in g1: ", ng1[1])
+println("\n\t \t Number of outliers in g2: ", ng2[1])
+
+s_blacklist = []
+for i in 1:length(s_model)
+  if s_model[i] < 0.05
+    push!(s_blacklist, i)
+  end
+end
+
+println("\nBlacklisted $(length(s_blacklist)) stars on the basis of s < 0.05" )
+
+for i in sort(s_blacklist, rev=true)
+  splice!(starCatalog, i)
+  splice!(errVignets, i)
+  splice!(s_model, i)
+  splice!(g1_model, i)
+  splice!(g2_model, i)
+  splice!(u_coordinates, i)
+  splice!(v_coordinates, i)
+end
 
 # ---------------------------------------------------------#
 fancyPrint("Pixel Grid Fit")
 pixelGridFits = []
 @time begin
-  pb = tqdm(1:itr)
+  pb = tqdm(1:length(starCatalog))
   for i in pb
     set_description(pb, "Star $i/$itr Complete")
     global iteration = i
