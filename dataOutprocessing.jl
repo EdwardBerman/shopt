@@ -44,35 +44,42 @@ function writeFitsData(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_
   from astropy.io import fits
   import numpy as np
   
-  s_model = np.array($s_model)
-  g1_model = np.array($g1_model)
-  g2_model = np.array($g2_model)
-  s_data = np.array($s_data)
-  g1_data = np.array($g1_data)
-  g2_data = np.array($g2_data)
-  u_coordinates = np.array($u_coordinates)
-  v_coordinates = np.array($v_coordinates)
-  PolynomialMatrix = np.array($PolynomialMatrix)
-  starCatalog = np.array($starCatalog)
-  pixelGridFits = np.array($pixelGridFits)
-  errVignets = np.array($errVignets)
+  s_model = np.array($s_model, dtype=np.float64)
+  g1_model = np.array($g1_model, dtype=np.float64)
+  g2_model = np.array($g2_model, dtype=np.float64)
+  s_data = np.array($s_data, dtype=np.float64)
+  g1_data = np.array($g1_data, dtype=np.float64)
+  g2_data = np.array($g2_data, dtype=np.float64)
+  u_coordinates = np.array($u_coordinates, dtype=np.float64)
+  v_coordinates = np.array($v_coordinates, dtype=np.float64)
+  PolynomialMatrix = np.array($PolynomialMatrix, dtype=np.float64)
+  starCatalog = np.array($starCatalog, dtype=np.float64)
+  pixelGridFits = np.array($pixelGridFits, dtype=np.float64)
+  errVignets = np.array($errVignets, dtype=np.float64)
 
   hdu1 = fits.PrimaryHDU(PolynomialMatrix)
+  hdu1.header['EXTNAME'] = 'Polynomial Matrix'
   
-  c00 = fits.Column(name='u coordinates', array=u_coordinates, format='K')
-  c01 = fits.Column(name='v coordinates', array=v_coordinates, format='K')
-  c1 = fits.Column(name='s model', array=s_model, format='K')
-  c2 = fits.Column(name='g1 model', array=g1_model, format='K')
-  c3 = fits.Column(name='g2 model', array=g2_model, format='K')
-  c4 = fits.Column(name='s data', array=s_data, format='K')
-  c5 = fits.Column(name='g1 data', array=g1_data, format='K')
-  c6 = fits.Column(name='g2 data', array=g2_data, format='K')
+  c00 = fits.Column(name='u coordinates', array=u_coordinates, format='D')
+  c01 = fits.Column(name='v coordinates', array=v_coordinates, format='D')
+  c1 = fits.Column(name='s model', array=s_model, format='D')
+  c2 = fits.Column(name='g1 model', array=g1_model, format='D')
+  c3 = fits.Column(name='g2 model', array=g2_model, format='D')
+  c4 = fits.Column(name='s data', array=s_data, format='D')
+  c5 = fits.Column(name='g1 data', array=g1_data, format='D')
+  c6 = fits.Column(name='g2 data', array=g2_data, format='D')
 
   VIGNETS_hdu = fits.ImageHDU(starCatalog)
-  errVignets_hdu = fits.ImageHDU(errVignets)
-  pixelGridFits_hdu = fits.ImageHDU(pixelGridFits)
+  VIGNETS_hdu.header['EXTNAME'] = 'VIGNETS'
 
-  summary_statistics_hdu = fits.BinTableHDU.from_columns([c00, c01, c1, c2, c3, c4, c5, c6]) #error is here
+  errVignets_hdu = fits.ImageHDU(errVignets)
+  errVignets_hdu.header['EXTNAME'] = 'Error Vignets'
+
+  pixelGridFits_hdu = fits.ImageHDU(pixelGridFits)
+  pixelGridFits_hdu.header['EXTNAME'] = 'Pixel Grid Fits'
+
+  summary_statistics_hdu = fits.BinTableHDU.from_columns([c00, c01, c1, c2, c3, c4, c5, c6]) 
+  summary_statistics_hdu.header['EXTNAME'] = 'Summary Statistics'
 
   hdul = fits.HDUList([hdu1, summary_statistics_hdu, VIGNETS_hdu, errVignets_hdu, pixelGridFits_hdu])
 
