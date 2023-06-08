@@ -4,7 +4,9 @@ function process_arguments(args)
   println("\n\tConfig Directory: ", configdir)
   outdir = args[2]
   println("\tOutput Directory: ", outdir)
-  datadir = args[3]
-  println("\tData Directory: ", datadir,"\n")
+  catalog = args[3]
+  println("\tCatalog: ", catalog,"\n")
+  sci_file = args[4]
+  println("\tScience File: ", sci_file,"\n")
 end
 

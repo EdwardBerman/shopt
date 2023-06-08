@@ -90,7 +90,8 @@ function error_plot(model, learned, errorModel, errorLearned, t)
   Plots.plot!(legend=:topright, titlefontsize=30, xguidefontsize=30, yguidefontsize=30, margin = 25mm)
 end
 
-function plot_err()
+function plot_err(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data)
+  #=
   s_modelClean = remove_outliers(s_model)
   g1_modelClean = remove_outliers(g1_model)
   g2_modelClean = remove_outliers(g2_model)
@@ -106,19 +107,25 @@ function plot_err()
   n_sD = size(s_modelClean, 1)
   n_g1D = size(g1_modelClean, 1)
   n_g2D = size(g2_modelClean, 1)
+  =#
 
   #Plotting Error True Vs Learned
   #Adapt for means and stds
+  
+  n = size(s_model, 1)
   ps1 = error_plot([mean(s_model), mean(g1_model), mean(g2_model)],
                    [mean(s_data), mean(g1_data), mean(g2_data)],
-                   [std(s_model)/sqrt(itr), std(g1_model)/sqrt(itr), std(g2_model)/sqrt(itr)],
-                   [std(s_data)/sqrt(itr), std(g1_data)/sqrt(itr), std(g2_data)/sqrt(itr)],
+                   [std(s_model)/sqrt(n), std(g1_model)/sqrt(n), std(g2_model)/sqrt(n)],
+                   [std(s_data)/sqrt(n), std(g1_data)/sqrt(n), std(g2_data)/sqrt(n)],
                    "Learned vs True Parameters")
+  #=
   ps2 = error_plot([mean(s_modelClean), mean(g1_modelClean), mean(g2_modelClean)],
                    [mean(s_dataClean), mean(g1_dataClean), mean(g2_dataClean)],
                    [std(s_model)/sqrt(n_s), std(g1_model)/sqrt(n_g1), std(g2_model)/sqrt(n_g2)],
                    [std(s_data)/sqrt(n_sD), std(g1_data)/sqrt(n_g1D), std(g2_data)/sqrt(n_g2D)],
                    "Learned vs True Parameters Outliers Removed")
+  =#
+
   Plots.savefig(Plots.plot(ps1, size = (1920, 1080)), joinpath("outdir", "parametersScatterplot.pdf"))
   Plots.savefig(Plots.plot(ps1, size = (1920, 1080)), joinpath("outdir", "parametersScatterplot.png"))
 end
@@ -162,7 +169,7 @@ function hist_2(x::Array{T, 1}, y::Array{T, 1}, t1, t2) where T<:Real
   Plots.plot!(margin=15mm)
 end
 
-function plot_hist()
+function plot_hist(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, hist_1=hist_1, hist_2=hist_2)
   hist1 = hist_1(s_model, s_data, "s Model", "s Data")
   hist2 = hist_2(g1_model, g1_data, "g1 Model", "g1 Data")
   hist3 = hist_2(g2_model, g2_data, "g2 Model", "g2 Data")
@@ -204,7 +211,7 @@ function plot_hist()
                               joinpath("outdir", "parametersHistogram.png"))
 end
 
-function plot_hm()#p
+function plot_hm(sampled_indices=sampled_indices, starCatalog=starCatalog, pixelGridFits=pixelGridFits, get_middle_15x15=get_middle_15x15, generate_heatmap_sp_t=generate_heatmap_sp_t, generate_heatmap_sp=generate_heatmap_sp,generate_heatmap_titled=generate_heatmap_titled, fft_image=fft_image)#p
   star1 = sampled_indices[1]
   star2 = sampled_indices[2]
   star3 = sampled_indices[3]

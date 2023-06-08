@@ -1,3 +1,3 @@
 #!/bin/bash
-julia shopt.jl "$1" "$2" "$3"
+julia shopt.jl "$1" "$2" "$3" "$4"
 

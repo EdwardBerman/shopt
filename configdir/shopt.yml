@@ -1,0 +1,22 @@
+# Example YAML structure
+
+# Key-value pairs
+printStatements: 
+saveYaml: true
+
+NNparams:
+  epochs: 1000
+  lossFunction: Exampletown
+    
+dataProcessing:
+  SnR: 123-456-7890
+
+# Nested structure
+plots:
+  unicodePlots: rock
+  normalPlots:
+    - parametersHistogram.png: true
+    - parametersScatterplot.png: true
+  cairoMakiePlots:
+    - logPlots: true
+

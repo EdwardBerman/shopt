@@ -260,7 +260,7 @@ pixelGridFits = []
    
     # Train the autoencoder
     try
-      for epoch in 1:1000
+      for epoch in 1:epochs
         Flux.train!(loss, Flux.params(autoencoder), [(data,)], optimizer) #Flux.params(autoencoder))
       end
       # Take a sample input image
@@ -528,7 +528,7 @@ function get_middle_15x15(array::Array{T, 2}) where T
     return array[row_start:(row_start+14), col_start:(col_start+14)]
 end
 
-starSample = rand(1:(itr - length(failedStars)))
+starSample = rand(1:length(starCatalog))
 a = starCatalog[starSample]
 b = pixelGridFits[starSample]
 
@@ -734,9 +734,9 @@ let
 end
 
 # ---------------------------------------------------------#
-fancyPrint("Saving DataFrame to df.shopt")
-writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
-println(readData())
+fancyPrint("Saving Data to summary.shopt")
+#writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
+#println(readData())
 
 println(UnicodePlots.boxplot(["s model", "s data", "g1 model", "g1 data", "g2 model", "g2 data"], 
                              [s_model, s_data, g1_model, g1_data, g2_model, g2_data],
