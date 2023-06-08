@@ -196,12 +196,13 @@ println("\n\t \t Number of outliers in g2: ", ng2[1])
 
 s_blacklist = []
 for i in 1:length(s_model)
-  if (s_model[i] < 0.05 || s_model[i] > 1) #i in failedStars is optional Since Failed Stars are assigned s=0 
+  if (s_model[i] < 0.075 || s_model[i] > 1) #i in failedStars is optional Since Failed Stars are assigned s=0 
     push!(s_blacklist, i)
   end
 end
 
-println("\nBlacklisted $(length(s_blacklist)) stars on the basis of s < 0.05 or s > 1 (Failed Stars Assigned 0)" )
+println("\nBlacklisted Stars: ", s_blacklist)
+println("\nBlacklisted $(length(s_blacklist)) stars on the basis of s < 0.075 or s > 1 (Failed Stars Assigned 0)" )
 
 for i in sort(s_blacklist, rev=true)
   splice!(starCatalog, i)
@@ -243,7 +244,8 @@ pixelGridFits = []
     
     
     function relative_error_loss(x)
-      relative_error = abs.(x - autoencoder(x)) ./ (x .+ 1e-10)  # Add a small value to avoid division by zero
+      x = nanToZero(nanMask(x))
+      relative_error = abs.(x - autoencoder(x)) ./ abs.(x .+ 1e-10)  # Add a small value to avoid division by zero
       mean(relative_error)
     end
 
@@ -331,6 +333,10 @@ fancyPrint("Analytic Profile Fit for Learned Star")
         end
       end
       A_data[i] = 1/sum(norm_data)
+
+      if s_data[i] < 0.075 || s_data[i] > 1 
+        push!(failedStars, i) 
+      end
     catch
       println("Star $i failed")
       push!(failedStars, i)
@@ -382,7 +388,8 @@ fancyPrint("Analytic Profile Fit for Learned Star")
 end
 
 
-println("failed stars: ", failedStars)
+println("failed stars: ", unique(failedStars))
+println("\nRejected $(length(unique(failedStars))) more stars for failing or having either s < 0.075 or s > 1 when fitting an analytic profile to an autoencoded image. NB: These failed stars are being indexed after the blacklisted stars were removed.")
 
 failedStars = unique(failedStars)
 
@@ -414,7 +421,7 @@ end
 
 s_fov = optimize(interpCostS, polyG_s!, rand(10), ConjugateGradient())
 sC = s_fov.minimizer
-println("\ns(u,v): $(sC[1])u^3 + $(sC[2])v^3 + $(sC[3])u^2v + $(sC[4])v^2u + $(sC[5])u^2 + $(sC[6])v^2 + $(sC[7])uv + $(sC[8])u + $(sC[9])v + $(sC[10])\n")
+println("\ns(u,v) = $(sC[1])u^3 + $(sC[2])v^3 + $(sC[3])u^2v + $(sC[4])v^2u + $(sC[5])u^2 + $(sC[6])v^2 + $(sC[7])uv + $(sC[8])u + $(sC[9])v + $(sC[10])\n")
 
 s(u,v) = sC[1]*u^3 + sC[2]*v^3 + sC[3]*u^2*v + sC[4]*v^2*u + sC[5]*u^2 + sC[6]*v^2 + sC[7]*u*v + sC[8]*u + sC[9]*v + sC[10]
 ds_du(u,v) = sC[1]*3*u^2 + sC[3]*2*u*v + sC[4]*v^2 + sC[5]*2*u + sC[7]*v + sC[8]
@@ -427,7 +434,7 @@ end
 
 g1_fov = optimize(interpCostg1, polyG_g1!, rand(10), ConjugateGradient())
 g1C = g1_fov.minimizer
-println("\ng1(u,v): $(g1C[1])u^3 + $(g1C[2])v^3 + $(g1C[3])u^2v + $(g1C[4])v^2u + $(g1C[5])u^2 + $(g1C[6])v^2 + $(g1C[7])uv + $(g1C[8])u + $(g1C[9])v + $(g1C[10])\n")
+println("\ng1(u,v) = $(g1C[1])u^3 + $(g1C[2])v^3 + $(g1C[3])u^2v + $(g1C[4])v^2u + $(g1C[5])u^2 + $(g1C[6])v^2 + $(g1C[7])uv + $(g1C[8])u + $(g1C[9])v + $(g1C[10])\n")
 
 g1(u,v) = g1C[1]*u^3 + g1C[2]*v^3 + g1C[3]*u^2*v + g1C[4]*v^2*u + g1C[5]*u^2 + g1C[6]*v^2 + g1C[7]*u*v + g1C[8]*u + g1C[9]*v + g1C[10]
 dg1_du(u,v) = g1C[1]*3*u^2 + g1C[3]*2*u*v + g1C[4]*v^2 + g1C[5]*2*u + g1C[7]*v + g1C[8]
@@ -441,7 +448,7 @@ h_uv_data = g2_tuples
 
 g2_fov = optimize(interpCostg2, polyG_g2!, rand(10), ConjugateGradient())
 g2C = g2_fov.minimizer
-println("\ng2(u,v): $(g2C[1])u^3 + $(g2C[2])v^3 + $(g2C[3])u^2v + $(g2C[4])v^2u + $(g2C[5])u^2 + $(g2C[6])v^2 + $(g2C[7])uv + $(g2C[8])u + $(g2C[9])v + $(g2C[10])\n")
+println("\ng2(u,v) = $(g2C[1])u^3 + $(g2C[2])v^3 + $(g2C[3])u^2v + $(g2C[4])v^2u + $(g2C[5])u^2 + $(g2C[6])v^2 + $(g2C[7])uv + $(g2C[8])u + $(g2C[9])v + $(g2C[10])\n")
 
 g2(u,v) = g2C[1]*u^3 + g2C[2]*v^3 + g2C[3]*u^2*v + g2C[4]*v^2*u + g2C[5]*u^2 + g2C[6]*v^2 + g2C[7]*u*v + g2C[8]*u + g2C[9]*v + g2C[10]
 dg2_du(u,v) = g2C[1]*3*u^2 + g2C[3]*2*u*v + g2C[4]*v^2 + g2C[5]*2*u + g2C[7]*v + g2C[8]
@@ -510,6 +517,19 @@ end
 
 # ---------------------------------------------------------#
 fancyPrint("Plotting")
+
+meanRelativeError = []
+for i in 1:length(starCatalog)
+  a = starCatalog[i]
+  b = pixelGridFits[i]
+  RelativeError = []
+  for j in 1:size(starCatalog[i], 1)
+    for k in 1:size(starCatalog[i], 2)
+      push!(RelativeError, abs.(starCatalog[i][j,k] .- pixelGridFits[i][j,k]) ./ abs.(starCatalog[i][j,k] .+ 1e-10))
+    end
+  end
+  push!(meanRelativeError, mean(RelativeError))
+end
 
 function sample_indices(array, k)
     indices = collect(1:length(array))  # Create an array of indices

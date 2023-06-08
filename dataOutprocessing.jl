@@ -17,7 +17,7 @@ function readData()
 end
 
 
-function writeFitsData(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, errVignets=errVignets)
+function writeFitsData(meanRelativeError=meanRelativeError, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, errVignets=errVignets)
   
   m, n = size(starCatalog[1])
   array_3d = zeros(m, n, length(starCatalog))
@@ -56,6 +56,7 @@ function writeFitsData(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_
   starCatalog = np.array($starCatalog, dtype=np.float64)
   pixelGridFits = np.array($pixelGridFits, dtype=np.float64)
   errVignets = np.array($errVignets, dtype=np.float64)
+  meanRelativeError = np.array($meanRelativeError, dtype=np.float64)
 
   hdu1 = fits.PrimaryHDU(PolynomialMatrix)
   hdu1.header['EXTNAME'] = 'Polynomial Matrix'
@@ -68,6 +69,7 @@ function writeFitsData(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_
   c4 = fits.Column(name='s data', array=s_data, format='D')
   c5 = fits.Column(name='g1 data', array=g1_data, format='D')
   c6 = fits.Column(name='g2 data', array=g2_data, format='D')
+  c7 = fits.Column(name='mean relative error', array=meanRelativeError, format='D')
 
   VIGNETS_hdu = fits.ImageHDU(starCatalog)
   VIGNETS_hdu.header['EXTNAME'] = 'VIGNETS'
@@ -78,7 +80,7 @@ function writeFitsData(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_
   pixelGridFits_hdu = fits.ImageHDU(pixelGridFits)
   pixelGridFits_hdu.header['EXTNAME'] = 'Pixel Grid Fits'
 
-  summary_statistics_hdu = fits.BinTableHDU.from_columns([c00, c01, c1, c2, c3, c4, c5, c6]) 
+  summary_statistics_hdu = fits.BinTableHDU.from_columns([c00, c01, c1, c2, c3, c4, c5, c6, c7]) 
   summary_statistics_hdu.header['EXTNAME'] = 'Summary Statistics'
 
   hdul = fits.HDUList([hdu1, summary_statistics_hdu, VIGNETS_hdu, errVignets_hdu, pixelGridFits_hdu])
