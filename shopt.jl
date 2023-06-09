@@ -46,7 +46,7 @@ using ProgressBars
 using UnicodePlots
 using Flux
 using Flux.Optimise
-using Flux: onehotbatch, throttle, @epochs, mse
+using Flux: onehotbatch, throttle, @epochs, mse, msle
 using CairoMakie
 
 # ---------------------------------------------------------#
@@ -225,15 +225,15 @@ pixelGridFits = []
     set_description(pb, "Star $i/$(length(starCatalog)) Complete")
     global iteration = i
     encoder = Chain(
-                    Dense(r*c, 128, relu),
-                    Dense(128, 64, relu),
-                    Dense(64, 32, relu),
+                    Dense(r*c, 128, leakyrelu),
+                    Dense(128, 64, leakyrelu),
+                    Dense(64, 32, leakyrelu),
                    )
     # Define the decoder
     decoder = Chain(
-                    Dense(32, 64, relu),
-                    Dense(64, 128, relu),
-                    Dense(128, r*c, sigmoid),
+                    Dense(32, 64, leakyrelu),
+                    Dense(64, 128, leakyrelu),
+                    Dense(128, r*c, tanh),
                    )
   
     # Define the full autoencoder
@@ -244,26 +244,29 @@ pixelGridFits = []
     
     
     function relative_error_loss(x)
-      x = nanToZero(nanMask(x))
       relative_error = abs.(x - autoencoder(x)) ./ abs.(x .+ 1e-10)  # Add a small value to avoid division by zero
       mean(relative_error)
     end
 
     #x̂ = autoencoder(x)
     loss(x) = mse(autoencoder(x), x)
-    #loss(x; model=autoencoder, filter = nanToZero) = mse(filter(model(x)), filter(x))
+    #loss2(x) = mean(abs.(autoencoder(x) .- x)./abs.(x .+ 1e-10))
+    #loss2(x) = mse(1,  sign(x)*sign(autoencoder(x))*abs.(autoencoder(x) ./ (x .+ 1e-10))) 
+    #loss2(x; agg = mean, autoencoder=autoencoder) = agg( abs.((autoencoder(x) .- x) ./ (x .+ 1e-10)) * 100)
+    #loss2(x) = msle(autoencoder(x), x)
+    #loss2(x; agg = mean, eps = eps(eltype(autoencoder(x)))) =  agg((log.(abs.(autoencoder(x) .+ eps)) .- log.(abs.(x .+ eps))) .^ 2)
 
     optimizer = ADAM()
 
     
     # Format some random image data
-    data = reshape(starCatalog[i], length(starCatalog[i]))
+    data = nanToZero(reshape(starCatalog[i], length(starCatalog[i])))
     
    
     # Train the autoencoder
     try
       for epoch in 1:epochs
-        Flux.train!(loss, Flux.params(autoencoder), [(data,)], optimizer) #Flux.params(autoencoder))
+        Flux.train!(loss, Flux.params(autoencoder), [(data,)], optimizer) #loss #Flux.params(autoencoder))
       end
       # Take a sample input image
       input_image = reshape(starCatalog[i], length(starCatalog[i]))
@@ -755,8 +758,8 @@ end
 
 # ---------------------------------------------------------#
 fancyPrint("Saving Data to summary.shopt")
-#writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
-#println(readData())
+writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
+println(readData())
 
 println(UnicodePlots.boxplot(["s model", "s data", "g1 model", "g1 data", "g2 model", "g2 data"], 
                              [s_model, s_data, g1_model, g1_data, g2_model, g2_data],
