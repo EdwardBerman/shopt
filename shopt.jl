@@ -476,7 +476,9 @@ PolynomialMatrix = ones(r,c, 10)
         function sumLoss(f, t)
           totalLoss = 0
           for i in 1:length(t)  #t = [(u,v, I), ...     ]
-            totalLoss += (f(t[i][1], t[i][2]) - t[i][3])^2
+            if t[i][3] != NaN
+              totalLoss += (f(t[i][1], t[i][2]) - t[i][3])^2
+            end
           end
           return totalLoss
         end
@@ -523,8 +525,6 @@ fancyPrint("Plotting")
 
 meanRelativeError = []
 for i in 1:length(starCatalog)
-  a = starCatalog[i]
-  b = pixelGridFits[i]
   RelativeError = []
   for j in 1:size(starCatalog[i], 1)
     for k in 1:size(starCatalog[i], 2)
@@ -555,39 +555,16 @@ starSample = rand(1:length(starCatalog))
 a = starCatalog[starSample]
 b = pixelGridFits[starSample]
 
-Residuals = a - b
-costSquaredError = Residuals.^2 
-
-fft_image = fft(complex.(Residuals))
-fft_image = abs2.(fft_image)
-
-pk = []
-for i in 1:10
-  radius = range(1, max(r/2, c/2) - 1, length=10)
-  push!(pk, powerSpectrum(fft_image, radius[i]))
-end
-
-
-#ksMatrix , b = ks 
-
-fftmin = minimum(fft_image)
-fftmax = maximum(fft_image)
+a = nanToZero(a)
+b = nanToZero(b)
 
 cmx = maximum([maximum(a), maximum(b)])
 cmn = minimum([minimum(a), minimum(b)])
 
-plot_hm()
-plot_hist()
-plot_err()
-
-a = nanMask2(a)
-b = nanMask2(b)
-
-#=
 println(UnicodePlots.heatmap(get_middle_15x15(a), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of star $starSample"))
 println(UnicodePlots.heatmap(get_middle_15x15(b), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
 println(UnicodePlots.heatmap(get_middle_15x15(a - b), colormap=:inferno, title="Heatmap of Residuals"))
-=#
+
 
 #=
 println(UnicodePlots.histogram(s_model, vertical=true, title="Histogram of s model"))
@@ -620,7 +597,7 @@ CairoMakie.Colorbar(fig1[1, 2],
                     fs1,
                     label = L"s(u,v)",
                     width = 20,
-                    labelsize = 14,
+                    labelsize = 30,
                     ticklabelsize = 14)
  
 CairoMakie.colgap!(fig1.layout, 5)
@@ -649,7 +626,7 @@ CairoMakie.Colorbar(fig2[1, 2],
                     fs2,
                     label = L"g1(u,v)",
                     width = 20,
-                    labelsize = 14,
+                    labelsize = 30,
                     ticklabelsize = 14)
  
 CairoMakie.colgap!(fig2.layout, 5)
@@ -678,7 +655,7 @@ CairoMakie.Colorbar(fig3[1, 2],
                     fs3,
                     label = L"g2(u,v)",
                     width = 20,
-                    labelsize = 14,
+                    labelsize = 30,
                     ticklabelsize = 14)
  
 CairoMakie.colgap!(fig3.layout, 5)
@@ -721,24 +698,31 @@ let
         vals
     end
     custom_formatter(values) = map(v -> "10" * Makie.UnicodeFun.to_superscript(round(Int64, v    )), values)
-      data = a
-      starData = b
+      
+      sc1 = nanMask2(starCatalog[sampled_indices[1]])
+      pg1 = nanMask2(pixelGridFits[sampled_indices[1]])
+      sc2 = nanMask2(starCatalog[sampled_indices[2]])
+      pg2 = nanMask2(pixelGridFits[sampled_indices[2]])
+      sc3 = nanMask2(starCatalog[sampled_indices[3]])
+      pg3 = nanMask2(pixelGridFits[sampled_indices[3]])
+
       fig = Figure(resolution = (1800, 1800))
-      ax_a, hm = CairoMakie.heatmap(fig[1, 1], log10.(data),
+      
+      ax_a, hm = CairoMakie.heatmap(fig[1, 1], log10.(sc1),
       axis=(; xminorticksvisible=true,
          xminorticks=IntervalsBetween(9)))
       ax_a.xlabel = "U"
       ax_a.ylabel = "V"
       ax_a.aspect = DataAspect()
 
-      ax_b, hm = CairoMakie.heatmap(fig[1, 2], log10.(starData),
+      ax_b, hm = CairoMakie.heatmap(fig[1, 2], log10.(pg1),
       axis=(; xminorticksvisible=true,
          xminorticks=IntervalsBetween(9)))
       ax_b.xlabel = "U"
       ax_b.ylabel = "V"
       ax_b.aspect = DataAspect()
     
-      ax_c, hm = CairoMakie.heatmap(fig[1, 3], log10.(abs.(data - starData)),
+      ax_c, hm = CairoMakie.heatmap(fig[1, 3], log10.(abs.(sc1 - pg1)),
       axis=(; xminorticksvisible=true,
          xminorticks=IntervalsBetween(9)))
       ax_c.xlabel = "U"
@@ -749,6 +733,59 @@ let
       tickformat=custom_formatter,
       minorticksvisible=true,
       minorticks=LogMinorTicks())
+
+      ax_a2, hm = CairoMakie.heatmap(fig[2, 1], log10.(sc2),
+      axis=(; xminorticksvisible=true,
+         xminorticks=IntervalsBetween(9)))
+      ax_a2.xlabel = "U"
+      ax_a2.ylabel = "V"
+      ax_a2.aspect = DataAspect()
+
+      ax_b2, hm = CairoMakie.heatmap(fig[2, 2], log10.(pg2),
+      axis=(; xminorticksvisible=true,
+         xminorticks=IntervalsBetween(9)))
+      ax_b2.xlabel = "U"
+      ax_b2.ylabel = "V"
+      ax_b2.aspect = DataAspect()
+    
+      ax_c2, hm = CairoMakie.heatmap(fig[2, 3], log10.(abs.(sc2 - pg2)),
+      axis=(; xminorticksvisible=true,
+         xminorticks=IntervalsBetween(9)))
+      ax_c.xlabel = "U"
+      ax_c.ylabel = "V"
+      ax_c.aspect = DataAspect()
+      
+      cb2 = Colorbar(fig[2, 4], hm;
+      tickformat=custom_formatter,
+      minorticksvisible=true,
+      minorticks=LogMinorTicks())
+      
+      ax_a3, hm = CairoMakie.heatmap(fig[3, 1], log10.(sc3),
+      axis=(; xminorticksvisible=true,
+         xminorticks=IntervalsBetween(9)))
+      ax_a3.xlabel = "U"
+      ax_a3.ylabel = "V"
+      ax_a3.aspect = DataAspect()
+
+      ax_b3, hm = CairoMakie.heatmap(fig[3, 2], log10.(pg3),
+      axis=(; xminorticksvisible=true,
+         xminorticks=IntervalsBetween(9)))
+      ax_b3.xlabel = "U"
+      ax_b3.ylabel = "V"
+      ax_b3.aspect = DataAspect()
+    
+      ax_c3, hm = CairoMakie.heatmap(fig[3, 3], log10.(abs.(sc3 - pg3)),
+      axis=(; xminorticksvisible=true,
+         xminorticks=IntervalsBetween(9)))
+      ax_c3.xlabel = "U"
+      ax_c3.ylabel = "V"
+      ax_c3.aspect = DataAspect()
+      
+      cb3 = Colorbar(fig[3, 4], hm;
+      tickformat=custom_formatter,
+      minorticksvisible=true,
+      minorticks=LogMinorTicks())
+
       ax_a.title = "Log Scale Model PSF"
       ax_b.title = "Log Scale Learned PSF"
       ax_c.title = "Log Scale Absolute Value of Residuals"
