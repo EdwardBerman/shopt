@@ -46,8 +46,10 @@ using ProgressBars
 using UnicodePlots
 using Flux
 using Flux.Optimise
+using Flux.Losses
 using Flux: onehotbatch, throttle, @epochs, mse, msle
 using CairoMakie
+using Dates 
 
 # ---------------------------------------------------------#
 fancyPrint("Reading .jl Files")
@@ -265,8 +267,19 @@ pixelGridFits = []
    
     # Train the autoencoder
     try
+      min_gradient = 1e-6
       for epoch in 1:epochs
         Flux.train!(loss, Flux.params(autoencoder), [(data,)], optimizer) #loss #Flux.params(autoencoder))
+        grad = Flux.gradient(Flux.params(autoencoder)) do
+          loss(data)
+        end
+        #grad = gradient(loss, Flux.params(autoencoder))[1]
+        #println("here")
+        grad_norm = norm(grad)
+        if grad_norm < min_gradient
+          #println(epoch)
+          break
+        end
       end
       # Take a sample input image
       input_image = reshape(starCatalog[i], length(starCatalog[i]))
@@ -582,7 +595,7 @@ v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)
 s_map = [s(u,v) for u in u, v in v]
  
 fig1 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
-ax1 = fig1[1, 1] = CairoMakie.Axis(fig1, xlabel = L"u", ylabel = L"v")
+ax1 = fig1[1, 1] = CairoMakie.Axis(fig1, xlabel = L"u", ylabel = L"v",xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
 fs1 = CairoMakie.heatmap!(ax1, u, v, s_map, colormap = Reverse(:plasma))
 CairoMakie.streamplot!(ax1,
             testField,
@@ -597,7 +610,7 @@ CairoMakie.Colorbar(fig1[1, 2],
                     fs1,
                     label = L"s(u,v)",
                     width = 20,
-                    labelsize = 30,
+                    labelsize = 50,
                     ticklabelsize = 14)
  
 CairoMakie.colgap!(fig1.layout, 5)
@@ -611,7 +624,7 @@ v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)
 g1_map = [g1(u,v) for u in u, v in v]
  
 fig2 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
-ax2 = fig2[1, 1] = CairoMakie.Axis(fig2, xlabel = L"u", ylabel = L"v")
+ax2 = fig2[1, 1] = CairoMakie.Axis(fig2, xlabel = L"u", ylabel = L"v",xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
 fs2 = CairoMakie.heatmap!(ax2, u, v, g1_map, colormap = Reverse(:plasma))
 CairoMakie.streamplot!(ax2,
             testField,
@@ -626,7 +639,7 @@ CairoMakie.Colorbar(fig2[1, 2],
                     fs2,
                     label = L"g1(u,v)",
                     width = 20,
-                    labelsize = 30,
+                    labelsize = 50,
                     ticklabelsize = 14)
  
 CairoMakie.colgap!(fig2.layout, 5)
@@ -640,7 +653,7 @@ v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)
 g2_map = [g2(u,v) for u in u, v in v]
 
 fig3 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
-ax3 = fig3[1, 1] = CairoMakie.Axis(fig3, xlabel = L"u", ylabel = L"v")
+ax3 = fig3[1, 1] = CairoMakie.Axis(fig3, xlabel = L"u", ylabel = L"v", xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
 fs3 = CairoMakie.heatmap!(ax3, u, v, g2_map, colormap = Reverse(:plasma))
 CairoMakie.streamplot!(ax3,
             testField,
@@ -655,7 +668,7 @@ CairoMakie.Colorbar(fig3[1, 2],
                     fs3,
                     label = L"g2(u,v)",
                     width = 20,
-                    labelsize = 30,
+                    labelsize = 50,
                     ticklabelsize = 14)
  
 CairoMakie.colgap!(fig3.layout, 5)
@@ -679,6 +692,13 @@ kshm = Plots.heatmap(ksCosmos,
 
 Plots.savefig(kshm, joinpath("outdir","kaisserSquires.png"))
 
+function custom_log(x)
+    if x >= 0
+      log10(x + 10^(-10))
+    else
+      -log10(abs(x))
+    end
+end
 
 
 let
@@ -699,7 +719,7 @@ let
     end
     custom_formatter(values) = map(v -> "10" * Makie.UnicodeFun.to_superscript(round(Int64, v    )), values)
       
-      sc1 = nanMask2(starCatalog[sampled_indices[1]])
+      sc1 = nanMask2(starCatalog[sampled_indices[1]]) #nanMask2
       pg1 = nanMask2(pixelGridFits[sampled_indices[1]])
       sc2 = nanMask2(starCatalog[sampled_indices[2]])
       pg2 = nanMask2(pixelGridFits[sampled_indices[2]])
@@ -708,23 +728,23 @@ let
 
       fig = Figure(resolution = (1800, 1800))
       
-      ax_a, hm = CairoMakie.heatmap(fig[1, 1], log10.(sc1),
+      ax_a, hm = CairoMakie.heatmap(fig[1, 1], custom_log.(sc1), colormap =:coolwarm,
       axis=(; xminorticksvisible=true,
          xminorticks=IntervalsBetween(9)))
       ax_a.xlabel = "U"
       ax_a.ylabel = "V"
       ax_a.aspect = DataAspect()
 
-      ax_b, hm = CairoMakie.heatmap(fig[1, 2], log10.(pg1),
+      ax_b, hm = CairoMakie.heatmap(fig[1, 2], custom_log.(pg1), colormap =:coolwarm,
       axis=(; xminorticksvisible=true,
          xminorticks=IntervalsBetween(9)))
       ax_b.xlabel = "U"
       ax_b.ylabel = "V"
       ax_b.aspect = DataAspect()
     
-      ax_c, hm = CairoMakie.heatmap(fig[1, 3], log10.(abs.(sc1 - pg1)),
+      ax_c, hm = CairoMakie.heatmap(fig[1, 3], custom_log.(sc1 - pg1), colormap =:coolwarm,
       axis=(; xminorticksvisible=true,
-         xminorticks=IntervalsBetween(9)))
+            xminorticks=IntervalsBetween(9)))
       ax_c.xlabel = "U"
       ax_c.ylabel = "V"
       ax_c.aspect = DataAspect()
@@ -733,22 +753,23 @@ let
       tickformat=custom_formatter,
       minorticksvisible=true,
       minorticks=LogMinorTicks())
+      #cb.clim = (custom_log(minimum(sc1)), custom_log(maximum(sc1)))
 
-      ax_a2, hm = CairoMakie.heatmap(fig[2, 1], log10.(sc2),
+      ax_a2, hm = CairoMakie.heatmap(fig[2, 1], custom_log.(sc2), colormap =:coolwarm,
       axis=(; xminorticksvisible=true,
          xminorticks=IntervalsBetween(9)))
       ax_a2.xlabel = "U"
       ax_a2.ylabel = "V"
       ax_a2.aspect = DataAspect()
 
-      ax_b2, hm = CairoMakie.heatmap(fig[2, 2], log10.(pg2),
+      ax_b2, hm = CairoMakie.heatmap(fig[2, 2], custom_log.(pg2), colormap =:coolwarm,
       axis=(; xminorticksvisible=true,
          xminorticks=IntervalsBetween(9)))
       ax_b2.xlabel = "U"
       ax_b2.ylabel = "V"
       ax_b2.aspect = DataAspect()
     
-      ax_c2, hm = CairoMakie.heatmap(fig[2, 3], log10.(abs.(sc2 - pg2)),
+      ax_c2, hm = CairoMakie.heatmap(fig[2, 3], custom_log.(abs.(sc2 - pg2)), colormap =:coolwarm,
       axis=(; xminorticksvisible=true,
          xminorticks=IntervalsBetween(9)))
       ax_c.xlabel = "U"
@@ -759,22 +780,23 @@ let
       tickformat=custom_formatter,
       minorticksvisible=true,
       minorticks=LogMinorTicks())
+      #cb2.clim = (custom_log(minimum(sc2)), custom_log(maximum(sc2)))
       
-      ax_a3, hm = CairoMakie.heatmap(fig[3, 1], log10.(sc3),
+      ax_a3, hm = CairoMakie.heatmap(fig[3, 1], custom_log.(sc3), colormap =:coolwarm,
       axis=(; xminorticksvisible=true,
          xminorticks=IntervalsBetween(9)))
       ax_a3.xlabel = "U"
       ax_a3.ylabel = "V"
       ax_a3.aspect = DataAspect()
 
-      ax_b3, hm = CairoMakie.heatmap(fig[3, 2], log10.(pg3),
+      ax_b3, hm = CairoMakie.heatmap(fig[3, 2], custom_log.(pg3), colormap =:coolwarm,
       axis=(; xminorticksvisible=true,
          xminorticks=IntervalsBetween(9)))
       ax_b3.xlabel = "U"
       ax_b3.ylabel = "V"
       ax_b3.aspect = DataAspect()
     
-      ax_c3, hm = CairoMakie.heatmap(fig[3, 3], log10.(abs.(sc3 - pg3)),
+      ax_c3, hm = CairoMakie.heatmap(fig[3, 3], custom_log.(abs.(sc3 - pg3)), colormap =:coolwarm,
       axis=(; xminorticksvisible=true,
          xminorticks=IntervalsBetween(9)))
       ax_c3.xlabel = "U"
@@ -785,12 +807,13 @@ let
       tickformat=custom_formatter,
       minorticksvisible=true,
       minorticks=LogMinorTicks())
+      #cb3.clim = (custom_log(minimum(sc3)), custom_log(maximum(sc3)))
 
       ax_a.title = "Log Scale Model PSF"
       ax_b.title = "Log Scale Learned PSF"
       ax_c.title = "Log Scale Absolute Value of Residuals"
-      save(joinpath("outdir", "logScale.pdf"), fig)
-      save(joinpath("outdir", "logScale.png"), fig)
+      save(joinpath(outdir, "logScale.pdf"), fig)
+      save(joinpath(outdir, "logScale.png"), fig)
 end
 
 # ---------------------------------------------------------#
