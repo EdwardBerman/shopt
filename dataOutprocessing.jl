@@ -1,4 +1,7 @@
 ## .shopt file
+using PyCall
+using Dates
+
 function writeData(size, shear1, shear2, sizeD, shear1D, shear2D)
   df = DataFrame(star = 1:length(size), 
                  s_model=size, 
@@ -16,8 +19,7 @@ function readData()
   DataFrame(CSV.File(joinpath("outdir", "df.shopt")))
 end
 
-
-function writeFitsData(meanRelativeError=meanRelativeError, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, errVignets=errVignets, fancyprint=fancyprint)
+function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRelativeError, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, errVignets=errVignets, fancyPrint=fancyPrint)
   
   m, n = size(starCatalog[1])
   array_3d = zeros(m, n, length(starCatalog))
@@ -87,7 +89,6 @@ function writeFitsData(meanRelativeError=meanRelativeError, s_model=s_model, g1_
 
   hdul.writeto('summary.shopt', overwrite=True)
   """
-
   command1 = `mv summary.shopt $outdir`
   run(command1)
 
@@ -98,10 +99,11 @@ function writeFitsData(meanRelativeError=meanRelativeError, s_model=s_model, g1_
   command3 = `mv $outdir/shopt.yml $outdir/$(Dates.format(Time(current_time), "HH:MM:SS")*"_shopt.yml")`
   run(command3)
 
-  fancyprint("Producing Additional Python Plots")
+  fancyPrint("Producing Additional Python Plots")
 
   #command4 = `python $outdir/diagnostics.py`
   #run(command4)
+  py_outdir = outdir*"/$(Dates.format(Time(current_time), "HH:MM:SS"))"
   py"""
   from astropy.io import fits
   import numpy as np
@@ -111,34 +113,39 @@ function writeFitsData(meanRelativeError=meanRelativeError, s_model=s_model, g1_
   from matplotlib import cm
   from matplotlib import animation
   import imageio
+  import os
   from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+
+  plt.ion()
 
   f = fits.open('/home/eddieberman/research/mcclearygroup/shopt/outdir/summary.shopt')
 
   polyMatrix = f[0].data
 
-
   def polynomial_interpolation_star(u,v, polynomialMatrix):
-    r,c = np.shape(f[0].data)[0], np.shape(f[0].data)[1]
-    star = np.zeros((r,c))
-    for i in range(r):
-      for j in range(c):
-        star[i,j] = polynomialMatrix[i,j][0]*u**3 + \
-          polynomialMatrix[i,j][1]*v**3 + \
-          polynomialMatrix[i,j][2]*u**2*v + \
-          polynomialMatrix[i,j][3]*u*v**2 + \
-          polynomialMatrix[i,j][4]*u**2 + \
-          polynomialMatrix[i,j][5]*v**2 + \
-          polynomialMatrix[i,j][6]*u*v + \
-          polynomialMatrix[i,j][7]*u + \
-          polynomialMatrix[i,j][8]*v + \
-          polynomialMatrix[i,j][9]
-    star = star/np.sum(star)
-    return star
+      r,c = np.shape(f[0].data)[0], np.shape(f[0].data)[1]
+      star = np.zeros((r,c))
+      for i in range(r):
+          for j in range(c):
+              star[i,j] = polynomialMatrix[i,j][0]*u**3 + \
+                          polynomialMatrix[i,j][1]*v**3 + \
+                          polynomialMatrix[i,j][2]*u**2*v + \
+                          polynomialMatrix[i,j][3]*u*v**2 + \
+                          polynomialMatrix[i,j][4]*u**2 + \
+                          polynomialMatrix[i,j][5]*v**2 + \
+                          polynomialMatrix[i,j][6]*u*v + \
+                          polynomialMatrix[i,j][7]*u + \
+                          polynomialMatrix[i,j][8]*v + \
+                          polynomialMatrix[i,j][9]
+      star = star/np.sum(star)
+      return star
 
   a = polynomial_interpolation_star(f[1].data['u coordinates'][0], f[1].data['v coordinates'][0]   ,polyMatrix)
+  print(np.shape(a))
   fig, axes = plt.subplots(1, 3)
 
+  # Display the first image in the first subplot
   axes[0].imshow(f[4].data[0, :, :  ], norm=colors.SymLogNorm(linthresh=1*10**(-4)))
   axes[0].set_title('Pixel Grid Fit')
 
@@ -151,6 +158,9 @@ function writeFitsData(meanRelativeError=meanRelativeError, s_model=s_model, g1_
 
   # Adjust the spacing between subplots
   plt.tight_layout()
+  plt.show()
+
+
 
   vignets = f[2].data
   a,b,c = np.shape(f[4].data)
@@ -210,8 +220,6 @@ function writeFitsData(meanRelativeError=meanRelativeError, s_model=s_model, g1_
   axes4[1].plot(radius, pk)
   axes4[1].set_title('Power Spectra')
 
-
-
   def update(frame):
       im.set_array(polyMatrix[:, :, frame]) # Update the plot data for each frame
       return im,
@@ -223,13 +231,40 @@ function writeFitsData(meanRelativeError=meanRelativeError, s_model=s_model, g1_
   frames = range(np.shape(polyMatrix)[2])  # Number of frames
   animation = animation.FuncAnimation(fig5, update, frames=frames, interval=200, blit=True)
 
-  fig.savefig('pgfVsInterp.png')
-  fig2.savefig('logV_P_R.png')
-  fig3.savefig('MRE.png')
-  fig4.savefig('fftPk.png')
+  def mreHist(vignets, pixelGrid):
+      RelativeError = []
+      for j in range(vignets.shape[0]):
+          for k in range(vignets.shape[1]):
+              for i in range(vignets.shape[2]):
+                  RelativeError.append((vignets[j,k,i] - pixelGrid[j,k,i]) / (vignets[j,k,i]) + 1e-10)
+      return RelativeError
 
+  fig6, axes6 = plt.subplots(1, figsize=(30, 10))
+  bins = np.linspace(-1, 1, 21)
+  axes6.hist(mreHist(vignets, pixelGrid), bins=bins, color = "lightblue", ec="red", lw=3)
+  axes6.set_xlabel('Relative Error', fontsize=20)
+  axes6.set_ylabel('Frequency',fontsize=20)
+  axes6.set_yscale('log')
+  axes6.set_title(f'Relative Error Histogram (logscale)\n $\mu = {np.mean(mreHist(vignets, pixelGrid))}$,  $\sigma = {np.std(mreHist(vignets, pixelGrid))/np.sqrt(len(mreHist(vignets, pixelGrid)))}$', fontsize=30)
+
+  py_outdir = $py_outdir
+  
+  if not os.path.exists(py_outdir):
+    os.makedirs(py_outdir)
+
+  fig.savefig(os.path.join(py_outdir,'pgfVsInterp.png'))
+  fig2.savefig(os.path.join(py_outdir, 'logV_P_R.png'))
+  fig3.savefig(os.path.join(py_outdir, 'MRE.png'))
+  fig4.savefig(os.path.join(py_outdir, 'fftPk.png'))
+  fig6.savefig(os.path.join(py_outdir, 'RelativeErrorHistogram.png'))
+  fig6.savefig(os.path.join(py_outdir, 'RelativeErrorHistogram.pdf'))
 
   """
-
+  command4 = `mv $outdir/$(Dates.format(Time(current_time), "HH:MM:SS")*"_shopt.yml")  $py_outdir`
+  run(command4)
+  
+  command5 = `mv $outdir/summary.shopt  $py_outdir`
+  run(command5)
   # run on sampled indices, copy diagnostics.py to py""" """ here
 end
+

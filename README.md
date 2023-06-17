@@ -50,17 +50,18 @@ There is also a shell script that runs this command so that the user may call sh
 ### Dependencies 
 Not all of these will be strictly necessary depending on the checkplots you produce, but for full functionality of Shopt the following are necessary. Source Extractor is also not a strict dependency, but in practice one will inevitably install.
 
-| Julia            | Python   | Binaries | Julia          |
-|------------------|----------|----------|----------------|
-| Plots            | treecorr | SEx      | ProgressBars   |
-| ForwardDiff      | astropy  |          | UnicodePlots   |
-| LinearAlgebra    | numpy    |          | CSV            |
-| Random           |          |          | FFTW           |
-| Distributions    |          |          | Images         |
-| SpecialFunctions |          |          | ImageFiltering |
-| Optim            |          |          | DataFrames     |
-| IterativeSolvers |          |          | PyCall         |
-| QuadGK           |          |          | Flux           |
+| Julia            | Python     | Binaries | Julia          |
+|------------------|------------|----------|----------------|
+| Plots            | matplotlib | SEx      | ProgressBars   |
+| ForwardDiff      | astropy    |          | UnicodePlots   |
+| LinearAlgebra    | numpy      |          | CSV            |
+| Random           |            |          | FFTW           |
+| Distributions    |            |          | Images         |
+| SpecialFunctions |            |          | ImageFiltering |
+| Optim            |            |          | DataFrames     |
+| IterativeSolvers |            |          | PyCall         |
+| QuadGK           |            |          | Flux           |
+| CairoMakie       |            |          | YAML           |
 
 ### Set Up 
 The dependencies can be installed in the Julia REPL. For example:
