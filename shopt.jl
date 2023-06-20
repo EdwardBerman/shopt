@@ -1,84 +1,129 @@
 # ---------------------------------------------------------#
-include("argparser.jl")
-include("fancyPrint.jl")
+@time begin
+  include("argparser.jl")
+  include("fancyPrint.jl")
 
-try
-  process_arguments(ARGS)
-catch err
-  println("Error: ", err)
-  println("Usage: julia shopt.jl <configdir> <outdir> <catalog> <sci>")
-  exit(1)
+  try
+    process_arguments(ARGS)
+  catch err
+    println("Error: ", err)
+    println("Usage: julia shopt.jl <configdir> <outdir> <catalog> <sci>")
+    exit(1)
+  end
+
+  configdir = ARGS[1]
+  outdir = ARGS[2]
+  catalog = ARGS[3]
+  sci = ARGS[4]
+
+  if isdir(outdir)
+    println("\tOutdir found")
+  else
+    println("\tOutdir not found, creating...")
+    mkdir(outdir)
+  end
 end
-
-configdir = ARGS[1]
-outdir = ARGS[2]
-catalog = ARGS[3]
-sci = ARGS[4]
-
-if isdir(outdir)
-  println("\tOutdir found")
-else
-  println("\tOutdir not found, creating...")
-  mkdir(outdir)
-end
-
 # ---------------------------------------------------------#
 fancyPrint("Handling Imports")
-using Base: initarray!
-using YAML
-using BenchmarkTools
-using Plots
-using ForwardDiff
-using LinearAlgebra
-using PyCall
-using Random
-using Distributions
-using SpecialFunctions
-using Optim
-using IterativeSolvers
-using QuadGK
-using DataFrames
-using FFTW
-using CSV
-using Images, ImageFiltering
-using Measures
-using ProgressBars
-using UnicodePlots
-using Flux
-using Flux.Optimise
-using Flux.Losses
-using Flux: onehotbatch, throttle, @epochs, mse, msle
-using CairoMakie
-using Dates 
-
+@time begin
+  using Base: initarray!
+  println("\t\t    Base: initarray! imported")
+  using YAML
+  println("\t\t    YAML imported")
+  using BenchmarkTools
+  println("\t\t    BenchmarkTools imported")
+  using Plots
+  println("\t\t    Plots imported")
+  using ForwardDiff
+  println("\t\t    ForwardDiff imported")
+  using LinearAlgebra
+  println("\t\t    LinearAlgebra imported")
+  using PyCall
+  println("\t\t    PyCall imported")
+  using Random
+  println("\t\t    Random imported")
+  using Distributions
+  println("\t\t    Distributions imported")
+  using SpecialFunctions
+  println("\t\t    SpecialFunctions imported")
+  using Optim
+  println("\t\t    Optim imported")
+  using IterativeSolvers
+  println("\t\t    IterativeSolvers imported")
+  using QuadGK
+  println("\t\t    QuadGK imported")
+  using DataFrames
+  println("\t\t    DataFrames imported")
+  using FFTW
+  println("\t\t    FFTW imported")
+  using CSV
+  println("\t\t    CSV imported")
+  using Images, ImageFiltering
+  println("\t\t    Images, ImageFiltering imported")
+  using Measures
+  println("\t\t    Measures imported")
+  using ProgressBars
+  println("\t\t    ProgressBars imported")
+  using UnicodePlots
+  println("\t\t    UnicodePlots imported")
+  using Flux
+  println("\t\t    Flux imported")
+  using Flux.Optimise
+  println("\t\t    Flux.Optimise imported")
+  using Flux.Losses
+  println("\t\t    Flux.Losses imported")
+  using Flux: onehotbatch, throttle, @epochs, mse, msle
+  println("\t\t    Flux: onehotbatch, throttle, @epochs, mse, msle imported")
+  using CairoMakie
+  println("\t\t    CairoMakie imported")
+  using Dates 
+  println("\t\t    Dates imported")
+end
 # ---------------------------------------------------------#
 fancyPrint("Reading .jl Files")
-include("plot.jl")
-include("analyticCGD.jl")
-include("radialProfiles.jl")
-include("pixelGridCGD.jl")
-include("masks.jl")
-include("dataPreprocessing.jl")
-include("outliers.jl")
-include("dataOutprocessing.jl")
-include("powerSpectrum.jl")
-include("kaisserSquires.jl")
-include("webbpsfProcessing.jl")
-include("interpolate.jl")
-
+@time begin
+  include("plot.jl")
+  include("analyticCGD.jl")
+  include("radialProfiles.jl")
+  include("pixelGridCGD.jl")
+  include("masks.jl")
+  include("dataPreprocessing.jl")
+  include("outliers.jl")
+  include("dataOutprocessing.jl")
+  include("powerSpectrum.jl")
+  include("kaisserSquires.jl")
+  include("webbpsfProcessing.jl")
+  include("interpolate.jl")
+end
 # ---------------------------------------------------------#
 #fancyPrint("Running Source Extractor")
 # ---------------------------------------------------------#
 
 fancyPrint("Processing Data for Fit")
-starCatalog, errVignets, r, c, itr, u_coordinates, v_coordinates = cataloging(ARGS)
-starCatalog = starCatalog[1:25]
-#starCatalog, r,c, itr = catalogingWEBBPSF()
-errVignets = errVignets[1:25]
-u_coordinates = u_coordinates[1:25]
-v_coordinates = v_coordinates[1:25]
+@time begin
+  
+  starCatalog, errVignets, r, c, itr, u_coordinates, v_coordinates = cataloging(ARGS)
+  starCatalog = starCatalog[1:100]
+  errVignets = errVignets[1:100]
+  u_coordinates = u_coordinates[1:100]
+  v_coordinates = v_coordinates[1:100]
+  itr = length(starCatalog)
+  
+  
+  #=
+  starCatalog, r,c, itr = catalogingWEBBPSF()
+  u_coordinates = rand(2)
+  v_coordinates = rand(2)
 
-itr = length(starCatalog)
+  itr = length(starCatalog)
+  =#
+
+  #=
+  starCatalog, r, c, u_coordinates, v_coordinates = gridPSFS() #return catalogNew, rows, cols, u_coords, v_coords
+  errVignets = starCatalog
+  itr = length(starCatalog)
+  =#
+end
 
 starData = zeros(r, c)
 
@@ -101,7 +146,8 @@ fancyPrint("Analytic Profile Fit for Model Star")
   for i in pb
     initial_guess = rand(3) #println("\t initial guess [σ, e1, e2]: ", initial_guess)
     set_description(pb, "Star $i/$itr Complete")
-
+    
+    #=
     it = []
     loss = []
 
@@ -110,13 +156,14 @@ fancyPrint("Analytic Profile Fit for Model Star")
       push!(loss, opt_state.value)
       return false  
     end
+    =#
     global iteration = i
     try
       global x_cg = optimize(cost, 
                              g!, 
                              initial_guess, 
-                             ConjugateGradient(),
-                             Optim.Options(callback = cb))
+                             LBFGS(),#ConjugateGradient()
+                             Optim.Options(g_tol = 1e-6))#Optim.Options(callback = cb)
       
       s_model[i] = x_cg.minimizer[1]^2
       e1_guess = x_cg.minimizer[2]
@@ -137,48 +184,11 @@ fancyPrint("Analytic Profile Fit for Model Star")
       A_model[i] = 1/sum(norm_data)
     catch
       println("Star $i failed")
-      push!(failedStars, i)
+      #push!(failedStars, i)
       s_model[i] = 0
       g1_model[i] = 0
       g2_model[i] = 0
       continue
-    end
-
-    loss_time = Plots.plot(it, 
-                           loss, 
-                           linewidth = 5,
-                           tickfontsize=8,
-                           margin=15mm,
-                           xlims=(0,30),
-                           xguidefontsize=20,
-                           yguidefontsize=20,
-                           xlabel="Iteration", 
-                           ylabel="Loss",
-                           label="Star $i Model")
-    push!(ltPlots, loss_time)
-
-    if "$i" == "$itr"
-      title = Plots.plot(title = "Analytic Profile Loss Vs Iteration (Model)",
-                         titlefontsize=30,
-                         grid = false, 
-                         showaxis = false, 
-                         bottom_margin = -50Plots.px)
-        
-      filler = Plots.plot(grid = false, 
-                          showaxis = false, 
-                          bottom_margin = -50Plots.px)
-        
-      Plots.savefig(Plots.plot(title,
-                               filler,
-                               ltPlots[1], 
-                               ltPlots[2], 
-                               ltPlots[3], 
-                               ltPlots[4], 
-                               ltPlots[5], 
-                               ltPlots[6], 
-                                  layout = (4,2),
-                                  size = (1800,800)),
-                                  joinpath("outdir", "lossTimeModel.pdf"))
     end
   end
 end
@@ -234,30 +244,23 @@ pixelGridFits = []
     # Define the decoder
     decoder = Chain(
                     Dense(32, 64, leakyrelu),
-                    Dense(64, 128, leakyrelu),
-                    Dense(128, r*c, tanh),
+                    Dense(64, 128, leakyrelu), #leakyrelu #relu
+                    Dense(128, r*c, tanh),   #tanh #sigmoid
                    )
-  
+    
     # Define the full autoencoder
     autoencoder = Chain(encoder, decoder)
 
-    # Define the loss function (mean squared error)
-    #loss(nanToZero, autoencoder, x, x̂) = Flux.mse(nanToZero(autoencoder(x)), nanToZero(x̂))
-    
+    #x̂ = autoencoder(x)
+    loss(x) = mse(autoencoder(x), x)
     
     function relative_error_loss(x)
+      #x = nanToZero(nanMask(x))
       relative_error = abs.(x - autoencoder(x)) ./ abs.(x .+ 1e-10)  # Add a small value to avoid division by zero
       mean(relative_error)
     end
 
-    #x̂ = autoencoder(x)
-    loss(x) = mse(autoencoder(x), x)
-    #loss2(x) = mean(abs.(autoencoder(x) .- x)./abs.(x .+ 1e-10))
-    #loss2(x) = mse(1,  sign(x)*sign(autoencoder(x))*abs.(autoencoder(x) ./ (x .+ 1e-10))) 
-    #loss2(x; agg = mean, autoencoder=autoencoder) = agg( abs.((autoencoder(x) .- x) ./ (x .+ 1e-10)) * 100)
-    #loss2(x) = msle(autoencoder(x), x)
-    #loss2(x; agg = mean, eps = eps(eltype(autoencoder(x)))) =  agg((log.(abs.(autoencoder(x) .+ eps)) .- log.(abs.(x .+ eps))) .^ 2)
-
+    # Define the optimizer
     optimizer = ADAM()
 
     
@@ -269,14 +272,12 @@ pixelGridFits = []
     try
       min_gradient = 1e-6
       for epoch in 1:epochs
-        Flux.train!(loss, Flux.params(autoencoder), [(data,)], optimizer) #loss #Flux.params(autoencoder))
+        Flux.train!(loss, Flux.params(autoencoder), [(data,)], optimizer) #loss#Flux.params(autoencoder))
         grad = Flux.gradient(Flux.params(autoencoder)) do
           loss(data)
         end
-        #grad = gradient(loss, Flux.params(autoencoder))[1]
-        #println("here")
         grad_norm = norm(grad)
-        if grad_norm < min_gradient
+        if (grad_norm < min_gradient) #min_gradient
           #println(epoch)
           break
         end
@@ -306,7 +307,7 @@ end
 
 
 ltdPlots = []
-
+println("failed stars:", failedStars)
 # ---------------------------------------------------------#
 fancyPrint("Analytic Profile Fit for Learned Star")
 #Copy Star Catalog then replace it with the learned pixel grid stars
@@ -315,7 +316,8 @@ fancyPrint("Analytic Profile Fit for Learned Star")
   for i in pb
     initial_guess = rand(3) #println("\t initial guess [σ, e1, e2]: ", initial_guess)
     set_description(pb, "Star $i/$(length(starCatalog)) Complete")
-     
+    
+    #=
     it = []
     loss = []
 
@@ -324,13 +326,14 @@ fancyPrint("Analytic Profile Fit for Learned Star")
       push!(loss, opt_state.value)
       return false  
     end
+    =#
     global iteration = i
     try 
       global y_cg = optimize(costD, 
                              gD!, 
-                             initial_guess, 
-                             ConjugateGradient(),
-                             Optim.Options(callback = cb))
+                             initial_guess,
+                             LBFGS(),#ConjugateGradient()ConjugateGradient(),
+                             Optim.Options(g_tol = 1e-6)) #Optim.Options(callback = cb)
     
       s_data[i] = y_cg.minimizer[1]^2
       e1_guess = y_cg.minimizer[2]
@@ -355,49 +358,11 @@ fancyPrint("Analytic Profile Fit for Learned Star")
       end
     catch
       println("Star $i failed")
-      push!(failedStars, i)
       s_data[i] = 0
       g1_data[i] = 0
       g2_data[i] = 0
       continue
     end
-
-    loss_time = Plots.plot(it, 
-                           loss, 
-                           margin=15mm,
-                           linewidth = 5,
-                           tickfontsize=8,
-                           xlims=(0,30),
-                           xlabel="Iteration",
-                           xguidefontsize=20,               
-                           yguidefontsize=20,
-                           ylabel="Loss",
-                           label="Star $i Data")
-    push!(ltdPlots, loss_time)
-    
-    if "$i" == "$itr"
-      title = Plots.plot(title = "Analytic Profile Loss Vs Iteration (Data)", 
-                         titlefontsize=30,
-                         grid = false, 
-                         showaxis = false, 
-                         bottom_margin = -50Plots.px)
-
-      filler = Plots.plot(grid = false, 
-                          showaxis = false, 
-                          bottom_margin = -50Plots.px)
-      Plots.savefig(Plots.plot(title,
-                               filler,
-                               ltdPlots[1], 
-                               ltdPlots[2], 
-                               ltdPlots[3], 
-                               ltdPlots[4], 
-                               ltdPlots[5], 
-                               ltdPlots[6], 
-                               layout = (4,2),
-                               size = (1800,800)),
-                               joinpath("outdir", "lossTimeData.pdf"))
-    end
-
     #println("\t Found A: ", A_data[i], "\t s: ", s_data[i]^2, "\t g1: ", g1_data[i], "\t g2: ", g2_data[i])
 
   end
@@ -470,350 +435,300 @@ g2(u,v) = g2C[1]*u^3 + g2C[2]*v^3 + g2C[3]*u^2*v + g2C[4]*v^2*u + g2C[5]*u^2 + g
 dg2_du(u,v) = g2C[1]*3*u^2 + g2C[3]*2*u*v + g2C[4]*v^2 + g2C[5]*2*u + g2C[7]*v + g2C[8]
 dg2_dv(u,v) = g2C[2]*3*v^2 + g2C[3]*u^2 + g2C[4]*2*u*v + g2C[6]*2*v + g2C[7]*u + g2C[9]
 
-println("\n** Adding a Progress Bar Dramatically Increases the Run Time, but note that Interpolation across the FOV is taking place! **\n")
+#println("\n** Adding a Progress Bar Dramatically Increases the Run Time, but note that Interpolation across the FOV is taking place! **\n")
 
 PolynomialMatrix = ones(r,c, 10)
+  
+function sample_indices(array, k)
+  indices = collect(1:length(array))  # Create an array of indices
+  return sample(indices, k, replace = false)
+end
+
+total_samples = length(pixelGridFits)
+training_ratio = 0.8
+training_samples = round(training_ratio * total_samples)
+
+training_indices = sample_indices(pixelGridFits, training_samples)
+training_stars = pixelGridFits[training_indices]
+training_u_coords = u_coordinates[training_indices]
+training_v_coords = v_coordinates[training_indices]
+
+validation_indices = setdiff(1:total_samples, training_indices)
+validation_stars = pixelGridFits[validation_indices]
+validation_u_coords = u_coordinates[validation_indices]
+validation_v_coords = v_coordinates[validation_indices]
+
 @time begin
   for i in 1:r
-    #pb = tqdm(1:c)
-    for j in 1:c
-      #set_description(pb, "Working on Pixel ($i, $j)")
-      p_tuples = []
+    pb = tqdm(1:c)
+    for j in pb #1:c #1:c #pb
+      set_description(pb, "Working on Pixel ($i , $j)")
+      #=
+      degree = 3
+      x_data = u_coordinates  # Sample x data
+      y_data = v_coordinates  # Sample y data
+      z_data = []  # Sample z data
       for k in 1:length(pixelGridFits)
-        push!(p_tuples, (u_coordinates[k], v_coordinates[k], pixelGridFits[k][i, j]))
+        push!(z_data, pixelGridFits[k][i, j])
+      end
+      # Number of data points
+      n = length(x_data)
+
+      # Construct the data matrix and function values (excluding rows with NaN coefficients)
+      data = zeros(n, 3)
+      z_vals = zeros(n)
+      index = 1
+      for i in 1:n
+          if !isnan(z_data[i])
+              data[index, 1] = x_data[i]
+              data[index, 2] = y_data[i]
+              data[index, 3] = z_data[i]
+              z_vals[index] = z_data[i]
+              index += 1
+          end
+      end
+      n_valid = index - 1
+
+      # Construct the coefficient matrix
+      A = zeros(n_valid, (degree + 1) * (degree + 2) ÷ 2)
+      for i in 1:n_valid
+          x_val, y_val = data[i, 1:2]
+          index = 1
+          for j in 0:degree
+              for k in 0:(degree - j)
+                  A[i, index] = x_val^j * y_val^k
+                  index += 1
+              end
+          end
       end
 
-      function interpCostP(p; truth=p_tuples)
-        I(u, v) = p[1]*u^3 + p[2]*v^3 + p[3]*u^2*v + p[4]*v^2*u + p[5]*u^2 + p[6]*v^2 + p[7]*u*v + p[8]*u + p[9]*v + p[10]
-        t = truth
-        function sumLoss(f, t)
-          totalLoss = 0
-          for i in 1:length(t)  #t = [(u,v, I), ...     ]
-            if t[i][3] != NaN
-              totalLoss += (f(t[i][1], t[i][2]) - t[i][3])^2
+      # Compute SVD
+      U, S, V = svd(A)
+
+      # Solve the system using SVD
+      pC = V * inv(diagm(S)) * transpose(U) * z_vals[1:n_valid]
+      pC = pC[1:(degree + 1) * (degree + 2) ÷ 2]
+      =#
+      
+      function objective_function(p, x, y, degree)
+        num_coefficients = (degree + 1) * (degree + 2) ÷ 2
+        value = 0
+        counter = 0
+        for i in 1:(degree + 1)
+          for j in 1:(degree + 1)
+            if (i - 1) + (j - 1) <= degree
+              counter += 1
+              value += p[counter] * x^(i - 1) * y^(j - 1) #Make p 2-D then flatten
             end
           end
-          return totalLoss
         end
-        return sumLoss(I, t)
+
+        return value
       end
 
-      function polyG_P!(storage, p)
-        grad_cost = ForwardDiff.gradient(interpCostP, p)
-        storage[1] = grad_cost[1]
-        storage[2] = grad_cost[2]
-        storage[3] = grad_cost[3]
-        storage[4] = grad_cost[4]
-        storage[5] = grad_cost[5]
-        storage[6] = grad_cost[6]
-        storage[7] = grad_cost[7]
-        storage[8] = grad_cost[8]
-        storage[9] = grad_cost[9]
-        storage[10] = grad_cost[10]
+      function polynomial_optimizer(degree, x_data, y_data, z_data)
+        num_coefficients = (degree + 1) * (degree + 2) ÷ 2
+        initial_guess = ones(num_coefficients)  # Initial guess for the coefficients
+        function objective(p)
+          epsilon = 1e-8  # Small constant to avoid division by zero or negative infinity
+          loss = sum((objective_function(p, x_val, y_val, degree) - z_actual)^2  for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
+          #loss = sum(log(1 + (objective_function(p, x_val, y_val, degree) - z_actual)^2) for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
+          #loss = sum((objective_function(p, x_val, y_val, degree) - z_actual)^2 for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
+          return loss
+        end
+ 
+        result = optimize(objective, initial_guess, autodiff=:forward, LBFGS(), Optim.Options(f_tol=1e-40)) #autodiff=:forward
+
+        return Optim.minimizer(result)
       end
 
-      p_fov = optimize(interpCostP, polyG_P!, rand(10), ConjugateGradient())
-      pC = p_fov.minimizer
+      degree = 3
+      x_data = training_u_coords  # Sample x data
+      y_data = training_v_coords  # Sample y data
+      z_data = []  # Sample z data
+      for k in 1:length(training_stars)
+        push!(z_data, training_stars[k][i, j])
+      end
+
+      pC = polynomial_optimizer(degree, x_data, y_data, z_data)
+      #println("Optimized Polynomial Coefficients:")
+      #println(pC)
 
       #Create Optimization Scheme with Truh Values from the PixelGridFits
-      PolynomialMatrix[i,j,1] = pC[1]
-      PolynomialMatrix[i,j,2] = pC[2]
-      PolynomialMatrix[i,j,3] = pC[3]
-      PolynomialMatrix[i,j,4] = pC[4]
-      PolynomialMatrix[i,j,5] = pC[5]
-      PolynomialMatrix[i,j,6] = pC[6]
-      PolynomialMatrix[i,j,7] = pC[7]
-      PolynomialMatrix[i,j,8] = pC[8]
-      PolynomialMatrix[i,j,9] = pC[9]
-      PolynomialMatrix[i,j,10] = pC[10]
+      for k in 1:length(pC)
+        PolynomialMatrix[i,j,k] = pC[k]
+      end
     end
   end 
 
 end
-#println("Polynomial Matrix: $(PolynomialMatrix)")
-
-
-# ---------------------------------------------------------#
-fancyPrint("Plotting")
-
-meanRelativeError = []
-for i in 1:length(starCatalog)
-  RelativeError = []
-  for j in 1:size(starCatalog[i], 1)
-    for k in 1:size(starCatalog[i], 2)
-      push!(RelativeError, abs.(starCatalog[i][j,k] .- pixelGridFits[i][j,k]) ./ abs.(starCatalog[i][j,k] .+ 1e-10))
-    end
-  end
-  push!(meanRelativeError, mean(RelativeError))
-end
-
-function sample_indices(array, k)
-    indices = collect(1:length(array))  # Create an array of indices
-    return sample(indices, k, replace = false)
-end
-
-sampled_indices = sort(sample_indices(starCatalog, 3))
-
-println("Sampled indices: ", sampled_indices)
-
-function get_middle_15x15(array::Array{T, 2}) where T
-    rows, cols = size(array)
-    row_start = div(rows, 2) - 7
-    col_start = div(cols, 2) - 7
-    
-    return array[row_start:(row_start+14), col_start:(col_start+14)]
-end
-
-starSample = rand(1:length(starCatalog))
-a = starCatalog[starSample]
-b = pixelGridFits[starSample]
-
-a = nanToZero(a)
-b = nanToZero(b)
-
-cmx = maximum([maximum(a), maximum(b)])
-cmn = minimum([minimum(a), minimum(b)])
-
-println(UnicodePlots.heatmap(get_middle_15x15(a), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of star $starSample"))
-println(UnicodePlots.heatmap(get_middle_15x15(b), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
-println(UnicodePlots.heatmap(get_middle_15x15(a - b), colormap=:inferno, title="Heatmap of Residuals"))
-
-
 #=
-println(UnicodePlots.histogram(s_model, vertical=true, title="Histogram of s model"))
-println(UnicodePlots.histogram(s_data, vertical=true, title="Histogram of s data"))
-println(UnicodePlots.histogram(g1_model, vertical=true, title="Histogram of g1 model"))
-println(UnicodePlots.histogram(g1_data, vertical=true, title="Histogram of g1 data"))
-println(UnicodePlots.histogram(g2_model, vertical=true, title="Histogram of g2 model"))
-println(UnicodePlots.histogram(g2_data, vertical=true, title="Histogram of g2 data"))
+println("Optimized Polynomial Coefficients:")
+println(coefficients)
+
+
 =#
 
-testField(u, v) = Point2f(ds_du(u,v), ds_dv(u,v)) # x'(t) = -x, y'(t) = 2y
-u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
-v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
+#println("Polynomial Matrix: $(PolynomialMatrix)")
 
-s_map = [s(u,v) for u in u, v in v]
- 
-fig1 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
-ax1 = fig1[1, 1] = CairoMakie.Axis(fig1, xlabel = L"u", ylabel = L"v",xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
-fs1 = CairoMakie.heatmap!(ax1, u, v, s_map, colormap = Reverse(:plasma))
-CairoMakie.streamplot!(ax1,
-            testField,
-            u,
-            v,
-            colormap = Reverse(:plasma),
-            gridsize = (32, 32),
-            density = 0.25,
-            arrow_size = 10)
-
-CairoMakie.Colorbar(fig1[1, 2],
-                    fs1,
-                    label = L"s(u,v)",
-                    width = 20,
-                    labelsize = 50,
-                    ticklabelsize = 14)
- 
-CairoMakie.colgap!(fig1.layout, 5)
- 
-save(joinpath("outdir", "s_uv.png"), fig1)
-
-testField(u, v) = Point2f(dg1_du(u,v), dg1_dv(u,v)) # x'(t) = -x, y'(t) = 2y
-u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
-v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
-
-g1_map = [g1(u,v) for u in u, v in v]
- 
-fig2 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
-ax2 = fig2[1, 1] = CairoMakie.Axis(fig2, xlabel = L"u", ylabel = L"v",xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
-fs2 = CairoMakie.heatmap!(ax2, u, v, g1_map, colormap = Reverse(:plasma))
-CairoMakie.streamplot!(ax2,
-            testField,
-            u,
-            v,
-            colormap = Reverse(:plasma),
-            gridsize = (32, 32),
-            density = 0.25,
-            arrow_size = 10)
-
-CairoMakie.Colorbar(fig2[1, 2],
-                    fs2,
-                    label = L"g1(u,v)",
-                    width = 20,
-                    labelsize = 50,
-                    ticklabelsize = 14)
- 
-CairoMakie.colgap!(fig2.layout, 5)
- 
-save(joinpath("outdir", "g1_uv.png"), fig2)
-
-testField(u, v) = Point2f(dg2_du(u,v), dg2_dv(u,v)) # x'(t) = -x, y'(t) = 2y
-u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
-v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
-
-g2_map = [g2(u,v) for u in u, v in v]
-
-fig3 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
-ax3 = fig3[1, 1] = CairoMakie.Axis(fig3, xlabel = L"u", ylabel = L"v", xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
-fs3 = CairoMakie.heatmap!(ax3, u, v, g2_map, colormap = Reverse(:plasma))
-CairoMakie.streamplot!(ax3,
-            testField,
-            u,
-            v,
-            colormap = Reverse(:plasma),
-            gridsize = (32, 32),
-            density = 0.25,
-            arrow_size = 10)
-
-CairoMakie.Colorbar(fig3[1, 2],
-                    fs3,
-                    label = L"g2(u,v)",
-                    width = 20,
-                    labelsize = 50,
-                    ticklabelsize = 14)
- 
-CairoMakie.colgap!(fig3.layout, 5)
- 
-save(joinpath("outdir", "g2_uv.png"), fig3)
-
-scale = 1/0.29
-ks93, k0 = ks(g1_map, g2_map)
-ksCosmos = get_middle_15x15(imfilter(ks93, Kernel.gaussian(scale)))
-kshm = Plots.heatmap(ksCosmos,
-                     title="Kaisser-Squires", 
-                     xlabel="u", 
-                     ylabel="v",
-                     xlims=(0.5, size(ksCosmos, 2) + 0.5),  # set the x-axis limits to include the full cells
-                     ylims=(0.5, size(ksCosmos, 1) + 0.5),  # set the y-axis limits to include the full cells
-                     aspect_ratio=:equal,
-                     ticks=:none,  # remove the ticks
-                     frame=:box,  # draw a box around the plot
-                     grid=:none,  # remove the grid lines
-                     size=(1920,1080))
-
-Plots.savefig(kshm, joinpath("outdir","kaisserSquires.png"))
-
-function custom_log(x)
-    if x >= 0
-      log10(x + 10^(-10))
-    else
-      -log10(abs(x))
+#println(PolynomialMatrix[31,31,:])
+# ---------------------------------------------------------#
+fancyPrint("Plotting")
+@time begin
+  meanRelativeError = []
+  for i in 1:length(starCatalog)
+    RelativeError = []
+    for j in 1:size(starCatalog[i], 1)
+      for k in 1:size(starCatalog[i], 2)
+        push!(RelativeError, abs.(starCatalog[i][j,k] .- pixelGridFits[i][j,k]) ./ abs.(starCatalog[i][j,k] .+ 1e-10))
+      end
     end
-end
+    push!(meanRelativeError, mean(RelativeError))
+  end
 
 
-let
-    # cf. https://github.com/JuliaPlots/Makie.jl/issues/822#issuecomment-769684652
-    # with scale argument that is required now
-    struct LogMinorTicks end
-    
-    function MakieLayout.get_minor_tickvalues(::LogMinorTicks, scale, tickvalues, vmin, vmax)
-        vals = Float64[]
-        for (lo, hi) in zip(
-                  @view(tickvalues[1:end-1]),
-                  @view(tickvalues[2:end]))
-                        interval = hi-lo
-                        steps = log10.(LinRange(10^lo, 10^hi, 11))
-            append!(vals, steps[2:end-1])
-        end
-        vals
-    end
-    custom_formatter(values) = map(v -> "10" * Makie.UnicodeFun.to_superscript(round(Int64, v    )), values)
+  #sampled_indices = sort(sample_indices(starCatalog, 3))
+  sampled_indices = [1,2]
+
+  println("Sampled indices: ", sampled_indices)
+
+  function get_middle_15x15(array::Array{T, 2}) where T
+      rows, cols = size(array)
+      row_start = div(rows, 2) - 7
+      col_start = div(cols, 2) - 7
       
-      sc1 = nanMask2(starCatalog[sampled_indices[1]]) #nanMask2
-      pg1 = nanMask2(pixelGridFits[sampled_indices[1]])
-      sc2 = nanMask2(starCatalog[sampled_indices[2]])
-      pg2 = nanMask2(pixelGridFits[sampled_indices[2]])
-      sc3 = nanMask2(starCatalog[sampled_indices[3]])
-      pg3 = nanMask2(pixelGridFits[sampled_indices[3]])
+      return array[row_start:(row_start+14), col_start:(col_start+14)]
+  end
 
-      fig = Figure(resolution = (1800, 1800))
-      
-      ax_a, hm = CairoMakie.heatmap(fig[1, 1], custom_log.(sc1), colormap =:coolwarm,
-      axis=(; xminorticksvisible=true,
-         xminorticks=IntervalsBetween(9)))
-      ax_a.xlabel = "U"
-      ax_a.ylabel = "V"
-      ax_a.aspect = DataAspect()
+  starSample = rand(1:length(starCatalog))
+  a = starCatalog[starSample]
+  b = pixelGridFits[starSample]
 
-      ax_b, hm = CairoMakie.heatmap(fig[1, 2], custom_log.(pg1), colormap =:coolwarm,
-      axis=(; xminorticksvisible=true,
-         xminorticks=IntervalsBetween(9)))
-      ax_b.xlabel = "U"
-      ax_b.ylabel = "V"
-      ax_b.aspect = DataAspect()
-    
-      ax_c, hm = CairoMakie.heatmap(fig[1, 3], custom_log.(sc1 - pg1), colormap =:coolwarm,
-      axis=(; xminorticksvisible=true,
-            xminorticks=IntervalsBetween(9)))
-      ax_c.xlabel = "U"
-      ax_c.ylabel = "V"
-      ax_c.aspect = DataAspect()
-      
-      cb = Colorbar(fig[1, 4], hm;
-      tickformat=custom_formatter,
-      minorticksvisible=true,
-      minorticks=LogMinorTicks())
-      #cb.clim = (custom_log(minimum(sc1)), custom_log(maximum(sc1)))
+  a = nanToZero(a)
+  b = nanToZero(b)
 
-      ax_a2, hm = CairoMakie.heatmap(fig[2, 1], custom_log.(sc2), colormap =:coolwarm,
-      axis=(; xminorticksvisible=true,
-         xminorticks=IntervalsBetween(9)))
-      ax_a2.xlabel = "U"
-      ax_a2.ylabel = "V"
-      ax_a2.aspect = DataAspect()
+  cmx = maximum([maximum(a), maximum(b)])
+  cmn = minimum([minimum(a), minimum(b)])
 
-      ax_b2, hm = CairoMakie.heatmap(fig[2, 2], custom_log.(pg2), colormap =:coolwarm,
-      axis=(; xminorticksvisible=true,
-         xminorticks=IntervalsBetween(9)))
-      ax_b2.xlabel = "U"
-      ax_b2.ylabel = "V"
-      ax_b2.aspect = DataAspect()
-    
-      ax_c2, hm = CairoMakie.heatmap(fig[2, 3], custom_log.(abs.(sc2 - pg2)), colormap =:coolwarm,
-      axis=(; xminorticksvisible=true,
-         xminorticks=IntervalsBetween(9)))
-      ax_c.xlabel = "U"
-      ax_c.ylabel = "V"
-      ax_c.aspect = DataAspect()
-      
-      cb2 = Colorbar(fig[2, 4], hm;
-      tickformat=custom_formatter,
-      minorticksvisible=true,
-      minorticks=LogMinorTicks())
-      #cb2.clim = (custom_log(minimum(sc2)), custom_log(maximum(sc2)))
-      
-      ax_a3, hm = CairoMakie.heatmap(fig[3, 1], custom_log.(sc3), colormap =:coolwarm,
-      axis=(; xminorticksvisible=true,
-         xminorticks=IntervalsBetween(9)))
-      ax_a3.xlabel = "U"
-      ax_a3.ylabel = "V"
-      ax_a3.aspect = DataAspect()
+  println(UnicodePlots.heatmap(get_middle_15x15(a), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of star $starSample"))
+  println(UnicodePlots.heatmap(get_middle_15x15(b), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
+  println(UnicodePlots.heatmap(get_middle_15x15(a - b), colormap=:inferno, title="Heatmap of Residuals"))
 
-      ax_b3, hm = CairoMakie.heatmap(fig[3, 2], custom_log.(pg3), colormap =:coolwarm,
-      axis=(; xminorticksvisible=true,
-         xminorticks=IntervalsBetween(9)))
-      ax_b3.xlabel = "U"
-      ax_b3.ylabel = "V"
-      ax_b3.aspect = DataAspect()
-    
-      ax_c3, hm = CairoMakie.heatmap(fig[3, 3], custom_log.(abs.(sc3 - pg3)), colormap =:coolwarm,
-      axis=(; xminorticksvisible=true,
-         xminorticks=IntervalsBetween(9)))
-      ax_c3.xlabel = "U"
-      ax_c3.ylabel = "V"
-      ax_c3.aspect = DataAspect()
-      
-      cb3 = Colorbar(fig[3, 4], hm;
-      tickformat=custom_formatter,
-      minorticksvisible=true,
-      minorticks=LogMinorTicks())
-      #cb3.clim = (custom_log(minimum(sc3)), custom_log(maximum(sc3)))
 
-      ax_a.title = "Log Scale Model PSF"
-      ax_b.title = "Log Scale Learned PSF"
-      ax_c.title = "Log Scale Absolute Value of Residuals"
-      save(joinpath(outdir, "logScale.pdf"), fig)
-      save(joinpath(outdir, "logScale.png"), fig)
+  #=
+  println(UnicodePlots.histogram(s_model, vertical=true, title="Histogram of s model"))
+  println(UnicodePlots.histogram(s_data, vertical=true, title="Histogram of s data"))
+  println(UnicodePlots.histogram(g1_model, vertical=true, title="Histogram of g1 model"))
+  println(UnicodePlots.histogram(g1_data, vertical=true, title="Histogram of g1 data"))
+  println(UnicodePlots.histogram(g2_model, vertical=true, title="Histogram of g2 model"))
+  println(UnicodePlots.histogram(g2_data, vertical=true, title="Histogram of g2 data"))
+  =#
+
+  testField(u, v) = Point2f(ds_du(u,v), ds_dv(u,v)) # x'(t) = -x, y'(t) = 2y
+  u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
+  v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
+
+  s_map = [s(u,v) for u in u, v in v]
+   
+  fig1 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
+  ax1 = fig1[1, 1] = CairoMakie.Axis(fig1, xlabel = L"u", ylabel = L"v",xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
+  fs1 = CairoMakie.heatmap!(ax1, u, v, s_map, colormap = Reverse(:plasma))
+  CairoMakie.streamplot!(ax1,
+              testField,
+              u,
+              v,
+              colormap = Reverse(:plasma),
+              gridsize = (32, 32),
+              density = 0.25,
+              arrow_size = 10)
+
+  CairoMakie.Colorbar(fig1[1, 2],
+                      fs1,
+                      label = L"s(u,v)",
+                      width = 20,
+                      labelsize = 50,
+                      ticklabelsize = 14)
+   
+  CairoMakie.colgap!(fig1.layout, 5)
+   
+  save(joinpath("outdir", "s_uv.png"), fig1)
+
+  testField(u, v) = Point2f(dg1_du(u,v), dg1_dv(u,v)) # x'(t) = -x, y'(t) = 2y
+  u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
+  v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
+
+  g1_map = [g1(u,v) for u in u, v in v]
+   
+  fig2 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
+  ax2 = fig2[1, 1] = CairoMakie.Axis(fig2, xlabel = L"u", ylabel = L"v",xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
+  fs2 = CairoMakie.heatmap!(ax2, u, v, g1_map, colormap = Reverse(:plasma))
+  CairoMakie.streamplot!(ax2,
+              testField,
+              u,
+              v,
+              colormap = Reverse(:plasma),
+              gridsize = (32, 32),
+              density = 0.25,
+              arrow_size = 10)
+
+  CairoMakie.Colorbar(fig2[1, 2],
+                      fs2,
+                      label = L"g1(u,v)",
+                      width = 20,
+                      labelsize = 50,
+                      ticklabelsize = 14)
+   
+  CairoMakie.colgap!(fig2.layout, 5)
+   
+  save(joinpath("outdir", "g1_uv.png"), fig2)
+
+  testField(u, v) = Point2f(dg2_du(u,v), dg2_dv(u,v)) # x'(t) = -x, y'(t) = 2y
+  u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
+  v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
+
+  g2_map = [g2(u,v) for u in u, v in v]
+
+  fig3 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
+  ax3 = fig3[1, 1] = CairoMakie.Axis(fig3, xlabel = L"u", ylabel = L"v", xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
+  fs3 = CairoMakie.heatmap!(ax3, u, v, g2_map, colormap = Reverse(:plasma))
+  CairoMakie.streamplot!(ax3,
+              testField,
+              u,
+              v,
+              colormap = Reverse(:plasma),
+              gridsize = (32, 32),
+              density = 0.25,
+              arrow_size = 10)
+
+  CairoMakie.Colorbar(fig3[1, 2],
+                      fs3,
+                      label = L"g2(u,v)",
+                      width = 20,
+                      labelsize = 50,
+                      ticklabelsize = 14)
+   
+  CairoMakie.colgap!(fig3.layout, 5)
+   
+  save(joinpath("outdir", "g2_uv.png"), fig3)
+
+  #=
+  scale = 1/0.29
+  ks93, k0 = ks(g1_map, g2_map)
+  ksCosmos = get_middle_15x15(imfilter(ks93, Kernel.gaussian(scale)))
+  kshm = Plots.heatmap(ksCosmos,
+                       title="Kaisser-Squires", 
+                       xlabel="u", 
+                       ylabel="v",
+                       xlims=(0.5, size(ksCosmos, 2) + 0.5),  # set the x-axis limits to include the full cells
+                       ylims=(0.5, size(ksCosmos, 1) + 0.5),  # set the y-axis limits to include the full cells
+                       aspect_ratio=:equal,
+                       ticks=:none,  # remove the ticks
+                       frame=:box,  # draw a box around the plot
+                       grid=:none,  # remove the grid lines
+                       size=(1920,1080))
+
+  Plots.savefig(kshm, joinpath("outdir","kaisserSquires.png"))
+  =#
 end
 
 # ---------------------------------------------------------#
@@ -824,6 +739,11 @@ println(readData())
 println(UnicodePlots.boxplot(["s model", "s data", "g1 model", "g1 data", "g2 model", "g2 data"], 
                              [s_model, s_data, g1_model, g1_data, g2_model, g2_data],
                             title="Boxplot of df.shopt"))
+
+errVignets = []
+for i in 1:2
+  push!(errVignets, rand(161,161))
+end
 writeFitsData()
 
 # ---------------------------------------------------------#
