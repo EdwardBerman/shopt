@@ -9,13 +9,13 @@ function detect_outliers(data::AbstractVector{T}; k::Float64=1.5) where T<:Real
   return outliers
 end
 
-function outliers_filter(snr::Vector{Any}, img::Vector{Any}, wht::Vector{Matrix{Float32}}; k::Float64=1.5) 
+function outliers_filter(snr::Vector{Any}, img::Vector{Any}, wht::Vector{Matrix{Float32}}; k::Float64=0.5) 
   q1 = quantile(snr, 0.25)
   q3 = quantile(snr, 0.75)
   iqr = q3 - q1
   lower_fence = q1 - k * iqr 
   upper_fence = q3 + k * iqr
-  outlier_indices = findall(x -> x < lower_fence || x > upper_fence, snr)
+  outlier_indices = findall(x -> x < lower_fence) #outlier_indices = findall(x -> x < lower_fence || x > upper_fence, snr)
   img_snr_cleaned = img
   wht_snr_cleaned = wht
   for i in sort(outlier_indices, rev=true)
