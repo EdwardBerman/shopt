@@ -277,8 +277,8 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
       return RelativeError
 
   fig6, axes6 = plt.subplots(1, figsize=(30, 10))
-  #bins = np.linspace(-10, 10, 21)
-  axes6.hist(mreHist(vignets, pixelGrid), color = "lightblue", ec="red", lw=3) #bins = bins
+  bins = np.linspace(-1, 1, 21)
+  axes6.hist(mreHist(vignets, pixelGrid), bins = bins, color = "lightblue", ec="red", lw=3) #bins = bins
   axes6.set_xlabel('Relative Error', fontsize=20)
   axes6.set_ylabel('Frequency',fontsize=20)
   axes6.set_yscale('log')

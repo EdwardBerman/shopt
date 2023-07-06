@@ -1,5 +1,6 @@
 config = YAML.load_file(joinpath(configdir, "shopt.yml"))
 epochs = config["NNparams"]["epochs"]
+degree = config["polynomialDegree"]
 
 function signal_to_noise(I, e; nm=nanMask, nz=nanToZero)
   signal_power = sum(nz(nm(I)).^2)

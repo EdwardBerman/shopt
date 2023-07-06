@@ -27,57 +27,57 @@ end
 fancyPrint("Handling Imports")
 @time begin
   using Base: initarray!
-  println("\t\t    Base: initarray! imported")
+  #println("\t\t    Base: initarray! imported")
   using YAML
-  println("\t\t    YAML imported")
+  #println("\t\t    YAML imported")
   using BenchmarkTools
-  println("\t\t    BenchmarkTools imported")
+  #println("\t\t    BenchmarkTools imported")
   using Plots
-  println("\t\t    Plots imported")
+  #println("\t\t    Plots imported")
   using ForwardDiff
-  println("\t\t    ForwardDiff imported")
+  #println("\t\t    ForwardDiff imported")
   using LinearAlgebra
-  println("\t\t    LinearAlgebra imported")
+  #println("\t\t    LinearAlgebra imported")
   using PyCall
-  println("\t\t    PyCall imported")
+  #println("\t\t    PyCall imported")
   using Random
-  println("\t\t    Random imported")
+  #println("\t\t    Random imported")
   using Distributions
-  println("\t\t    Distributions imported")
+  #println("\t\t    Distributions imported")
   using SpecialFunctions
-  println("\t\t    SpecialFunctions imported")
+  #println("\t\t    SpecialFunctions imported")
   using Optim
-  println("\t\t    Optim imported")
+  #println("\t\t    Optim imported")
   using IterativeSolvers
-  println("\t\t    IterativeSolvers imported")
+  #println("\t\t    IterativeSolvers imported")
   using QuadGK
-  println("\t\t    QuadGK imported")
+  #println("\t\t    QuadGK imported")
   using DataFrames
-  println("\t\t    DataFrames imported")
+  #println("\t\t    DataFrames imported")
   using FFTW
-  println("\t\t    FFTW imported")
+  #println("\t\t    FFTW imported")
   using CSV
-  println("\t\t    CSV imported")
+  #println("\t\t    CSV imported")
   using Images, ImageFiltering
-  println("\t\t    Images, ImageFiltering imported")
+  #println("\t\t    Images, ImageFiltering imported")
   using Measures
-  println("\t\t    Measures imported")
+  #println("\t\t    Measures imported")
   using ProgressBars
-  println("\t\t    ProgressBars imported")
+  #println("\t\t    ProgressBars imported")
   using UnicodePlots
-  println("\t\t    UnicodePlots imported")
+  #println("\t\t    UnicodePlots imported")
   using Flux
-  println("\t\t    Flux imported")
+  #println("\t\t    Flux imported")
   using Flux.Optimise
-  println("\t\t    Flux.Optimise imported")
+  #println("\t\t    Flux.Optimise imported")
   using Flux.Losses
-  println("\t\t    Flux.Losses imported")
+  #println("\t\t    Flux.Losses imported")
   using Flux: onehotbatch, throttle, @epochs, mse, msle
-  println("\t\t    Flux: onehotbatch, throttle, @epochs, mse, msle imported")
+  #println("\t\t    Flux: onehotbatch, throttle, @epochs, mse, msle imported")
   using CairoMakie
-  println("\t\t    CairoMakie imported")
+  #println("\t\t    CairoMakie imported")
   using Dates 
-  println("\t\t    Dates imported")
+  #println("\t\t    Dates imported")
 end
 # ---------------------------------------------------------#
 fancyPrint("Reading .jl Files")
@@ -103,10 +103,10 @@ fancyPrint("Processing Data for Fit")
 @time begin
   
   starCatalog, errVignets, r, c, itr, u_coordinates, v_coordinates = cataloging(ARGS)
-  starCatalog = starCatalog[1:100]
-  errVignets = errVignets[1:100]
-  u_coordinates = u_coordinates[1:100]
-  v_coordinates = v_coordinates[1:100]
+  starCatalog = starCatalog
+  errVignets = errVignets
+  u_coordinates = u_coordinates
+  v_coordinates = v_coordinates
   itr = length(starCatalog)
   
   
@@ -194,17 +194,17 @@ fancyPrint("Analytic Profile Fit for Model Star")
 end
 
 
-println("\t \t Outliers in s: ", detect_outliers(s_model))
-println("\n\t \t Outliers in g1: ", detect_outliers(g1_model))
-println("\n\t \t Outliers in g2: ", detect_outliers(g2_model))
+#println("\t \t Outliers in s: ", detect_outliers(s_model))
+#println("\n\t \t Outliers in g1: ", detect_outliers(g1_model))
+#println("\n\t \t Outliers in g2: ", detect_outliers(g2_model))
 
 ns = length(detect_outliers(s_model))
 ng1 = length(detect_outliers(g1_model))
 ng2 = length(detect_outliers(g2_model))
 
-println("\n\t \t Number of outliers in s: ", ns[1])
-println("\n\t \t Number of outliers in g1: ", ng1[1])
-println("\n\t \t Number of outliers in g2: ", ng2[1])
+#println("\n\t \t Number of outliers in s: ", ns[1])
+#println("\n\t \t Number of outliers in g1: ", ng1[1])
+#println("\n\t \t Number of outliers in g2: ", ng2[1])
 
 s_blacklist = []
 for i in 1:length(s_model)
@@ -270,7 +270,7 @@ pixelGridFits = []
    
     # Train the autoencoder
     try
-      min_gradient = 1e-6
+      min_gradient = 1e-5
       for epoch in 1:epochs
         Flux.train!(loss, Flux.params(autoencoder), [(data,)], optimizer) #loss#Flux.params(autoencoder))
         grad = Flux.gradient(Flux.params(autoencoder)) do
@@ -389,7 +389,7 @@ for i in sort(failedStars, rev=true)
 end
 
 # ---------------------------------------------------------#
-fancyPrint("Transforming (x,y) -> (u,v) | Interpolation Across the Field of View")
+fancyPrint("Transforming (x,y) -> (u,v) | Interpolation [s, g1, g2] Across the Field of View")
 
 s_data = s_data[1:length(pixelGridFits)]
 g1_data = g1_data[1:length(pixelGridFits)]
@@ -441,12 +441,12 @@ PolynomialMatrix = ones(r,c, 10)
   
 function sample_indices(array, k)
   indices = collect(1:length(array))  # Create an array of indices
-  return sample(indices, k, replace = false)
+  return randperm(length(indices))[1:k] #sample(indices, k, replace = false)
 end
 
 total_samples = length(pixelGridFits)
 training_ratio = 0.8
-training_samples = round(training_ratio * total_samples)
+training_samples = round(Int, training_ratio * total_samples)
 
 training_indices = sample_indices(pixelGridFits, training_samples)
 training_stars = pixelGridFits[training_indices]
@@ -457,58 +457,15 @@ validation_indices = setdiff(1:total_samples, training_indices)
 validation_stars = pixelGridFits[validation_indices]
 validation_u_coords = u_coordinates[validation_indices]
 validation_v_coords = v_coordinates[validation_indices]
+validation_star_catalog = starCatalog[validation_indices]
+
+fancyPrint("Transforming (x,y) -> (u,v) | Interpolation Pixel by Pixel Across the Field of View")
 
 @time begin
   for i in 1:r
-    pb = tqdm(1:c)
-    for j in pb #1:c #1:c #pb
-      set_description(pb, "Working on Pixel ($i , $j)")
-      #=
-      degree = 3
-      x_data = u_coordinates  # Sample x data
-      y_data = v_coordinates  # Sample y data
-      z_data = []  # Sample z data
-      for k in 1:length(pixelGridFits)
-        push!(z_data, pixelGridFits[k][i, j])
-      end
-      # Number of data points
-      n = length(x_data)
-
-      # Construct the data matrix and function values (excluding rows with NaN coefficients)
-      data = zeros(n, 3)
-      z_vals = zeros(n)
-      index = 1
-      for i in 1:n
-          if !isnan(z_data[i])
-              data[index, 1] = x_data[i]
-              data[index, 2] = y_data[i]
-              data[index, 3] = z_data[i]
-              z_vals[index] = z_data[i]
-              index += 1
-          end
-      end
-      n_valid = index - 1
-
-      # Construct the coefficient matrix
-      A = zeros(n_valid, (degree + 1) * (degree + 2) ÷ 2)
-      for i in 1:n_valid
-          x_val, y_val = data[i, 1:2]
-          index = 1
-          for j in 0:degree
-              for k in 0:(degree - j)
-                  A[i, index] = x_val^j * y_val^k
-                  index += 1
-              end
-          end
-      end
-
-      # Compute SVD
-      U, S, V = svd(A)
-
-      # Solve the system using SVD
-      pC = V * inv(diagm(S)) * transpose(U) * z_vals[1:n_valid]
-      pC = pC[1:(degree + 1) * (degree + 2) ÷ 2]
-      =#
+    #pb = tqdm(1:c)
+    for j in 1:c #1:c #pb
+      #set_description(pb, "Working on Pixel ($i , $j)")
       
       function objective_function(p, x, y, degree)
         num_coefficients = (degree + 1) * (degree + 2) ÷ 2
@@ -588,9 +545,9 @@ fancyPrint("Plotting")
 
 
   #sampled_indices = sort(sample_indices(starCatalog, 3))
-  sampled_indices = [1,2]
+  #sampled_indices = [1,2]
 
-  println("Sampled indices: ", sampled_indices)
+  #println("Sampled indices: ", sampled_indices)
 
   function get_middle_15x15(array::Array{T, 2}) where T
       rows, cols = size(array)
@@ -733,17 +690,17 @@ end
 
 # ---------------------------------------------------------#
 fancyPrint("Saving Data to summary.shopt")
-writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
-println(readData())
+#writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
+#println(readData())
 
 println(UnicodePlots.boxplot(["s model", "s data", "g1 model", "g1 data", "g2 model", "g2 data"], 
                              [s_model, s_data, g1_model, g1_data, g2_model, g2_data],
                             title="Boxplot of df.shopt"))
 
-errVignets = []
-for i in 1:2
-  push!(errVignets, rand(161,161))
-end
+#errVignets = []
+#for i in 1:2
+ # push!(errVignets, rand(161,161))
+#end
 writeFitsData()
 
 # ---------------------------------------------------------#

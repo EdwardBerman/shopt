@@ -2,21 +2,23 @@
 
 # Key-value pairs
 printStatements: 
-saveYaml: true
+saveYaml: false
 
 NNparams:
   epochs: 1000
-  lossFunction: Exampletown
+  lossFunction: MSE
+  activationFunctions: tanh #Also available, sigmoid
     
 dataProcessing:
-  SnR: 123-456-7890
+  SnR: 0.5
 
 # Nested structure
 plots:
-  unicodePlots: rock
+  unicodePlots: true
   normalPlots:
     - parametersHistogram.png: true
     - parametersScatterplot.png: true
   cairoMakiePlots:
     - logPlots: true
-
+polynomialDegree: 3
+#Comments on run:
