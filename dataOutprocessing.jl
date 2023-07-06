@@ -156,11 +156,11 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
               num_coefficients = (degree + 1) * (degree + 2) // 2
               value = 0
               counter = 0
-              for a in range(1, degree + 1):
-                for b in range(1, degree + 1):
+              for a in range(1, degree + 2):
+                for b in range(1, degree + 2):
                   if (a - 1) + (b - 1) <= degree:
-                    counter += 1
                     value += p[counter] * x**(a - 1) * y**(b - 1)  
+                    counter += 1
               return value 
             star[i,j] = objective_function(polynomialMatrix[i,j], u, v, deg)
 
