@@ -26,7 +26,7 @@ end
 #validation_u_coords = u_coordinates[validation_indices]
 #validation_v_coords = v_coordinates[validation_indices]
 
-function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRelativeError, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, errVignets=errVignets, fancyPrint=fancyPrint, training_stars=training_stars, training_u_coords=training_u_coords, training_v_coords=training_v_coords, validation_stars=validation_stars, validation_u_coords=validation_u_coords, validation_v_coords=validation_v_coords  )
+function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRelativeError, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, errVignets=errVignets, fancyPrint=fancyPrint, training_stars=training_stars, training_u_coords=training_u_coords, training_v_coords=training_v_coords, validation_stars=validation_stars, validation_u_coords=validation_u_coords, validation_v_coords=validation_v_coords, validation_star_catalog=validation_star_catalog, degree=degree)
   
   m, n = size(starCatalog[1])
   array_3d = zeros(m, n, length(starCatalog))
@@ -124,6 +124,9 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
   #command4 = `python $outdir/diagnostics.py`
   #run(command4)
   py_outdir = outdir*"/$(now())"
+
+  deg = degree 
+
   py"""
   from astropy.io import fits
   import numpy as np
@@ -143,21 +146,24 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
 
   polyMatrix = f[0].data
   #print(polyMatrix[30,30,:])
+  deg = $deg
   def polynomial_interpolation_star(u,v, polynomialMatrix):
       r,c = np.shape(f[0].data)[0], np.shape(f[0].data)[1]
       star = np.zeros((r,c))
       for i in range(r):
           for j in range(c):
-              star[i,j] = polynomialMatrix[i,j][9]*u**3 + \
-                          polynomialMatrix[i,j][8]*u**2*v + \
-                          polynomialMatrix[i,j][7]*u**2 + \
-                          polynomialMatrix[i,j][6]*u*v**2 + \
-                          polynomialMatrix[i,j][5]*u*v + \
-                          polynomialMatrix[i,j][4]*u + \
-                          polynomialMatrix[i,j][3]*v**3 + \
-                          polynomialMatrix[i,j][2]*v**2 + \
-                          polynomialMatrix[i,j][1]*v + \
-                          polynomialMatrix[i,j][0]
+            def objective_function(p, x, y, degree):
+              num_coefficients = (degree + 1) * (degree + 2) // 2
+              value = 0
+              counter = 0
+              for a in range(1, degree + 1):
+                for b in range(1, degree + 1):
+                  if (a - 1) + (b - 1) <= degree:
+                    counter += 1
+                    value += p[counter] * x**(a - 1) * y**(b - 1)  
+              return value 
+            star[i,j] = objective_function(polynomialMatrix[i,j], u, v, deg)
+
       star = star/np.sum(star)
       return star
 
@@ -166,26 +172,26 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
   fig, axes = plt.subplots(2, 3)
 
   # Display the first image in the first subplot
-  axes[0, 0].imshow(f[4].data[0, :, :  ], norm=colors.SymLogNorm(linthresh=1*10**(-6)))
+  axes[0, 0].imshow(f[5].data[0, :, :  ], norm=colors.SymLogNorm(linthresh=1*10**(-6)))
   axes[0, 0].set_title('Pixel Grid Fit')
 
   # Display the second image in the second subplot
   axes[0, 1].imshow(a, norm=colors.SymLogNorm(linthresh=1*10**(-6)))
   axes[0, 1].set_title('Polynomial Interpolation')
 
-  axes[0, 2].imshow(f[4].data[0, :, :  ] - a, norm=colors.SymLogNorm(linthresh=1*10**(-6)))
+  axes[0, 2].imshow(f[5].data[0, :, :  ] - a, norm=colors.SymLogNorm(linthresh=1*10**(-6)))
   axes[0, 2].set_title('Residuals')
   
-  b = polynomial_interpolation_star(f[1].data['u coordinates'][5], f[1].data['v coordinates'][5]   ,polyMatrix)
+  b = polynomial_interpolation_star(f[1].data['validation_u_coords'][5], f[1].data['validation_v_coords'][5]   ,polyMatrix)
 
-  axes[1, 0].imshow(f[4].data[5, :, :  ], norm=colors.SymLogNorm(linthresh=1*10**(-6)))
+  axes[1, 0].imshow(f[5].data[5, :, :  ], norm=colors.SymLogNorm(linthresh=1*10**(-6)))
   axes[1, 0].set_title('Pixel Grid Fit')
 
   # Display the second image in the second subplot
   axes[1, 1].imshow(b, norm=colors.SymLogNorm(linthresh=1*10**(-6)))
   axes[1, 1].set_title('Polynomial Interpolation')
 
-  axes[1, 2].imshow(f[4].data[5, :, :  ] - b, norm=colors.SymLogNorm(linthresh=1*10**(-6)))
+  axes[1, 2].imshow(f[5].data[5, :, :  ] - b, norm=colors.SymLogNorm(linthresh=1*10**(-6)))
   axes[1, 2].set_title('Residuals')
   # Adjust the spacing between subplots
   plt.tight_layout()
@@ -220,8 +226,8 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
           for k in range(vignets.shape[1]):
               RelativeError = []
               for i in range(vignets.shape[2]):
-                  RelativeError.append((vignets[j,k,i] - pixelGrid[j,k,i]) / (vignets[j,k,i]) + 1e-10)
-              meanRelativeError[j,k] = np.nanmean(RelativeError)
+                RelativeError.append((vignets[j,k,i] - pixelGrid[j,k,i]) / (vignets[j,k,i] + 1e-10))
+                meanRelativeError[j,k] = np.nanmean(RelativeError)
       return meanRelativeError
 
   fig3, axes3 = plt.subplots(1)
@@ -257,7 +263,7 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
 
   fig5 = plt.figure()
   ax5 = fig5.add_subplot(111)
-  im = ax5.imshow(polyMatrix[:, :, 0], cmap='viridis', norm=colors.SymLogNorm(linthresh=1*10**(-4)), interpolation='nearest')
+  im = ax5.imshow(polyMatrix[:, :, 0], cmap=plt.cm.bwr_r, norm=colors.SymLogNorm(linthresh=1*10**(-6)), interpolation='nearest')
 
   frames = range(np.shape(polyMatrix)[2])  # Number of frames
   animation = animation.FuncAnimation(fig5, update, frames=frames, interval=200, blit=True)
@@ -271,8 +277,8 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
       return RelativeError
 
   fig6, axes6 = plt.subplots(1, figsize=(30, 10))
-  bins = np.linspace(-1, 1, 21)
-  axes6.hist(mreHist(vignets, pixelGrid), bins=bins, color = "lightblue", ec="red", lw=3)
+  #bins = np.linspace(-10, 10, 21)
+  axes6.hist(mreHist(vignets, pixelGrid), color = "lightblue", ec="red", lw=3) #bins = bins
   axes6.set_xlabel('Relative Error', fontsize=20)
   axes6.set_ylabel('Frequency',fontsize=20)
   axes6.set_yscale('log')
@@ -299,3 +305,6 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
   # run on sampled indices, copy diagnostics.py to py""" """ here
 end
 
+# function P(u,v)
+# PSF at uv
+# end
