@@ -1,19 +1,24 @@
+using PyCall
 
 function read_shopt(shoptFile)
-  using PyCall
+  shoptFile = string(shoptFile)
   py"""
+  shoptFile = $shoptFile
+  from astropy.io import fits
   f = fits.open(shoptFile)
   polyMatrix = f[0].data
+  degree = f[1].data['polynomial degree'][0]
   """
   polynomialMatrix = convert(Array{Float64,3}, py"polyMatrix")
-  #degree = degree ...
+  degree = convert(Int64, py"degree")
+
   return polynomialMatrix, degree
 end
 
 function p(u,v, polMatrix, degree)
   #Read in degree of Polynomial
   #Read in Size of Star Vignet
-  r,c = size(f,1), size(f,2)
+  r,c = size(polMatrix,1), size(polMatrix,2)
   star = zeros(r,c)
     
   for a in 1:r
@@ -33,7 +38,7 @@ function p(u,v, polMatrix, degree)
         end
         return value
       end
-      star[a,b] = objective_function(polMatrix[a,b] ,u,v,degree) # -> Filename Polynomial Matrix
+      star[a,b] = objective_function(polMatrix[a,b,:] ,u,v,degree) # -> Filename Polynomial Matrix
     end
   end
   star = star/sum(star)

@@ -499,7 +499,7 @@ fancyPrint("Transforming (x,y) -> (u,v) | Interpolation Pixel by Pixel Across th
         return Optim.minimizer(result)
       end
 
-      degree = 3
+      #degree = 3
       x_data = training_u_coords  # Sample x data
       y_data = training_v_coords  # Sample y data
       z_data = []  # Sample z data
@@ -544,10 +544,10 @@ fancyPrint("Plotting")
   end
 
 
-  #sampled_indices = sort(sample_indices(starCatalog, 3))
+  sampled_indices = sort(sample_indices(starCatalog, 3))
   #sampled_indices = [1,2]
 
-  #println("Sampled indices: ", sampled_indices)
+  println("Sampled indices: ", sampled_indices)
 
   function get_middle_15x15(array::Array{T, 2}) where T
       rows, cols = size(array)
