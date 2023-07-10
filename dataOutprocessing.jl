@@ -72,6 +72,8 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
   validation_v_coords = np.array($validation_v_coords, dtype=np.float64)
   training_stars = np.array($training_stars, dtype=np.float64)
   validation_stars = np.array($validation_stars, dtype=np.float64)
+  deg_element = $degree
+  degree_array = np.array([deg_element], dtype=np.float64)
 
   hdu1 = fits.PrimaryHDU(PolynomialMatrix)
   hdu1.header['EXTNAME'] = 'Polynomial Matrix'
@@ -89,6 +91,7 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
   c5 = fits.Column(name='g1 data', array=g1_data, format='D')
   c6 = fits.Column(name='g2 data', array=g2_data, format='D')
   c7 = fits.Column(name='mean relative error', array=meanRelativeError, format='D')
+  c8 = fits.Column(name='polynomial degree', array=degree_array, format='D')
 
   VIGNETS_hdu = fits.ImageHDU(starCatalog)
   VIGNETS_hdu.header['EXTNAME'] = 'VIGNETS'
@@ -102,7 +105,7 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
   validation_hdu = fits.ImageHDU(validation_stars)
   validation_hdu.header['EXTNAME'] = 'Validation Stars'
 
-  summary_statistics_hdu = fits.BinTableHDU.from_columns([c00, c01, c02, c03, c04, c05, c1, c2, c3, c4, c5, c6, c7]) 
+  summary_statistics_hdu = fits.BinTableHDU.from_columns([c00, c01, c02, c03, c04, c05, c1, c2, c3, c4, c5, c6, c7, c8]) 
   summary_statistics_hdu.header['EXTNAME'] = 'Summary Statistics'
 
   hdul = fits.HDUList([hdu1, summary_statistics_hdu, VIGNETS_hdu, errVignets_hdu, pixelGridFits_hdu, validation_hdu])
