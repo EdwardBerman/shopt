@@ -141,8 +141,12 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
 
 
   plt.ion()
+  
+  #Generalize this
+  python_current_outdir = $outdir
 
-  f = fits.open('/home/eddieberman/research/mcclearygroup/shopt/outdir/summary.shopt')
+  f = fits.open(python_current_outdir + '/summary.shopt')
+  #f = fits.open('/home/eddieberman/research/mcclearygroup/shopt/outdir/summary.shopt')
 
   polyMatrix = f[0].data
   #print(polyMatrix[30,30,:])
