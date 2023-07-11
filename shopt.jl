@@ -209,28 +209,33 @@ failedStars = []
 # ---------------------------------------------------------#
 fancyPrint("Pixel Grid Fit")
 pixelGridFits = []
+
+encoder = Chain(
+                Dense(r*c, 128, leakyrelu),
+                Dense(128, 64, leakyrelu),
+                Dense(64, 32, leakyrelu),
+               )
+# Define the decoder
+decoder = Chain(
+                Dense(32, 64, leakyrelu),
+                Dense(64, 128, leakyrelu), #leakyrelu #relu
+                Dense(128, r*c, tanh),   #tanh #sigmoid
+               )
+
+# Define the full autoencoder
+autoencoder = Chain(encoder, decoder)
+
+#x̂ = autoencoder(x)
+loss(x) = mse(autoencoder(x), x)
+
+# Define the optimizer
+optimizer = ADAM()
+
 @time begin
   pb = tqdm(1:length(starCatalog))
   for i in pb
     set_description(pb, "Star $i/$(length(starCatalog)) Complete")
     global iteration = i
-    encoder = Chain(
-                    Dense(r*c, 128, leakyrelu),
-                    Dense(128, 64, leakyrelu),
-                    Dense(64, 32, leakyrelu),
-                   )
-    # Define the decoder
-    decoder = Chain(
-                    Dense(32, 64, leakyrelu),
-                    Dense(64, 128, leakyrelu), #leakyrelu #relu
-                    Dense(128, r*c, tanh),   #tanh #sigmoid
-                   )
-    
-    # Define the full autoencoder
-    autoencoder = Chain(encoder, decoder)
-
-    #x̂ = autoencoder(x)
-    loss(x) = mse(autoencoder(x), x)
     
     function relative_error_loss(x)
       #x = nanToZero(nanMask(x))
@@ -238,8 +243,6 @@ pixelGridFits = []
       mean(relative_error)
     end
 
-    # Define the optimizer
-    optimizer = ADAM()
 
     
     # Format some random image data
