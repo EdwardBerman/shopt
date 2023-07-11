@@ -1,6 +1,35 @@
 config = YAML.load_file(joinpath(configdir, "shopt.yml"))
 epochs = config["NNparams"]["epochs"]
 degree = config["polynomialDegree"]
+new_img_dim = config["stampSize"]
+
+function get_middle_nxn(array, n)
+  rows, cols = size(array)
+  if isodd(rows)
+    if isodd(n)
+      row_start = div(rows,2) - (n ÷ 2)
+      col_start = div(cols,2) - (n ÷ 2)
+      return array[row_start:(row_start + (2*(n ÷ 2))), col_start:(col_start + (2*(n ÷ 2)))]
+    else
+      array = array[1:(rows - 1), 1:(cols - 1)]
+      rows, cols = size(array)
+      row_start = div(rows,2) - (n ÷ 2)
+      col_start = div(cols,2) - (n ÷ 2)
+      return array[(1 + row_start):(row_start + (2*(n ÷ 2))), ( 1 + col_start):(col_start + (2*(n ÷ 2)))]
+    end
+  else
+    if isodd(n)
+      row_start = div(rows,2) - (n ÷ 2)
+      col_start = div(cols,2) - (n ÷ 2)
+      return array[row_start:(row_start + (2*(n ÷ 2))), col_start:(col_start + (2*(n ÷ 2)))]
+    else
+      row_start = div(rows,2) - (n ÷ 2)
+      col_start = div(cols,2) - (n ÷ 2)
+      return array[(1 + row_start):(row_start + (2*(n ÷ 2))), (1 + col_start):(col_start + (2*(n ÷ 2)))]
+    end
+  end
+end
+
 
 function signal_to_noise(I, e; nm=nanMask, nz=nanToZero)
   signal_power = sum(nz(nm(I)).^2)
@@ -26,10 +55,9 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   vignets = f[2].data['VIGNET']
   err_vignets = f[2].data['ERR_VIGNET']
   l = len(vignets)
-
   python_sci_file = $sci_image
   g = fits.open(python_sci_file)
-  w = WCS(g[1].header)
+  w = WCS(g[0].header)
 
   x_coords = f[2].data['XWIN_IMAGE']
   y_coords = f[2].data['YWIN_IMAGE']
@@ -62,8 +90,25 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
     push!(signal2noiseRatios, snr(catalog[i], errVignets[i]))
   end
 
+  new_snr_arr = Array{Float64}(undef, length(signal2noiseRatios))
+  for (i, element) in enumerate(signal2noiseRatios)
+    new_snr_arr[i] = element
+  end
+
+  println(UnicodePlots.boxplot(["snr"], [new_snr_arr], title="signal to noise ratio"))
+
+
   catalogNew, errVignets = dout(signal2noiseRatios, catalogNew, errVignets)
-  println("Removed $(length(catalog) - length(catalogNew)) outliers on the basis of Signal to Noise Ratio")
+  println("━ Number of vignets: ", length(catalog))
+  println("━ Removed $(length(catalog) - length(catalogNew)) outliers on the basis of Signal to Noise Ratio")
+  
+  for i in 1:length(catalogNew)
+    catalogNew[i] = get_middle_nxn(catalogNew[i], new_img_dim)
+    errVignets[i] = get_middle_nxn(errVignets[i], new_img_dim)
+  end
+  println("━ Sampled all vignets to $(new_img_dim) x $(new_img_dim) from $(r) x $(c)")
+  r = size(catalogNew[1], 1)
+  c = size(catalogNew[1], 2)
   
   return catalogNew, errVignets, r, c, length(catalogNew), u_coords, v_coords
 end

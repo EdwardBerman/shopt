@@ -17,9 +17,9 @@
   sci = ARGS[4]
 
   if isdir(outdir)
-    println("\tOutdir found")
+    println("━ Outdir found")
   else
-    println("\tOutdir not found, creating...")
+    println("━ Outdir not found, creating...")
     mkdir(outdir)
   end
 end
@@ -27,63 +27,39 @@ end
 fancyPrint("Handling Imports")
 @time begin
   using Base: initarray!
-  #println("\t\t    Base: initarray! imported")
   using YAML
-  #println("\t\t    YAML imported")
   using BenchmarkTools
-  #println("\t\t    BenchmarkTools imported")
   using Plots
-  #println("\t\t    Plots imported")
   using ForwardDiff
-  #println("\t\t    ForwardDiff imported")
   using LinearAlgebra
-  #println("\t\t    LinearAlgebra imported")
   using PyCall
-  #println("\t\t    PyCall imported")
   using Random
-  #println("\t\t    Random imported")
   using Distributions
-  #println("\t\t    Distributions imported")
   using SpecialFunctions
-  #println("\t\t    SpecialFunctions imported")
   using Optim
-  #println("\t\t    Optim imported")
   using IterativeSolvers
-  #println("\t\t    IterativeSolvers imported")
   using QuadGK
-  #println("\t\t    QuadGK imported")
   using DataFrames
-  #println("\t\t    DataFrames imported")
   using FFTW
-  #println("\t\t    FFTW imported")
   using CSV
-  #println("\t\t    CSV imported")
   using Images, ImageFiltering
-  #println("\t\t    Images, ImageFiltering imported")
   using Measures
-  #println("\t\t    Measures imported")
   using ProgressBars
-  #println("\t\t    ProgressBars imported")
   using UnicodePlots
-  #println("\t\t    UnicodePlots imported")
   using Flux
-  #println("\t\t    Flux imported")
   using Flux.Optimise
-  #println("\t\t    Flux.Optimise imported")
   using Flux.Losses
-  #println("\t\t    Flux.Losses imported")
   using Flux: onehotbatch, throttle, @epochs, mse, msle
-  #println("\t\t    Flux: onehotbatch, throttle, @epochs, mse, msle imported")
   using CairoMakie
-  #println("\t\t    CairoMakie imported")
   using Dates 
-  #println("\t\t    Dates imported")
 end
+println("━ Start Time ", Dates.now())
+start = Dates.now()
 # ---------------------------------------------------------#
 fancyPrint("Reading .jl Files")
 @time begin
   include("plot.jl")
-  include("analyticCGD.jl")
+  include("analyticLBFGS.jl")
   include("radialProfiles.jl")
   include("pixelGridCGD.jl")
   include("masks.jl")
@@ -127,12 +103,12 @@ end
 
 starData = zeros(r, c)
 
-A_model = zeros(itr)
+#A_model = zeros(itr)
 s_model = zeros(itr)
 g1_model = zeros(itr)
 g2_model = zeros(itr)
 
-A_data = zeros(itr)
+#A_data = zeros(itr)
 s_data = zeros(itr)
 g1_data = zeros(itr)
 g2_data = zeros(itr)
@@ -174,14 +150,16 @@ fancyPrint("Analytic Profile Fit for Model Star")
       ratioData = ellipticityData/normGdata
       g1_model[i] = e1_guess/ratioData            
       g2_model[i] = e2_guess/ratioData  
-  
+      
+      #=
       norm_data = zeros(r,c)
       for u in 1:r
         for v in 1:c
           norm_data[u,v] = fGaussian(u, v, g1_model[i], g2_model[i], s_model[i], r/2, c/2)
         end
       end
-      A_model[i] = 1/sum(norm_data)
+      =#
+      #A_model[i] = 1/sum(norm_data)
     catch
       println("Star $i failed")
       #push!(failedStars, i)
@@ -213,8 +191,8 @@ for i in 1:length(s_model)
   end
 end
 
-println("\nBlacklisted Stars: ", s_blacklist)
-println("\nBlacklisted $(length(s_blacklist)) stars on the basis of s < 0.075 or s > 1 (Failed Stars Assigned 0)" )
+println("\n━ Blacklisted Stars: ", s_blacklist)
+println("\n━ Blacklisted $(length(s_blacklist)) stars on the basis of s < 0.075 or s > 1 (Failed Stars Assigned 0)" )
 
 for i in sort(s_blacklist, rev=true)
   splice!(starCatalog, i)
@@ -307,7 +285,7 @@ end
 
 
 ltdPlots = []
-println("failed stars:", failedStars)
+println("━ failed stars:", failedStars)
 # ---------------------------------------------------------#
 fancyPrint("Analytic Profile Fit for Learned Star")
 #Copy Star Catalog then replace it with the learned pixel grid stars
@@ -345,6 +323,7 @@ fancyPrint("Analytic Profile Fit for Learned Star")
       g1_data[i] = e1_guess/ratioData            
       g2_data[i] = e2_guess/ratioData  
       
+      #=
       norm_data = zeros(r,c)
       for u in 1:r
         for v in 1:c
@@ -352,6 +331,7 @@ fancyPrint("Analytic Profile Fit for Learned Star")
         end
       end
       A_data[i] = 1/sum(norm_data)
+      =#
 
       if s_data[i] < 0.075 || s_data[i] > 1 
         push!(failedStars, i) 
@@ -369,8 +349,8 @@ fancyPrint("Analytic Profile Fit for Learned Star")
 end
 
 
-println("failed stars: ", unique(failedStars))
-println("\nRejected $(length(unique(failedStars))) more stars for failing or having either s < 0.075 or s > 1 when fitting an analytic profile to an autoencoded image. NB: These failed stars are being indexed after the blacklisted stars were removed.")
+println("━ failed stars: ", unique(failedStars))
+println("\n━ Rejected $(length(unique(failedStars))) more stars for failing or having either s < 0.075 or s > 1 when fitting an analytic profile to an autoencoded image. NB: These failed stars are being indexed after the blacklisted stars were removed.")
 
 failedStars = unique(failedStars)
 
@@ -400,9 +380,9 @@ for i in 1:length(starCatalog)
   push!(s_tuples, (u_coordinates[i], v_coordinates[i], s_data[i]))
 end
 
-s_fov = optimize(interpCostS, polyG_s!, rand(10), ConjugateGradient())
+s_fov = optimize(interpCostS, polyG_s!, rand(10), LBFGS())
 sC = s_fov.minimizer
-println("\ns(u,v) = $(sC[1])u^3 + $(sC[2])v^3 + $(sC[3])u^2v + $(sC[4])v^2u + $(sC[5])u^2 + $(sC[6])v^2 + $(sC[7])uv + $(sC[8])u + $(sC[9])v + $(sC[10])\n")
+println("\ns(u,v) = $(sC[1])u^3 \n+ $(sC[2])v^3 \n+ $(sC[3])u^2v \n+ $(sC[4])v^2u \n+ $(sC[5])u^2 \n+ $(sC[6])v^2 \n+ $(sC[7])uv \n+ $(sC[8])u \n+ $(sC[9])v \n+ $(sC[10])\n")
 
 s(u,v) = sC[1]*u^3 + sC[2]*v^3 + sC[3]*u^2*v + sC[4]*v^2*u + sC[5]*u^2 + sC[6]*v^2 + sC[7]*u*v + sC[8]*u + sC[9]*v + sC[10]
 ds_du(u,v) = sC[1]*3*u^2 + sC[3]*2*u*v + sC[4]*v^2 + sC[5]*2*u + sC[7]*v + sC[8]
@@ -413,9 +393,9 @@ for i in 1:length(starCatalog)
   push!(g1_tuples, (u_coordinates[i], v_coordinates[i], g1_data[i]))
 end
 
-g1_fov = optimize(interpCostg1, polyG_g1!, rand(10), ConjugateGradient())
+g1_fov = optimize(interpCostg1, polyG_g1!, rand(10), LBFGS())
 g1C = g1_fov.minimizer
-println("\ng1(u,v) = $(g1C[1])u^3 + $(g1C[2])v^3 + $(g1C[3])u^2v + $(g1C[4])v^2u + $(g1C[5])u^2 + $(g1C[6])v^2 + $(g1C[7])uv + $(g1C[8])u + $(g1C[9])v + $(g1C[10])\n")
+println("\ng1(u,v) = $(g1C[1])u^3 \n+ $(g1C[2])v^3 \n+ $(g1C[3])u^2v \n+ $(g1C[4])v^2u \n+ $(g1C[5])u^2 \n+ $(g1C[6])v^2 \n+ $(g1C[7])uv \n+ $(g1C[8])u \n+ $(g1C[9])v \n+ $(g1C[10])\n")
 
 g1(u,v) = g1C[1]*u^3 + g1C[2]*v^3 + g1C[3]*u^2*v + g1C[4]*v^2*u + g1C[5]*u^2 + g1C[6]*v^2 + g1C[7]*u*v + g1C[8]*u + g1C[9]*v + g1C[10]
 dg1_du(u,v) = g1C[1]*3*u^2 + g1C[3]*2*u*v + g1C[4]*v^2 + g1C[5]*2*u + g1C[7]*v + g1C[8]
@@ -427,9 +407,9 @@ for i in 1:length(starCatalog)
 end
 h_uv_data = g2_tuples
 
-g2_fov = optimize(interpCostg2, polyG_g2!, rand(10), ConjugateGradient())
+g2_fov = optimize(interpCostg2, polyG_g2!, rand(10), LBFGS())
 g2C = g2_fov.minimizer
-println("\ng2(u,v) = $(g2C[1])u^3 + $(g2C[2])v^3 + $(g2C[3])u^2v + $(g2C[4])v^2u + $(g2C[5])u^2 + $(g2C[6])v^2 + $(g2C[7])uv + $(g2C[8])u + $(g2C[9])v + $(g2C[10])\n")
+println("\ng2(u,v) = $(g2C[1])u^3 \n+ $(g2C[2])v^3 \n+ $(g2C[3])u^2v \n+ $(g2C[4])v^2u \n+ $(g2C[5])u^2 \n+ $(g2C[6])v^2 \n+ $(g2C[7])uv \n+ $(g2C[8])u \n+ $(g2C[9])v \n+ $(g2C[10])\n")
 
 g2(u,v) = g2C[1]*u^3 + g2C[2]*v^3 + g2C[3]*u^2*v + g2C[4]*v^2*u + g2C[5]*u^2 + g2C[6]*v^2 + g2C[7]*u*v + g2C[8]*u + g2C[9]*v + g2C[10]
 dg2_du(u,v) = g2C[1]*3*u^2 + g2C[3]*2*u*v + g2C[4]*v^2 + g2C[5]*2*u + g2C[7]*v + g2C[8]
@@ -705,4 +685,5 @@ writeFitsData()
 
 # ---------------------------------------------------------#
 fancyPrint("Done! =]")
-
+println("━ Total Time: ", Dates.format(now() - start, "HH:MM:SS"))
+println("For more on ShOpt.jl, see https://github.com/EdwardBerman/shopt")
