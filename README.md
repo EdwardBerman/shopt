@@ -143,6 +143,12 @@ index.md
 _config.yml
 > Also for official website
 
+imports.txt
+> List of Julia Libraries used in the program
+
+dependencies.jl 
+> Download all of the imports from imports.txt automatically
+
 ## Known Issues
 + kolmogorov radial profile not yet functional
 
