@@ -2,6 +2,10 @@
 using PyCall
 using Dates
 
+#=
+Functions to be called to write output to a fits file and add more diagnostic plots
+=#
+
 function writeData(size, shear1, shear2, sizeD, shear1D, shear2D)
   df = DataFrame(star = 1:length(size), 
                  s_model=size, 
@@ -18,13 +22,6 @@ end
 function readData()
   DataFrame(CSV.File(joinpath("outdir", "df.shopt")))
 end
-#training_stars = pixelGridFits[training_indices]   
-#training_u_coords = u_coordinates[training_indices]    
-#training_v_coords = v_coordinates[training_indices]   
-#validation_indices = setdiff(1:total_samples, training_indices)
-#validation_stars = pixelGridFits[validation_indices]
-#validation_u_coords = u_coordinates[validation_indices]
-#validation_v_coords = v_coordinates[validation_indices]
 
 function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRelativeError, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, errVignets=errVignets, fancyPrint=fancyPrint, training_stars=training_stars, training_u_coords=training_u_coords, training_v_coords=training_v_coords, validation_stars=validation_stars, validation_u_coords=validation_u_coords, validation_v_coords=validation_v_coords, validation_star_catalog=validation_star_catalog, degree=degree, YAMLSAVE=YAMLSAVE)
   

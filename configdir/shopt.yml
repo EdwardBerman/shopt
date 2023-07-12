@@ -11,10 +11,12 @@ NNparams:
   minGradientPixel: 1e-5
 AnalyticFitParams:
   minGradientAnalyticModel: 1e-6
-  minGradientAnalyticLearned: 1e-4
+  minGradientAnalyticLearned: 1e-5
 
 dataProcessing:
   SnRPercentile: 0.33
+  sUpperBound: 1
+  sLowerBound: 0.075
 
 # Nested structure
 plots:
@@ -25,4 +27,6 @@ plots:
 polynomialDegree: 3
 stampSize: 131
 AcceptImagesWithNaNs: true
+
+CommentsOnRun: "\n ** This is Where You Can Leave Comments or Notes To Self on the Run! ** \n"
 #Comments on run:

@@ -61,7 +61,6 @@ fancyPrint("Reading .jl Files")
   include("plot.jl")
   include("analyticLBFGS.jl")
   include("radialProfiles.jl")
-  include("pixelGridCGD.jl")
   include("masks.jl")
   include("outliers.jl")
   include("dataOutprocessing.jl")
@@ -186,13 +185,13 @@ ng2 = length(detect_outliers(g2_model))
 
 s_blacklist = []
 for i in 1:length(s_model)
-  if (s_model[i] < 0.075 || s_model[i] > 1) #i in failedStars is optional Since Failed Stars are assigned s=0 
+  if (s_model[i] < sLowerBound || s_model[i] > sUpperBound) #i in failedStars is optional Since Failed Stars are assigned s=0 
     push!(s_blacklist, i)
   end
 end
 
 println("\n━ Blacklisted Stars: ", s_blacklist)
-println("\n━ Blacklisted $(length(s_blacklist)) stars on the basis of s < 0.075 or s > 1 (Failed Stars Assigned 0)" )
+println("\n━ Blacklisted $(length(s_blacklist)) stars on the basis of s < $sLowerBound or s > $sUpperBound (Failed Stars Assigned 0)" )
 
 for i in sort(s_blacklist, rev=true)
   splice!(starCatalog, i)
@@ -338,7 +337,7 @@ fancyPrint("Analytic Profile Fit for Learned Star")
       A_data[i] = 1/sum(norm_data)
       =#
 
-      if s_data[i] < 0.075 || s_data[i] > 1 
+      if s_data[i] < sLowerBound || s_data[i] > sUpperBound 
         push!(failedStars, i) 
       end
     catch
@@ -355,7 +354,7 @@ end
 
 
 println("━ failed stars: ", unique(failedStars))
-println("\n━ Rejected $(length(unique(failedStars))) more stars for failing or having either s < 0.075 or s > 1 when fitting an analytic profile to an autoencoded image. NB: These failed stars are being indexed after the blacklisted stars were removed.")
+println("\n━ Rejected $(length(unique(failedStars))) more stars for failing or having either s < $sLowerBound or s > $sUpperBound when fitting an analytic profile to an autoencoded image. NB: These failed stars are being indexed after the blacklisted stars were removed.")
 
 failedStars = unique(failedStars)
 
@@ -551,10 +550,12 @@ fancyPrint("Plotting")
 
   cmx = maximum([maximum(a), maximum(b)])
   cmn = minimum([minimum(a), minimum(b)])
-
-  println(UnicodePlots.heatmap(get_middle_15x15(a), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of star $starSample"))
-  println(UnicodePlots.heatmap(get_middle_15x15(b), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
-  println(UnicodePlots.heatmap(get_middle_15x15(a - b), colormap=:inferno, title="Heatmap of Residuals"))
+  
+  if UnicodePlotsPrint
+    println(UnicodePlots.heatmap(get_middle_15x15(a), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of star $starSample"))
+    println(UnicodePlots.heatmap(get_middle_15x15(b), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
+    println(UnicodePlots.heatmap(get_middle_15x15(a - b), colormap=:inferno, title="Heatmap of Residuals"))
+  end
 
 
   #=
@@ -673,14 +674,17 @@ fancyPrint("Plotting")
   =#
 end
 
+if UnicodePlotsPrint
+  println(UnicodePlots.boxplot(["s model", "s data", "g1 model", "g1 data", "g2 model", "g2 data"], 
+                               [s_model, s_data, g1_model, g1_data, g2_model, g2_data],
+                              title="Boxplot of df.shopt"))
+end
+
 # ---------------------------------------------------------#
 fancyPrint("Saving Data to summary.shopt")
 #writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
 #println(readData())
 
-println(UnicodePlots.boxplot(["s model", "s data", "g1 model", "g1 data", "g2 model", "g2 data"], 
-                             [s_model, s_data, g1_model, g1_data, g2_model, g2_data],
-                            title="Boxplot of df.shopt"))
 
 #errVignets = []
 #for i in 1:2
