@@ -29,6 +29,7 @@ Currently, the inputs are JWST Point Spread Functions source catalogs. The curre
 
 | Image                                              | Description                                                                                                                         |
 |----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| summary.shopt                                      | Fits File containing summary statistics and information to reconstruct the PSF                                                      |
 | ![image](READMEassets/pgf9.png)                    | Pixel Grid Fit for the Star Above                                                                                                   |
 | ![image](READMEassets/hmresid.png)                 | Residual Map for Above Model and Fit                                                                                                |
 | ![image](READMEassets/s_uv.png)                    | s varying across the field of view                                                                                                  |
@@ -67,11 +68,13 @@ Not all of these will be strictly necessary depending on the checkplots you prod
 | CairoMakie       |            |          | YAML           |
 
 ### Set Up 
+Start by cloning this repository. There are future plans to release ShOpt onto a julia package repository, but for now the user needs these files contents.
+
 The dependencies can be installed in the Julia REPL. For example:
 ```julia
 import Pkg; Pkg.add("PyCall")
 ```
-For some functionality we need to use wrappers for Python code, such as calculating rho statistics or reading in fits files. Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. If the Python snippets throw an error, run the following in the Julia REPL for each Python library:
+For some functionality we need to use wrappers for Python code, such as reading in fits files. Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. If the Python snippets throw an error, run the following in the Julia REPL for each Python library:
 
 ```julia
 using PyCall
@@ -90,23 +93,21 @@ run(`$(PyCall.python) -m pip install --upgrade cython`)
 run(`$(PyCall.python) -m pip install astropy`)
 ```
 
-Once all dependencies are handled, the user now should clone this repository to obtain its file contents. There are future plans to release shopt onto the julia package repository, but for now the user needs these files contents.
-
-After the file contents are downloaded the user can run ```julia shopt.jl [configdir] [outdir] [catalog] [scifile]``` as stated above. Alternatively, they can run the shellscript that calls shopt in whatever program they are working with to create their catalog. For example, in a julia program you may use ```run(`./runshopt.sh [configdir] [outdir] [datadir]`)```
+After the file contents are downloaded the user can run ```julia shopt.jl [configdir] [outdir] [catalog] [scifile]``` as stated above. Alternatively, they can run the shellscript that calls shopt in whatever program they are working with to create their catalog. For example, in a julia program you may use ```run(`./runshopt.sh [configdir] [outdir] [catalog] [scifile]`)```
 
 ## Program Architecture
-
-tutorialNotebook.ipynb
-> See for yourself how to run Shopt!
 
 shopt.jl 
 > A runner script for all functions in this software
 
 dataPreprocessing.jl
-> A wrapper for python code to handle fits files and dedicated file to deal with data cleaning and adding noise to test robustness of the software
+> A wrapper for python code to handle fits files and dedicated file to deal with data cleaning 
 
 dataOutprocessing.jl
-> Convert data into a .shopt file. Access this data with readData()
+> Convert data into a summary.shopt file. Access this data with reader.jl. Produces some additional python plots.
+
+reader.jl
+> Get Point Spread Functions at an arbitrary (u,v) by reading in a summary.shopt file 
 
 plot.jl 
 > A dedicated file to handle all plotting
@@ -114,32 +115,20 @@ plot.jl
 radialProfiles.jl 
 > Contains analytic profiles such as a Gaussian Fit and a kolmogorov fit
 
-analyticCGD.jl 
+analyticLBFGS.jl 
 > Provides the necessary arguments (cost function and gradient) to the optimize function for analytic fits 
 
-pixelGridCGD.jl 
-> Provides the necessary arguments (cost and gradient) to do a pixel grid Optimization
-
-fluxNormalizer.jl 
-> A function to determine A such that analytic profiles sum to unity
-
-ellipticityNormalizer.jl 
-> A function that maps the norm of a vector in Euclidean Space inside of an open ball, scales components appropriately such that g1 and g2 are in an open ball in 2d space
-
 interpolate.jl 
-> For Point Spread Functions that vary across the Field of View, interpolate.jl will fit a 3rd degree polynomial in u and v to show how each of the pixel grid parameters change across the ra and dec
+> For Point Spread Functions that vary across the Field of View, interpolate.jl will fit a nth degree polynomial in u and v to show how each of the pixel grid parameters change across the (u,v) plane
 
 outliers.jl 
-> Contains two functions for identifying and removing outliers from a list
+> Contains functions for identifying and removing outliers from a list
 
 powerSpectrum.jl
 > Computes the power spectra for a circle of radius k, called iteratively to plot P(k) / k
 
 kaisserSquires.jl
 > Computes the Kaisser-Squires array to be plotted
-
-runSourceExtractor.jl
-> Runs Sex on input .fits file supplied in datadir 
 
 runshopt.sh
 > A shell script for running Shopt. Available so that users can run a terminal command in whatever program they are writing to run shopt. 
@@ -157,10 +146,7 @@ _config.yml
 > Also for official website
 
 ## Known Issues
-+ Need to take stamps of images to focus on the actual PSF 
-+ Some Ploting Concerns with Size STD 
 + kolmogorov radial profile taking an unfeasible amount of time to compute
-+ No current functionality for Rho statistics
 
 ## Contributors
 + Edward Berman
@@ -170,4 +156,4 @@ _config.yml
 + The Northeastern Cosmology Group for Their Continued Support and Guidance                                                           
 + The Northeastern Physics Department and Northeastern Undergraduate Research and Fellowships, for making this project possible with funding from the Northeastern Physics Co-Op Fellowship and PEAK Ascent Award respectively   
 + [David Rosen](https://github.com/david-m-rosen), who gave valuable input in the early stages of this project and during his course Math 7223, Riemannian Optimization
-+ The COSMOS Web Collaboration for providing data from the James Webb Space Telescope
++ The COSMOS Web Collaboration for providing data from the James Webb Space Telescope and internal review
