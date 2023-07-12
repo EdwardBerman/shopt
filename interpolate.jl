@@ -13,7 +13,7 @@ function interpCostS(p; truth=s_tuples)
 end
 
 function polyG_s!(storage, p)
-  grad_cost = ForwardDiff.gradient(interpCostS, p)
+  grad_cost = ForwardDiff.gradient(interpCostS, p) #∇
   storage[1] = grad_cost[1]
   storage[2] = grad_cost[2]
   storage[3] = grad_cost[3]

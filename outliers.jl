@@ -9,9 +9,9 @@ function detect_outliers(data::AbstractVector{T}; k::Float64=1.5) where T<:Real
   return outliers
 end
 
-function outliers_filter(snr::Vector{Any}, img::Vector{Any}, wht::Vector{Matrix{Float32}}; k::Float64=0.5) 
-  q1 = quantile(snr, 0.25)
-  println("━ Cutting off Stars below the 25th Percentile of Signal to Noise Ratio: $q1 , based off of snr = 10log[Σpix(I²/σ²)]")
+function outliers_filter(snr::Vector{Any}, img::Vector{Any}, wht::Vector{Matrix{Float32}}, k::Float64) 
+  q1 = quantile(snr, k)
+  println("━ Cutting off Stars below the $k Percentile of Signal to Noise Ratio: $q1 , based off of snr = 10log[Σpix(I²/σ²)]")
   q3 = quantile(snr, 0.75)
   iqr = q3 - q1
   lower_fence = q1 - k * iqr 

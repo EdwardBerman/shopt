@@ -1,3 +1,6 @@
+using PyCall
+using Statistics
+using Distributions
 
 function catalogingWEBBPSF()
   py"""
@@ -5,13 +8,25 @@ function catalogingWEBBPSF()
   from astropy.io import fits
   from astropy.table import Table, hstack, vstack
   import webbpsf
-  nc = webbpsf.NIRCam()
-  psf = nc.calc_psf(nlambda=5, fov_arcsec=2)
-  a = psf[1].data
+  insts = ['NIRCam','NIRCam','NIRCam','NIRCam']
+  filts = ['F115W', 'F150W', 'F277W', 'F444W']
+
+  psfs = {}
+  for i, (instname, filt) in enumerate(zip(insts, filts)):
+    inst = webbpsf.instrument(instname)
+    inst.filter = filt
+    psf = inst.calc_psf(fov_arcsec=5.0)
+    psfs[instname+filt] = psf
+  
+  psf1 = psfs['NIRCamF115W'][1].data
+  psf2 = psfs['NIRCamF150W'][1].data
+  psf3 = psfs['NIRCamF277W'][1].data
+  psf4 = psfs['NIRCamF444W'][1].data
+
   """
-  julia_array = convert(Array{Float64,2}, py"a")
-  rows, cols = size(julia_array)
-  datadir = py"python_datadir"
+  julia_array1 = convert(Array{Float64,2}, py"psf1")
+  julia_array2 = convert(Array{Float64,2}, py"psf2")
+  rows, cols = size(julia_array1)
   catalogNew = []
   
   function blur(img::Array{T, 2}) where T<:Real
@@ -29,11 +44,9 @@ function catalogingWEBBPSF()
     return dummyArray
   end
 
-  for i in 1:25 
-    #filtered_array = [filter(!isnan, row) for row in eachrow(catalog[i])]
-    push!(catalogNew, blur(julia_array))
-  end
-  return catalogNew, rows, cols, 25
+  push!(catalogNew, blur(julia_array1))
+  push!(catalogNew, blur(julia_array2))
+  return catalogNew, rows, cols, 2
 end
 
 function gridPSFS()
@@ -44,12 +57,18 @@ function gridPSFS()
   import webbpsf
   nir = webbpsf.NIRCam()
   nir.filter = "F115W"
-  f115w = nir.psf_grid()
-  f115wdata = []
+  nir.detector = "NRCA2"
+  f115w = nir.psf_grid(all_detectors=False)
   
-  for j in range(len(f115w)):
-    for i in range(len(f115w[j].data)):
-      f115wdata.append(f115w[j].data[i])
+  f115wdata = []
+  u = []
+  v = []
+
+  #for j in range(len(f115w)):
+  for i in range(len(f115w.data)): #len(f115w[j].data)):
+    f115wdata.append(f115w.data[i]) #f115wdata.append(f115w[j].data[i])
+    u.append(f115w.meta['grid_xypos'][i][0]) #u.append(f115w[j].meta['grid_xypos'][i][0])
+    v.append(f115w.meta['grid_xypos'][i][1]) #v.append(f115w[j].meta['grid_xypos'][i][1])
 
   f115wdata = np.array(f115wdata)
 
@@ -78,6 +97,8 @@ function gridPSFS()
   
   catalogNew = []
   f115w = convert(Array{Float64,3}, py"f115wdata")
+  u_coords = convert(Array{Float64,1}, py"u")
+  v_coords = convert(Array{Float64,1}, py"v")
   for i in 1:size(f115w, 1)
     push!(catalogNew, blur(f115w[i,:,:]))
   end
@@ -87,7 +108,6 @@ function gridPSFS()
    # push!(catalogNew, blur(julia_array))
   #end
   rows, cols = size(catalogNew[1])
-  println(length(catalogNew), " ", rows, " ", cols)
-  return catalogNew, rows, cols, size(f115w, 1)
+  return catalogNew, rows, cols, u_coords, v_coords
 end
 

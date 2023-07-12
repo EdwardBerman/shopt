@@ -34,6 +34,23 @@ function generate_heatmap_sp_t(data::Array{T, 2}, t, cbmin, cbmax) where T<:Real
                 )
 end
 
+function generate_heatmap_sp_t2(data::Array{T, 2}, t, cbmin, cbmax) where T<:Real
+  Plots.heatmap(data,
+                aspect_ratio=:equal,  # ensure square cells
+                color=:winter,  # use the Winter color map
+                cbar=:true,  # add the color bar
+                title = t,
+                clims=(cbmin, cbmax),  # set the color limits
+                xlims=(0.5, size(data, 2) + 0.5),  # set the x-axis limits to include the full cells
+                ylims=(0.5, size(data, 1) + 0.5),  # set the y-axis limits to include the full cells
+                ticks=:none,  # remove the ticks
+                frame=:box,  # draw a box around the plot
+                grid=:none,  # remove the grid lines
+                margin = 15mm,
+                size=(1920, 1080)
+                )
+end
+
 function generate_heatmap_sp(data::Array{T, 2}, cbmin, cbmax) where T<:Real
   Plots.heatmap(data,
                 aspect_ratio=:equal,  # ensure square cells
@@ -125,9 +142,10 @@ function plot_err(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=
                    [std(s_data)/sqrt(n_sD), std(g1_data)/sqrt(n_g1D), std(g2_data)/sqrt(n_g2D)],
                    "Learned vs True Parameters Outliers Removed")
   =#
-
-  Plots.savefig(Plots.plot(ps1, size = (1920, 1080)), joinpath("outdir", "parametersScatterplot.pdf"))
-  Plots.savefig(Plots.plot(ps1, size = (1920, 1080)), joinpath("outdir", "parametersScatterplot.png"))
+  #filepath = "$outdir/parametersScatterplot.pdf"
+  Plots.savefig(Plots.plot(ps1, size = (1920, 1080)), "parametersScatterplot.pdf")
+  #filepath = "$outdir/parametersScatterplot.png"
+  Plots.savefig(Plots.plot(ps1, size = (1920, 1080)), "parametersScatterplot.png")
 end
 
 function hist_1(x::Array{T, 1}, y::Array{T, 1}, t1, t2) where T<:Real
@@ -211,7 +229,7 @@ function plot_hist(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data
                               joinpath("outdir", "parametersHistogram.png"))
 end
 
-function plot_hm(sampled_indices=sampled_indices, starCatalog=starCatalog, pixelGridFits=pixelGridFits, get_middle_15x15=get_middle_15x15, generate_heatmap_sp_t=generate_heatmap_sp_t, generate_heatmap_sp=generate_heatmap_sp,generate_heatmap_titled=generate_heatmap_titled, fft_image=fft_image)#p
+function plot_hm(r=r, c=c, outdir=outdir, sampled_indices=sampled_indices, starCatalog=starCatalog, pixelGridFits=pixelGridFits, get_middle_15x15=get_middle_15x15, generate_heatmap_sp_t=generate_heatmap_sp_t, generate_heatmap_sp=generate_heatmap_sp,generate_heatmap_titled=generate_heatmap_titled)#p
   star1 = sampled_indices[1]
   star2 = sampled_indices[2]
   star3 = sampled_indices[3]
@@ -280,11 +298,47 @@ function plot_hm(sampled_indices=sampled_indices, starCatalog=starCatalog, pixel
   hm62 = generate_heatmap_sp(pixelGridFits[star6], minimum([minimum(starCatalog[star6]), minimum(pixelGridFits[star6])]), maximum([maximum(starCatalog[star6]), maximum(pixelGridFits[star6])]))
   hm63 = generate_heatmap_sp(chiSquare[6], minimum(chiSquare[6]), maximum(chiSquare[6]))
 =#
-  fftmin = minimum(fft_image)       
-  fftmax = maximum(fft_image) 
+  #=
+  fft_image1 = fft(complex.(starCatalog[star1] .- pixelGridFits[star1]))
+  fft_image1 = abs2.(fft_image1)
 
-  hm8 = generate_heatmap_titled(fft_image, "FFT Residuals", fftmin, fftmax)
+  pk1 = []
+  for i in 1:10
+    radius = range(1, max(r/2, c/2) - 1, length=10)
+    push!(pk1, powerSpectrum(fft_image1, radius[i]))
+  end
+
+  fftmin1 = minimum(fft_image1)       
+  fftmax1 = maximum(fft_image1) 
   
+  fft_image2 = fft(complex.(starCatalog[star2] .- pixelGridFits[star2]))
+  fft_image2 = abs2.(fft_image2)
+
+  pk2 = []
+  for i in 1:10
+    radius = range(1, max(r/2, c/2) - 1, length=10)
+    push!(pk2, powerSpectrum(fft_image2, radius[i]))
+  end
+
+  fftmin2 = minimum(fft_image2)       
+  fftmax2 = maximum(fft_image2) 
+  
+  fft_image3 = fft(complex.(starCatalog[star3] .- pixelGridFits[star3]))
+  fft_image3 = abs2.(fft_image3)
+
+  pk3 = []
+  for i in 1:10
+    radius = range(1, max(r/2, c/2) - 1, length=10)
+    push!(pk3, powerSpectrum(fft_image3, radius[i]))
+  end
+
+  fftmin3 = minimum(fft_image3)       
+  fftmax3 = maximum(fft_image3) 
+
+  hm8 = generate_heatmap_sp_t(fft_image1, "FFT Residuals", fftmin1, fftmax1)
+  hm9 = generate_heatmap_sp(fft_image2, fftmin2, fftmax2)
+  hm10 = generate_heatmap_sp(fft_image3, fftmin3, fftmax3)
+  =#
   zmn = minimum([minimum(starCatalog[star3]), minimum(pixelGridFits[star3])])
   zmx = maximum([maximum(starCatalog[star3]), maximum(pixelGridFits[star3])])
 
@@ -292,7 +346,22 @@ function plot_hm(sampled_indices=sampled_indices, starCatalog=starCatalog, pixel
   s2 = Plots.surface(title="pixelGridFit", titlefontsize=30, pixelGridFits[star3], zlim=(zmn, zmx), colorbar = false)
   s3 = Plots.surface(title="Residuals", titlefontsize=30, starCatalog[star3] .- pixelGridFits[star3], zlim=(2*zmn, 2*zmx), colorbar = false)
 
-  pk_k = Plots.plot(pk, 
+  meanRelativeError = zeros(r,c)
+  for j in 1:size(starCatalog[star1], 1)
+    for k in 1:size(starCatalog[star1], 2)
+      RelativeError = []
+      for i in 1:length(starCatalog)
+        push!(RelativeError, abs.(starCatalog[i][j,k] .- pixelGridFits[i][j,k]) ./ abs.(starCatalog[i][j,k] .+ 1e-10))
+      end
+      meanRelativeError[j,k] = mean(RelativeError)
+    end
+  end
+
+  RelativeErrorHM = generate_heatmap_sp_t2(meanRelativeError, "Mean Relative Error at Each Pixel", minimum(meanRelativeError), maximum(meanRelativeError))
+
+
+
+  pk_1 = Plots.plot(pk1, 
                     xlabel = "k", 
                     linewidth=5, 
                     tickfontsize=16,
@@ -302,7 +371,24 @@ function plot_hm(sampled_indices=sampled_indices, starCatalog=starCatalog, pixel
                     ylabel = "P(k)", 
                     title = "Power Spectrum", 
                     margin = 25mm)
-
+  pk_2 = Plots.plot(pk2,
+                    xlabel = "k", 
+                    linewidth=5, 
+                    tickfontsize=16,
+                    titlefontsize=30, 
+                    xguidefontsize=30, 
+                    yguidefontsize=30, 
+                    ylabel = "P(k)", 
+                    margin = 25mm)
+  pk_3 = Plots.plot(pk3,
+                    xlabel = "k", 
+                    linewidth=5, 
+                    tickfontsize=16,
+                    titlefontsize=30, 
+                    xguidefontsize=30, 
+                    yguidefontsize=30, 
+                    ylabel = "P(k)", 
+                    margin = 25mm)
   #title1 = Plots.plot(title = "I(u,v) Model", titlefontsize=30, grid = false, showaxis = false, bottom_margin = -25Plots.px)
   #title2 = Plots.plot(title = "I(u,v) Data", titlefontsize=30, grid = false, showaxis = false, bottom_margin = -25Plots.px)
   #title3 = Plots.plot(title = "Chi-Square Residuals", titlefontsize=30, grid = false, showaxis = false, bottom_margin = -25Plots.px)
@@ -323,6 +409,8 @@ function plot_hm(sampled_indices=sampled_indices, starCatalog=starCatalog, pixel
                               size = (1920,1080)), 
                                   joinpath("outdir", "pixelGridFit.png"))
 
+  Plots.savefig(RelativeErrorHM, joinpath("outdir", "relativeErrorHM.pdf"))
+  Plots.savefig(RelativeErrorHM, joinpath("outdir", "relativeErrorHM.png"))
   #Plots.savefig(Plots.plot(hm, hm6, hm7, layout = (1,3), size = (1920,1080)), joinpath("outdir", "pixelGridFit.pdf"))
   
   #=
@@ -339,39 +427,33 @@ function plot_hm(sampled_indices=sampled_indices, starCatalog=starCatalog, pixel
                            s3, 
                            layout = (1,3),
                            size = (1920,1080)), 
-                           joinpath("outdir", "3dPixelGridFit.png"))
+                           joinpath(outdir, "3dPixelGridFit.png"))
   
-  Plots.savefig(Plots.plot(hm8, 
-                           pk_k,
-                            layout = (1,2),
+  Plots.savefig(Plots.plot(pk_1, 
+                           pk_2,
+                           pk_3,
+                            layout = (3,1),
                             size = (1920,1080)), 
-                                joinpath("outdir", "fftResiduals.pdf"))
+                                joinpath(outdir, "powerspectra.png"))
   
-  Plots.savefig(Plots.plot(hm8, 
-                           pk_k,
-                            layout = (1,2),
+  Plots.savefig(Plots.plot(hm8,  
+                           hm9, 
+                           hm10,
+                            layout = (3,1),
                             size = (1920,1080)), 
-                                joinpath("outdir", "fftResiduals.png"))
+                                joinpath(outdir, "fftresiduals.png"))
+  Plots.savefig(Plots.plot(pk_1, 
+                           pk_2,
+                           pk_3,
+                            layout = (3,1),
+                            size = (1920,1080)), 
+                                joinpath(outdir, "powerspectra.pdf"))
+  
+  Plots.savefig(Plots.plot(hm8,  
+                           hm9, 
+                           hm10,
+                            layout = (3,1),
+                            size = (1920,1080)), 
+                                joinpath(outdir, "fftresiduals.pdf"))
+  
 end
-#=
-#amin = minimum([minimum(star), minimum(starData)])
-333 amax = maximum([maximum(star), maximum(starData)])
-334 csmin = minimum(chiSquare)
-335 csmax = maximum(chiSquare)
-336 rmin = minimum(Residuals)
-337 rmax = maximum(Residuals)
-338 csemin = minimum(costSquaredError)
-339 csemax = maximum(costSquaredError)
-340 rpgmin = minimum((star - pg).^2)
-341 rpgmax = maximum((star - pg).^2)
-342 fftmin = minimum(fft_image)
-343 fftmax = maximum(fft_image)
-=#
-
-#=
-title = Plots.plot(title = "Analytic Profile Loss Vs Iteration (Model)",
-                         titlefontsize=30,
-                         grid = false,
-                         showaxis = false,
-                         bottom_margin = -25Plots.px)
-=#

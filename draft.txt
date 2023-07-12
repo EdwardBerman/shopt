@@ -1,7 +1,5 @@
 ## How Can I Help?
-171 Please note that this project is still in early development and many key features need to be fully finished before accepting any m    ajor changes from the community. However, if you subscribe to the principles that this project stands for and you would like to co    ntribute, you may do so in the following ways. Good science isn't done in isolation and I would welcome any and all input! 
-172 
-173 + Contact berman.ed@northeastern.edu 
-174 + Submit a Pull Request
-175 + Fork this Repository
++ Contact berman.ed@northeastern.edu 
++ Submit a Pull Request
++ Fork this Repository
 

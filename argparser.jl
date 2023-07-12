@@ -1,3 +1,7 @@
+#=
+Function to parse arguments from the command line
+=#
+
 function process_arguments(args)
   fancyPrint("Parsing Arguments")
   configdir = args[1]

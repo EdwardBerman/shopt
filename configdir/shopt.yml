@@ -2,15 +2,19 @@
 
 # Key-value pairs
 printStatements: 
-saveYaml: false
+saveYaml: true
 
 NNparams:
   epochs: 1000
   lossFunction: MSE
   activationFunctions: tanh #Also available, sigmoid
-    
+  minGradientPixel: 1e-5
+AnalyticFitParams:
+  minGradientAnalyticModel: 1e-6
+  minGradientAnalyticLearned: 1e-4
+
 dataProcessing:
-  SnR: 0.5
+  SnRPercentile: 0.33
 
 # Nested structure
 plots:
@@ -21,4 +25,6 @@ plots:
   cairoMakiePlots:
     - logPlots: true
 polynomialDegree: 3
+stampSize: 131
+AcceptImagesWithNaNs: true
 #Comments on run:
