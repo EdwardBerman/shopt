@@ -154,8 +154,38 @@ dependencies.jl
 > Download all of the imports from imports.txt automatically
 
 ## Config / YAML Information
-blah
-> blah
+saveYaml
+> Set `true` if you want to save the YAML to the output directory for future reference, set to `false` otherwise
+
+NNparams
+> epochs
+>> Set the Maximum Number of training epochs should the model never reach the minimum gradient of the loss function. Set to 100 by default
+> minGradientPixel
+>> A stopping gradient of the loss function for a pixel grid fit. Set to 1e-6 by default
+ 12 AnalyticFitParams:
+ 13   minGradientAnalyticModel: 1e-6
+ 14   minGradientAnalyticLearned: 1e-6
+ 15   analyticFitStampSize: 64
+ 16 
+ 17 dataProcessing:
+ 18   SnRPercentile: 0.33
+ 19   sUpperBound: 1
+ 20   sLowerBound: 0.075
+ 21 
+ 22 # Nested structure
+ 23 plots:
+ 24   unicodePlots: true
+ 25   normalPlots:
+ 26     - parametersHistogram.png: true
+ 27     - parametersScatterplot.png: true
+ 28 polynomialDegree: 3
+ 29 stampSize: 131
+ 30 AcceptImagesWithNaNs: true
+ 31 
+ 32 
+ 33 training_ratio: 0.8
+ 34 
+ 35 CommentsOnRun: "\n ** This is Where You Can Leave Comments or Notes To Se    lf on the Run! ** \n"
 
 ## Known Issues
 + kolmogorov radial profile not yet functional
