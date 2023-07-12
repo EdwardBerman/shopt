@@ -22,8 +22,6 @@ plots:
   normalPlots:
     - parametersHistogram.png: true
     - parametersScatterplot.png: true
-  cairoMakiePlots:
-    - logPlots: true
 polynomialDegree: 3
 stampSize: 131
 AcceptImagesWithNaNs: true
