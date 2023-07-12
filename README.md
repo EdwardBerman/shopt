@@ -30,16 +30,16 @@ Currently, the inputs are JWST Point Spread Functions source catalogs. The curre
 | Image                                              | Description                                                                                                                         |
 |----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | summary.shopt                                      | Fits File containing summary statistics and information to reconstruct the PSF                                                      |
+| shopt.yml                                          | Config File for Tunable Parameters Such as Stamp Size, Stopping Gradients, Plotting Options, etc.                                   |
 | ![image](READMEassets/pgf9.png)                    | Pixel Grid Fit for the Star Above                                                                                                   |
 | ![image](READMEassets/hmresid.png)                 | Residual Map for Above Model and Fit                                                                                                |
 | ![image](READMEassets/s_uv.png)                    | s varying across the field of view                                                                                                  |
 | ![image](READMEassets/g1_uv.png)                   | g1 varying across the field of view                                                                                                 |
 | ![image](READMEassets/g2_uv.png)                   | g2 varying across the field of view                                                                                                 |
-| ![image](READMEassets/3dAnalyticFit.png)           | 3D map to easily show where PSF is over and under subtracted                                                                        |
-| ![image](READMEassets/pixelGridFit.png)            | Pixel Grid fit for Model Star                                                                                                       |
 | ![image](READMEassets/parametersHistogram.png)     | Histogram for learned profiles for each star in an analytic fit with their residuals                                                |
 | ![image](READMEassets/parametersScatterplot.png)   | Same data recorded as a scatterplot with and without outliers removed and with error bars                                           |
-| ![image](READMEassets/fftResiduals.png)            | The complex magnitude squared of each pixel of the Fourier transform of the residual map side by side with the Power spectrum graph |
+
+NB: This is not a comprehensive list, only a few cechkplots are presented. See the shopt.yml to configure which plots you want to see and save!
 
 ## Running
 ### Command 
