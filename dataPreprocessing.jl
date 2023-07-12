@@ -6,7 +6,12 @@ snrCutoff = config["dataProcessing"]["SnRPercentile"]
 YAMLSAVE = config["saveYaml"]
 minAnalyticGradientModel = config["AnalyticFitParams"]["minGradientAnalyticModel"]
 minAnalyticGradientLearned = config["AnalyticFitParams"]["minGradientAnalyticLearned"]
+AnalyticStampSize = config["AnalyticFitParams"]["analyticFitStampSize"]
 minPixelGradient = config["NNparams"]["minGradientPixel"]
+UnicodePlotsPrint = config["plots"]["unicodePlots"]
+sLowerBound = config["dataProcessing"]["sLowerBound"]
+sUpperBound = config["dataProcessing"]["sUpperBound"]
+comments = config["CommentsOnRun"]
 
 println("Key Config Choices:")
 println("━ Max Epochs: ", epochs)
@@ -16,7 +21,12 @@ println("━ Signal to Noise Ratio Cutoff: ", snrCutoff)
 println("━ Save YAML: ", YAMLSAVE)
 println("━ Stopping Analytic Fit Gradient Star Vignets: ", minAnalyticGradientModel)
 println("━ Stopping Analytic Fit Gradient Learned Vignets: ", minAnalyticGradientLearned)
+println("━ Analytic Fit Stamp Size: ", AnalyticStampSize)
 println("━ Stopping Pixel Fit Gradient: ", minPixelGradient)
+println("━ Print Unicode Plots: ", UnicodePlotsPrint)
+println("━ s Lower Bound: ", sLowerBound)
+println("━ s Upper Bound: ", sUpperBound)
+println("━ Comments: ", comments)
 
 function countNaNs(arr)
     count = 0

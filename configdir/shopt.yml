@@ -12,6 +12,7 @@ NNparams:
 AnalyticFitParams:
   minGradientAnalyticModel: 1e-6
   minGradientAnalyticLearned: 1e-5
+  analyticFitStampSize: 64
 
 dataProcessing:
   SnRPercentile: 0.33

@@ -1,6 +1,11 @@
 include("radialProfiles.jl")
 
-function cost(params; r = r, c= c, starL=starCatalog[iteration], radial=fGaussian) #star=starCatalog[i] 
+#=
+Functions for Cost and Gradient used in the Optimize step with LBFGS
+NB: Reparameterization for [s, g1, g2] via [σ, e1, e2] to constraint update steps inside R+ x B_2(r)
+=#
+
+function cost(params; r = r, c= c, starL=starCatalog[iteration], radial=fGaussian, AnalyticStampSize=AnalyticStampSize, get_middle_nxn=get_middle_nxn) 
   Totalcost = 0
   σ = params[1]
   s_guess = σ^2
@@ -11,7 +16,11 @@ function cost(params; r = r, c= c, starL=starCatalog[iteration], radial=fGaussia
   ratio = ellipticity/normG
   g1_guess = e1_guess/ratio
   g2_guess = e2_guess/ratio
-  
+ 
+  starL = get_middle_nxn(starL, AnalyticStampSize)
+  r = AnalyticStampSize
+  c = AnalyticStampSize
+
   sum = 0
   for u in 1:r
     for v in 1:c
@@ -37,7 +46,7 @@ function cost(params; r = r, c= c, starL=starCatalog[iteration], radial=fGaussia
 end
 
 
-function costD(params; r = r, c= c, starL = pixelGridFits[iteration], radial = fGaussian) 
+function costD(params; r=r, c=c, starL=pixelGridFits[iteration], radial=fGaussian, AnalyticStampSize=AnalyticStampSize, get_middle_nxn=get_middle_nxn) 
   Totalcost = 0
   σ = params[1]
   s_guess = σ^2
@@ -48,6 +57,10 @@ function costD(params; r = r, c= c, starL = pixelGridFits[iteration], radial = f
   ratio = ellipticity/normG
   g1_guess = e1_guess/ratio
   g2_guess = e2_guess/ratio
+  
+  starL = get_middle_nxn(starL, AnalyticStampSize)
+  r = AnalyticStampSize
+  c = AnalyticStampSize
 
   sum = 0
   for u in 1:r
