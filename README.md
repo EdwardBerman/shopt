@@ -45,7 +45,7 @@ NB: This is not a comprehensive list, only a few cechkplots are presented. See t
 ### Command 
 To run `shopt.jl`
 
-First use Source Extractor to create a catalog for Shopt to accept and save this catalog in the appropriate directory
+First use Source Extractor to create a catalog for ShOpt to accept and save this catalog in the appropriate directory
 
 Run ```julia shopt.jl [configdir] [outdir] [catalog] [scifile]```
 
@@ -72,7 +72,10 @@ The dependencies can be installed in the Julia REPL. For example:
 ```julia
 import Pkg; Pkg.add("PyCall")
 ```
-For some functionality we need to use wrappers for Python code, such as reading in fits files. Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. If the Python snippets throw an error, run the following in the Julia REPL for each Python library:
+
+We also provide dependencies.jl, which you can run to download all of the Julia libraries automatically by reading in the imports.txt file.
+
+For some functionality we need to use wrappers for Python code, such as reading in fits files or converting (x,y) -> (u,v). Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. If the Python snippets throw an error, run the following in the Julia REPL for each Python library:
 
 ```julia
 using PyCall
