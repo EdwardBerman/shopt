@@ -54,18 +54,16 @@ There is also a shell script that runs this command so that the user may call sh
 ### Dependencies 
 Not all of these will be strictly necessary depending on the checkplots you produce, but for full functionality of Shopt the following are necessary. Source Extractor is also not a strict dependency, but in practice one will inevitably install.
 
-| Julia            | Python     | Binaries | Julia          |
-|------------------|------------|----------|----------------|
-| Plots            | matplotlib | SEx      | ProgressBars   |
-| ForwardDiff      | astropy    |          | UnicodePlots   |
-| LinearAlgebra    | numpy      |          | CSV            |
-| Random           |            |          | FFTW           |
-| Distributions    |            |          | Images         |
-| SpecialFunctions |            |          | ImageFiltering |
-| Optim            |            |          | DataFrames     |
-| IterativeSolvers |            |          | PyCall         |
-| QuadGK           |            |          | Flux           |
-| CairoMakie       |            |          | YAML           |
+| Julia            | Python     | Binaries | Julia          | Julia          |
+|------------------|------------|----------|----------------|----------------|
+| Plots            | matplotlib | SEx      | ProgressBars   | BenchmarkTools |
+| ForwardDiff      | astropy    |          | UnicodePlots   | Measures       |
+| LinearAlgebra    | numpy      |          | CSV            | Dates          |
+| Random           |            |          | FFTW           | YAML           |
+| Distributions    |            |          | Images         | CairoMakie     |
+| SpecialFunctions |            |          | ImageFiltering | Flux           |
+| Optim            |            |          | DataFrames     | QuadGK         |
+| IterativeSolvers |            |          | PyCall         |                |
 
 ### Set Up 
 Start by cloning this repository. There are future plans to release ShOpt onto a julia package repository, but for now the user needs these files contents.
@@ -146,7 +144,7 @@ _config.yml
 > Also for official website
 
 ## Known Issues
-+ kolmogorov radial profile taking an unfeasible amount of time to compute
++ kolmogorov radial profile not yet functional
 
 ## Contributors
 + Edward Berman
