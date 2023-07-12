@@ -63,13 +63,13 @@ fancyPrint("Reading .jl Files")
   include("radialProfiles.jl")
   include("pixelGridCGD.jl")
   include("masks.jl")
-  include("dataPreprocessing.jl")
   include("outliers.jl")
   include("dataOutprocessing.jl")
   include("powerSpectrum.jl")
   include("kaisserSquires.jl")
   include("webbpsfProcessing.jl")
   include("interpolate.jl")
+  include("dataPreprocessing.jl")
 end
 # ---------------------------------------------------------#
 #fancyPrint("Running Source Extractor")
@@ -139,7 +139,7 @@ fancyPrint("Analytic Profile Fit for Model Star")
                              g!, 
                              initial_guess, 
                              LBFGS(),#ConjugateGradient()
-                             Optim.Options(g_tol = 1e-6))#Optim.Options(callback = cb)
+                             Optim.Options(g_tol = minAnalyticGradientModel))#Optim.Options(callback = cb) #Optim.Options(g_tol = 1e-6))
       
       s_model[i] = x_cg.minimizer[1]^2
       e1_guess = x_cg.minimizer[2]
@@ -246,12 +246,14 @@ optimizer = ADAM()
 
     
     # Format some random image data
-    data = nanToZero(reshape(starCatalog[i], length(starCatalog[i])))
+    data = nanToGaussian(starCatalog[i], s_model[i], g1_model[i], g2_model[i], r/2, c/2)
+    data = reshape(data, length(data))
+    #data = nanToZero(reshape(starCatalog[i], length(starCatalog[i])))
     
    
     # Train the autoencoder
     try
-      min_gradient = 1e-5
+      min_gradient = minPixelGradient
       for epoch in 1:epochs
         Flux.train!(loss, Flux.params(autoencoder), [(data,)], optimizer) #loss#Flux.params(autoencoder))
         grad = Flux.gradient(Flux.params(autoencoder)) do
@@ -267,7 +269,7 @@ optimizer = ADAM()
       input_image = reshape(starCatalog[i], length(starCatalog[i]))
   
       # Pass the input image through the autoencoder to get the reconstructed image
-      reconstructed_image = autoencoder(input_image)
+      reconstructed_image = autoencoder(data) #autoencoder(input_image)
 
       #pg = optimize(pgCost, pg_g!, rand(r*c), ConjugateGradient())
       #push!(pixelGridFits ,reshape(pg.minimizer, (r, c)))
@@ -314,7 +316,7 @@ fancyPrint("Analytic Profile Fit for Learned Star")
                              gD!, 
                              initial_guess,
                              LBFGS(),#ConjugateGradient()ConjugateGradient(),
-                             Optim.Options(g_tol = 1e-6)) #Optim.Options(callback = cb)
+                             Optim.Options(g_tol = minAnalyticGradientLearned)) #Optim.Options(callback = cb)
     
       s_data[i] = y_cg.minimizer[1]^2
       e1_guess = y_cg.minimizer[2]
@@ -385,7 +387,7 @@ end
 
 s_fov = optimize(interpCostS, polyG_s!, rand(10), LBFGS())
 sC = s_fov.minimizer
-println("\ns(u,v) = $(sC[1])u^3 \n+ $(sC[2])v^3 \n+ $(sC[3])u^2v \n+ $(sC[4])v^2u \n+ $(sC[5])u^2 \n+ $(sC[6])v^2 \n+ $(sC[7])uv \n+ $(sC[8])u \n+ $(sC[9])v \n+ $(sC[10])\n")
+println("\ns(u,v) = \n$(sC[1]) u³ \n+ $(sC[2]) v³ \n+ $(sC[3]) u²v \n+ $(sC[4]) v²u \n+ $(sC[5]) u² \n+ $(sC[6]) v² \n+ $(sC[7]) uv \n+ $(sC[8]) u \n+ $(sC[9]) v \n+ $(sC[10])\n")
 
 s(u,v) = sC[1]*u^3 + sC[2]*v^3 + sC[3]*u^2*v + sC[4]*v^2*u + sC[5]*u^2 + sC[6]*v^2 + sC[7]*u*v + sC[8]*u + sC[9]*v + sC[10]
 ds_du(u,v) = sC[1]*3*u^2 + sC[3]*2*u*v + sC[4]*v^2 + sC[5]*2*u + sC[7]*v + sC[8]
@@ -398,7 +400,7 @@ end
 
 g1_fov = optimize(interpCostg1, polyG_g1!, rand(10), LBFGS())
 g1C = g1_fov.minimizer
-println("\ng1(u,v) = $(g1C[1])u^3 \n+ $(g1C[2])v^3 \n+ $(g1C[3])u^2v \n+ $(g1C[4])v^2u \n+ $(g1C[5])u^2 \n+ $(g1C[6])v^2 \n+ $(g1C[7])uv \n+ $(g1C[8])u \n+ $(g1C[9])v \n+ $(g1C[10])\n")
+println("\ng1(u,v) = \n$(g1C[1]) u³ \n+ $(g1C[2]) v³ \n+ $(g1C[3]) u²v \n+ $(g1C[4]) v²u \n+ $(g1C[5]) u² \n+ $(g1C[6]) v² \n+ $(g1C[7]) uv \n+ $(g1C[8]) u \n+ $(g1C[9]) v \n+ $(g1C[10])\n")
 
 g1(u,v) = g1C[1]*u^3 + g1C[2]*v^3 + g1C[3]*u^2*v + g1C[4]*v^2*u + g1C[5]*u^2 + g1C[6]*v^2 + g1C[7]*u*v + g1C[8]*u + g1C[9]*v + g1C[10]
 dg1_du(u,v) = g1C[1]*3*u^2 + g1C[3]*2*u*v + g1C[4]*v^2 + g1C[5]*2*u + g1C[7]*v + g1C[8]
@@ -412,7 +414,7 @@ h_uv_data = g2_tuples
 
 g2_fov = optimize(interpCostg2, polyG_g2!, rand(10), LBFGS())
 g2C = g2_fov.minimizer
-println("\ng2(u,v) = $(g2C[1])u^3 \n+ $(g2C[2])v^3 \n+ $(g2C[3])u^2v \n+ $(g2C[4])v^2u \n+ $(g2C[5])u^2 \n+ $(g2C[6])v^2 \n+ $(g2C[7])uv \n+ $(g2C[8])u \n+ $(g2C[9])v \n+ $(g2C[10])\n")
+println("\ng2(u,v) = \n$(g2C[1]) u³ \n+ $(g2C[2]) v³ \n+ $(g2C[3]) u²v \n+ $(g2C[4]) v²u \n+ $(g2C[5]) u² \n+ $(g2C[6]) v² \n+ $(g2C[7]) uv \n+ $(g2C[8]) u \n+ $(g2C[9]) v \n+ $(g2C[10])\n")
 
 g2(u,v) = g2C[1]*u^3 + g2C[2]*v^3 + g2C[3]*u^2*v + g2C[4]*v^2*u + g2C[5]*u^2 + g2C[6]*v^2 + g2C[7]*u*v + g2C[8]*u + g2C[9]*v + g2C[10]
 dg2_du(u,v) = g2C[1]*3*u^2 + g2C[3]*2*u*v + g2C[4]*v^2 + g2C[5]*2*u + g2C[7]*v + g2C[8]
@@ -527,7 +529,7 @@ fancyPrint("Plotting")
   end
 
 
-  sampled_indices = sort(sample_indices(starCatalog, 3))
+  sampled_indices = sort(sample_indices(validation_indices, 3))
   #sampled_indices = [1,2]
 
   println("Sampled indices: ", sampled_indices)
@@ -688,5 +690,5 @@ writeFitsData()
 
 # ---------------------------------------------------------#
 fancyPrint("Done! =]")
-println("━ Total Time: ", Dates.format(now() - start, "HH:MM:SS"))
+#println("━ Total Time: ", Dates.format(now() - start, "HH:MM:SS"))
 println("For more on ShOpt.jl, see https://github.com/EdwardBerman/shopt")

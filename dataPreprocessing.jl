@@ -2,6 +2,33 @@ config = YAML.load_file(joinpath(configdir, "shopt.yml"))
 epochs = config["NNparams"]["epochs"]
 degree = config["polynomialDegree"]
 new_img_dim = config["stampSize"]
+snrCutoff = config["dataProcessing"]["SnRPercentile"]
+YAMLSAVE = config["saveYaml"]
+minAnalyticGradientModel = config["AnalyticFitParams"]["minGradientAnalyticModel"]
+minAnalyticGradientLearned = config["AnalyticFitParams"]["minGradientAnalyticLearned"]
+minPixelGradient = config["NNparams"]["minGradientPixel"]
+
+println("Key Config Choices:")
+println("━ Max Epochs: ", epochs)
+println("━ Polynomial Degree: ", degree)
+println("━ Stamp Size: ", new_img_dim)
+println("━ Signal to Noise Ratio Cutoff: ", snrCutoff)
+println("━ Save YAML: ", YAMLSAVE)
+println("━ Stopping Analytic Fit Gradient Star Vignets: ", minAnalyticGradientModel)
+println("━ Stopping Analytic Fit Gradient Learned Vignets: ", minAnalyticGradientLearned)
+println("━ Stopping Pixel Fit Gradient: ", minPixelGradient)
+
+function countNaNs(arr)
+    count = 0
+    
+    for element in arr
+        if isnan(element)
+            count += 1
+        end
+    end
+    
+    return count
+end
 
 function get_middle_nxn(array, n)
   rows, cols = size(array)
@@ -98,7 +125,7 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   println(UnicodePlots.boxplot(["snr"], [new_snr_arr], title="signal to noise ratio"))
 
 
-  catalogNew, errVignets = dout(signal2noiseRatios, catalogNew, errVignets)
+  catalogNew, errVignets = dout(signal2noiseRatios, catalogNew, errVignets, snrCutoff)
   println("━ Number of vignets: ", length(catalog))
   println("━ Removed $(length(catalog) - length(catalogNew)) outliers on the basis of Signal to Noise Ratio")
   

@@ -26,7 +26,7 @@ end
 #validation_u_coords = u_coordinates[validation_indices]
 #validation_v_coords = v_coordinates[validation_indices]
 
-function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRelativeError, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, errVignets=errVignets, fancyPrint=fancyPrint, training_stars=training_stars, training_u_coords=training_u_coords, training_v_coords=training_v_coords, validation_stars=validation_stars, validation_u_coords=validation_u_coords, validation_v_coords=validation_v_coords, validation_star_catalog=validation_star_catalog, degree=degree)
+function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRelativeError, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, errVignets=errVignets, fancyPrint=fancyPrint, training_stars=training_stars, training_u_coords=training_u_coords, training_v_coords=training_v_coords, validation_stars=validation_stars, validation_u_coords=validation_u_coords, validation_v_coords=validation_v_coords, validation_star_catalog=validation_star_catalog, degree=degree, YAMLSAVE=YAMLSAVE)
   
   m, n = size(starCatalog[1])
   array_3d = zeros(m, n, length(starCatalog))
@@ -115,12 +115,14 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
   command1 = `mv summary.shopt $outdir`
   run(command1)
 
-  command2 = `cp $configdir/shopt.yml $outdir`
-  run(command2)
+  if YAMLSAVE
+    command2 = `cp $configdir/shopt.yml $outdir`
+    run(command2)
 
-  current_time = now()
-  command3 = `mv $outdir/shopt.yml $outdir/$(Dates.format(Time(current_time), "HH:MM:SS")*"_shopt.yml")`
-  run(command3)
+    current_time = now()
+    command3 = `mv $outdir/shopt.yml $outdir/$(Dates.format(Time(current_time), "HH:MM:SS")*"_shopt.yml")`
+    run(command3)
+  end
 
   fancyPrint("Producing Additional Python Plots")
 
@@ -174,31 +176,36 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
       star = star/np.sum(star)
       return star
 
-  a = polynomial_interpolation_star(f[1].data['validation_u_coords'][0], f[1].data['validation_v_coords'][0]   ,polyMatrix)
+  python_sampled_indices = $sampled_indices
+  sample_one = python_sampled_indices[0]
+  sample_two = python_sampled_indices[1]
+  sample_three = python_sampled_indices[2]
+
+  a = polynomial_interpolation_star(f[1].data['validation_u_coords'][sample_one], f[1].data['validation_v_coords'][sample_one]   ,polyMatrix)
   #print(np.shape(a))
   fig, axes = plt.subplots(2, 3)
 
   # Display the first image in the first subplot
-  axes[0, 0].imshow(f[5].data[0, :, :  ], norm=colors.SymLogNorm(linthresh=1*10**(-6)))
+  axes[0, 0].imshow(f[5].data[sample_one, :, :  ], norm=colors.SymLogNorm(linthresh=1*10**(-6)))
   axes[0, 0].set_title('Pixel Grid Fit')
 
   # Display the second image in the second subplot
   axes[0, 1].imshow(a, norm=colors.SymLogNorm(linthresh=1*10**(-6)))
   axes[0, 1].set_title('Polynomial Interpolation')
 
-  axes[0, 2].imshow(f[5].data[0, :, :  ] - a, norm=colors.SymLogNorm(linthresh=1*10**(-6)))
+  axes[0, 2].imshow(f[5].data[sample_one, :, :  ] - a, norm=colors.SymLogNorm(linthresh=1*10**(-6)))
   axes[0, 2].set_title('Residuals')
   
-  b = polynomial_interpolation_star(f[1].data['validation_u_coords'][5], f[1].data['validation_v_coords'][5]   ,polyMatrix)
+  b = polynomial_interpolation_star(f[1].data['validation_u_coords'][sample_two], f[1].data['validation_v_coords'][sample_two], polyMatrix)
 
-  axes[1, 0].imshow(f[5].data[5, :, :  ], norm=colors.SymLogNorm(linthresh=1*10**(-6)))
+  axes[1, 0].imshow(f[5].data[sample_two, :, :  ], norm=colors.SymLogNorm(linthresh=1*10**(-6)))
   axes[1, 0].set_title('Pixel Grid Fit')
 
   # Display the second image in the second subplot
   axes[1, 1].imshow(b, norm=colors.SymLogNorm(linthresh=1*10**(-6)))
   axes[1, 1].set_title('Polynomial Interpolation')
 
-  axes[1, 2].imshow(f[5].data[5, :, :  ] - b, norm=colors.SymLogNorm(linthresh=1*10**(-6)))
+  axes[1, 2].imshow(f[5].data[sample_two, :, :  ] - b, norm=colors.SymLogNorm(linthresh=1*10**(-6)))
   axes[1, 2].set_title('Residuals')
   # Adjust the spacing between subplots
   plt.tight_layout()
@@ -309,6 +316,15 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
   
   command5 = `mv $outdir/summary.shopt  $py_outdir`
   run(command5)
+  
+  command6 = `mv $outdir/s_uv.png  $py_outdir`
+  run(command6)
+  
+  command7 = `mv $outdir/g1_uv.png  $py_outdir`
+  run(command7)
+  
+  command8 = `mv $outdir/g2_uv.png  $py_outdir`
+  run(command8)
   # run on sampled indices, copy diagnostics.py to py""" """ here
 end
 
