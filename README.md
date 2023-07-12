@@ -158,10 +158,10 @@ saveYaml
 > Set `true` if you want to save the YAML to the output directory for future reference, set to `false` otherwise
 
 NNparams
-> epochs
->> Set the Maximum Number of training epochs should the model never reach the minimum gradient of the loss function. Set to 100 by default
-> minGradientPixel
->> A stopping gradient of the loss function for a pixel grid fit. Set to 1e-6 by default
+- epochs
+  - Set the Maximum Number of training epochs should the model never reach the minimum gradient of the loss function. Set to 100 by default
+- minGradientPixel
+  - A stopping gradient of the loss function for a pixel grid fit. Set to 1e-6 by default
  12 AnalyticFitParams:
  13   minGradientAnalyticModel: 1e-6
  14   minGradientAnalyticLearned: 1e-6
