@@ -63,7 +63,7 @@ Not all of these will be strictly necessary depending on the checkplots you prod
 | Distributions    |            |          | Images         | CairoMakie     |
 | SpecialFunctions |            |          | ImageFiltering | Flux           |
 | Optim            |            |          | DataFrames     | QuadGK         |
-| IterativeSolvers |            |          | PyCall         |                |
+| IterativeSolvers |            |          | PyCall         | Statistics     |
 
 ### Set Up 
 Start by cloning this repository. There are future plans to release ShOpt onto a julia package repository, but for now the user needs these files contents.
