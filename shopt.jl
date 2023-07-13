@@ -698,6 +698,6 @@ writeFitsData()
 # ---------------------------------------------------------#
 fancyPrint("Done! =]")
 end_time = Dates.now()
-println("━ Total Time: ", (end_time - start) / Dates.Millisecond(1000)) 
+println("━ Total Time: ", (end_time - start) / Dates.Millisecond(1000), " seconds") 
 #println("━ Total Time: ", Dates.format(now() - start, "HH:MM:SS"))
 println("For more on ShOpt.jl, see https://github.com/EdwardBerman/shopt")
