@@ -7,14 +7,14 @@
   - [Inputs](#inputs)
   - [Outputs](#outputs)
 - [Running](#running)
-  - [Command](#command)_
+  - [Command](#command)
   - [Dependencies](#dependencies)
   - [Set Up](#set-up)
 - [Program Architecture](#program-architecture)
-- [Config / YAML Information](#config-/-yaml-information)
+- [Config / YAML Information](#config--yaml-information)
 - [Known Issues](#known-issues)
 - [Contributors](#contributors)
-- [Future Acknowledgements](#future-acknowledgements)
+- [Further Acknowledgements](#further-acknowledgements)
 
 
 ## About
