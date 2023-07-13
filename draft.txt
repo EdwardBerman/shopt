@@ -1,5 +1,0 @@
-## How Can I Help?
-+ Contact berman.ed@northeastern.edu 
-+ Submit a Pull Request
-+ Fork this Repository
-
