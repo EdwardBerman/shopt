@@ -207,7 +207,4 @@ CommentsOnRun
 + [David Rosen](https://github.com/david-m-rosen), who gave valuable input in the early stages of this project and during his course Math 7223, Riemannian Optimization
 + The COSMOS Web Collaboration for providing data from the James Webb Space Telescope and internal review
 
-{% raw %}
-{% include toc.html html=content sanitize=true class='toc-class' id='toc-id' h_min=2 h_max=4 ordered=true item_class='list-item' submenu_class='submenu' base_url='/docs/' anchor_class='anchor' skip_no_ids=true %}
-{% endraw %}
 
