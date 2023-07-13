@@ -163,7 +163,7 @@ NNparams
 - minGradientPixel
   - A stopping gradient of the loss function for a pixel grid fit. Set to `1e-6` by default
 
-AnalyticFitParams:
+AnalyticFitParams
 - minGradientAnalyticModel
   - A stopping gradient of the loss function for an analytic profile fit for input star vignets from a catalog. Set to `1e-6` by default
 - minGradientAnalyticLearned
