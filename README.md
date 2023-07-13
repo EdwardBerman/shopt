@@ -159,33 +159,40 @@ saveYaml
 
 NNparams
 - epochs
-  - Set the Maximum Number of training epochs should the model never reach the minimum gradient of the loss function. Set to 100 by default
+  - Set the Maximum Number of training epochs should the model never reach the minimum gradient of the loss function. Set to `1000` by default
 - minGradientPixel
-  - A stopping gradient of the loss function for a pixel grid fit. Set to 1e-6 by default
- 12 AnalyticFitParams:
- 13   minGradientAnalyticModel: 1e-6
- 14   minGradientAnalyticLearned: 1e-6
- 15   analyticFitStampSize: 64
- 16 
- 17 dataProcessing:
- 18   SnRPercentile: 0.33
- 19   sUpperBound: 1
- 20   sLowerBound: 0.075
- 21 
- 22 # Nested structure
- 23 plots:
- 24   unicodePlots: true
- 25   normalPlots:
- 26     - parametersHistogram.png: true
- 27     - parametersScatterplot.png: true
- 28 polynomialDegree: 3
- 29 stampSize: 131
- 30 AcceptImagesWithNaNs: true
- 31 
- 32 
- 33 training_ratio: 0.8
- 34 
- 35 CommentsOnRun: "\n ** This is Where You Can Leave Comments or Notes To Se    lf on the Run! ** \n"
+  - A stopping gradient of the loss function for a pixel grid fit. Set to `1e-6` by default
+
+AnalyticFitParams:
+- minGradientAnalyticModel
+  - A stopping gradient of the loss function for an analytic profile fit for input star vignets from a catalog. Set to `1e-6` by default
+- minGradientAnalyticLearned
+  - A stopping gradient of the loss function for an analytic profile fit     for stars learned by a pixel grid fit. Set to `1e-6` by default
+- analyticFitStampSize
+  - The box size for the subset of your stamp (see stamp size) you wish to use for analytic profile fitting. Ensure to specify this to be smaller than the stamp size of the vignets themselves. Set to `64` by default, therefore fitting an analytic profile to the middle `64 x 64` pixels of the stamp. 
+
+dataProcessing
+- SnRPercentile 
+  - Supply a float that represents the percentile below which stars will be filtered by on the basis of signal to noise ratio. Set to `0.33` by default
+- sUpperBound
+  - Stars fit with an analytic profile are filtered out if their `s` exceeds this upper bound. Set to `1` by default
+- sLowerBound
+  - Stars fit with an analytic profile are filtered out if their `s` falls beneath this lower bound. Set to `0.075` by default
+ 
+plots
+- Set true to plot and save a given figure, false otherwise 
+
+polynomialDegree
+- The degree of the polynomial used to interpolate each pixel in the stamp across the field of view. Set to `3` by default
+
+stampSize
+- The subset of the vignet for which use wish to fit. Be sure to make this number be less than the size of the input vignets. Set to `131` by default to fit and interpolate the middle `131 x 131` pixels
+
+training_ratio
+- Before doing a polynomial interpolation, the remaining stars will be divided into training and validation stars based off of this float. Set to `0.8` by default, indicating 80% training stars 20% validation stars
+
+CommentsOnRun
+- This is Where You Can Leave Comments or Notes To Self on the Run! Could be very useful if you save the yaml file with each run
 
 ## Known Issues
 + kolmogorov radial profile not yet functional
