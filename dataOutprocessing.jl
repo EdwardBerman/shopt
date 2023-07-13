@@ -126,7 +126,8 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
   #command4 = `python $outdir/diagnostics.py`
   #run(command4)
   py_outdir = outdir*"/$(now())"
-
+  println("Creating ", py_outdir, " directory...")
+  
   deg = degree 
 
   py"""

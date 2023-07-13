@@ -12,6 +12,7 @@ UnicodePlotsPrint = config["plots"]["unicodePlots"]
 sLowerBound = config["dataProcessing"]["sLowerBound"]
 sUpperBound = config["dataProcessing"]["sUpperBound"]
 comments = config["CommentsOnRun"]
+training_ratio = config["training_ratio"]
 
 println("Key Config Choices:")
 println("━ Max Epochs: ", epochs)
@@ -26,6 +27,7 @@ println("━ Stopping Pixel Fit Gradient: ", minPixelGradient)
 println("━ Print Unicode Plots: ", UnicodePlotsPrint)
 println("━ s Lower Bound: ", sLowerBound)
 println("━ s Upper Bound: ", sUpperBound)
+println("━ Training Ratio: ", training_ratio)
 println("━ Comments: ", comments)
 
 function countNaNs(arr)
