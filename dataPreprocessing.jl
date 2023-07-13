@@ -102,7 +102,27 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   l = len(vignets)
   python_sci_file = $sci_image
   g = fits.open(python_sci_file)
-  w = WCS(g[0].header)
+  def find_wcs_info(filename):
+    with fits.open(filename) as hdul:
+      for idx, hdu in enumerate(hdul):
+        try:
+          wcs = WCS(hdu.header)
+          return wcs, idx  # Return the WCS and extension index
+        except Exception:
+          continue  # Skip if WCS info is not present or invalid
+        return None, None  # If no WCS info is found
+   
+  filename = python_sci_file
+  wcs, extension_idx = find_wcs_info(filename)
+  if wcs is not None:
+    print(f"WCS info found in extension {extension_idx}:")
+    print(wcs)
+    # Additional WCS operations can be performed here
+  else:
+    print("No WCS info found in any extension.")
+  
+  w = wcs
+  #w = WCS(g[0].header)
 
   x_coords = f[2].data['XWIN_IMAGE']
   y_coords = f[2].data['YWIN_IMAGE']
