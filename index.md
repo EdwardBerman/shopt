@@ -1,5 +1,3 @@
-{{navbar}}
-
 ## About
  [![License](https://img.shields.io/pypi/l/jax-cosmo)](https://github.com/EdwardBerman/shopt/blob/main/LICENSE) [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors)
 
@@ -25,14 +23,15 @@ Currently, the inputs are JWST Point Spread Functions source catalogs. The curre
 | Image                             | Description                        |
 |-----------------------------------|------------------------------------|
 | ![image](READMEassets/input.png)  | Star Taken From Input Catalog      |
-
+| shopt.yml                         | Config File for Tunable Parameters |
+| \* starcat.fits                   | Star Catalog to take  vignets from | 
+| \* SCI.fits                       | fits file containing WCS info.     |   
 
 ### Outputs
 
 | Image                                              | Description                                                                                                                         |
 |----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | summary.shopt                                      | Fits File containing summary statistics and information to reconstruct the PSF                                                      |
-| shopt.yml                                          | Config File for Tunable Parameters Such as Stamp Size, Stopping Gradients, Plotting Options, etc.                                   |
 | ![image](READMEassets/pgf9.png)                    | Pixel Grid Fit for the Star Above                                                                                                   |
 | ![image](READMEassets/hmresid.png)                 | Residual Map for Above Model and Fit                                                                                                |
 | ![image](READMEassets/s_uv.png)                    | s varying across the field of view                                                                                                  |

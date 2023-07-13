@@ -1,91 +1,3 @@
-function generate_heatmap(data::Array{T, 2}, cbmin, cbmax) where T<:Real
-  Plots.heatmap(data,
-                aspect_ratio=:equal,  # ensure square cells
-                color=:winter,  # use the Winter color map
-                cbar=:true,  # add the color bar
-                xlabel="u",
-                ylabel="v",
-                clims=(cbmin, cbmax),  # set the color limits
-                xlims=(0.5, size(data, 2) + 0.5),  # set the x-axis limits to include the full cells
-                ylims=(0.5, size(data, 1) + 0.5),  # set the y-axis limits to include the full cells
-                ticks=:none,  # remove the ticks
-                frame=:box,  # draw a box around the plot
-                grid=:none,  # remove the grid lines
-                titlefontsize=30, 
-                xguidefontsize=30, 
-                yguidefontsize=30,
-                margin = 25mm
-                )
-end
-
-function generate_heatmap_sp_t(data::Array{T, 2}, t, cbmin, cbmax) where T<:Real
-  Plots.heatmap(data,
-                aspect_ratio=:equal,  # ensure square cells
-                color=:winter,  # use the Winter color map
-                cbar=:true,  # add the color bar
-                title = t,
-                clims=(cbmin, cbmax),  # set the color limits
-                xlims=(0.5, size(data, 2) + 0.5),  # set the x-axis limits to include the full cells
-                ylims=(0.5, size(data, 1) + 0.5),  # set the y-axis limits to include the full cells
-                ticks=:none,  # remove the ticks
-                frame=:box,  # draw a box around the plot
-                grid=:none,  # remove the grid lines
-                margin = 15mm
-                )
-end
-
-function generate_heatmap_sp_t2(data::Array{T, 2}, t, cbmin, cbmax) where T<:Real
-  Plots.heatmap(data,
-                aspect_ratio=:equal,  # ensure square cells
-                color=:winter,  # use the Winter color map
-                cbar=:true,  # add the color bar
-                title = t,
-                clims=(cbmin, cbmax),  # set the color limits
-                xlims=(0.5, size(data, 2) + 0.5),  # set the x-axis limits to include the full cells
-                ylims=(0.5, size(data, 1) + 0.5),  # set the y-axis limits to include the full cells
-                ticks=:none,  # remove the ticks
-                frame=:box,  # draw a box around the plot
-                grid=:none,  # remove the grid lines
-                margin = 15mm,
-                size=(1920, 1080)
-                )
-end
-
-function generate_heatmap_sp(data::Array{T, 2}, cbmin, cbmax) where T<:Real
-  Plots.heatmap(data,
-                aspect_ratio=:equal,  # ensure square cells
-                color=:winter,  # use the Winter color map
-                cbar=:true,  # add the color bar
-                clims=(cbmin, cbmax),  # set the color limits
-                xlims=(0.5, size(data, 2) + 0.5),  # set the x-axis limits to include the full cells
-                ylims=(0.5, size(data, 1) + 0.5),  # set the y-axis limits to include the full cells
-                ticks=:none,  # remove the ticks
-                frame=:box,  # draw a box around the plot
-                grid=:none,  # remove the grid lines
-                margin = 15mm
-                )
-end
-
-function generate_heatmap_titled(data::Array{T, 2}, t, cbmin, cbmax) where T<:Real
-  Plots.heatmap(data,
-                aspect_ratio=:equal,  # ensure square cells
-                color=:winter,  # use the Winter color map
-                cbar=:true,  # add the color bar
-                xlabel="u",
-                ylabel="v",
-                title = t,
-                clims=(cbmin, cbmax),  # set the color limits
-                xlims=(0.5, size(data, 2) + 0.5),  # set the x-axis limits to include the full cells
-                ylims=(0.5, size(data, 1) + 0.5),  # set the y-axis limits to include the full cells
-                ticks=:none,  # remove the ticks
-                frame=:box,  # draw a box around the plot
-                grid=:none,  # remove the grid lines
-                titlefontsize=30, 
-                xguidefontsize=30, 
-                yguidefontsize=30,
-                margin = 25mm
-                )
-end
 function error_plot(model, learned, errorModel, errorLearned, t)
   # Generate example data
   x = [1, 5, 9]  # Three points on the x-axis
@@ -202,6 +114,95 @@ function plot_hist(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data
                              size = (1920,1080)), 
                                 "parametersHistogram.png")
   end
+end
+
+function generate_heatmap(data::Array{T, 2}, cbmin, cbmax) where T<:Real
+  Plots.heatmap(data,
+                aspect_ratio=:equal,  # ensure square cells
+                color=:winter,  # use the Winter color map
+                cbar=:true,  # add the color bar
+                xlabel="u",
+                ylabel="v",
+                clims=(cbmin, cbmax),  # set the color limits
+                xlims=(0.5, size(data, 2) + 0.5),  # set the x-axis limits to include the full cells
+                ylims=(0.5, size(data, 1) + 0.5),  # set the y-axis limits to include the full cells
+                ticks=:none,  # remove the ticks
+                frame=:box,  # draw a box around the plot
+                grid=:none,  # remove the grid lines
+                titlefontsize=30, 
+                xguidefontsize=30, 
+                yguidefontsize=30,
+                margin = 25mm
+                )
+end
+
+function generate_heatmap_sp_t(data::Array{T, 2}, t, cbmin, cbmax) where T<:Real
+  Plots.heatmap(data,
+                aspect_ratio=:equal,  # ensure square cells
+                color=:winter,  # use the Winter color map
+                cbar=:true,  # add the color bar
+                title = t,
+                clims=(cbmin, cbmax),  # set the color limits
+                xlims=(0.5, size(data, 2) + 0.5),  # set the x-axis limits to include the full cells
+                ylims=(0.5, size(data, 1) + 0.5),  # set the y-axis limits to include the full cells
+                ticks=:none,  # remove the ticks
+                frame=:box,  # draw a box around the plot
+                grid=:none,  # remove the grid lines
+                margin = 15mm
+                )
+end
+
+function generate_heatmap_sp_t2(data::Array{T, 2}, t, cbmin, cbmax) where T<:Real
+  Plots.heatmap(data,
+                aspect_ratio=:equal,  # ensure square cells
+                color=:winter,  # use the Winter color map
+                cbar=:true,  # add the color bar
+                title = t,
+                clims=(cbmin, cbmax),  # set the color limits
+                xlims=(0.5, size(data, 2) + 0.5),  # set the x-axis limits to include the full cells
+                ylims=(0.5, size(data, 1) + 0.5),  # set the y-axis limits to include the full cells
+                ticks=:none,  # remove the ticks
+                frame=:box,  # draw a box around the plot
+                grid=:none,  # remove the grid lines
+                margin = 15mm,
+                size=(1920, 1080)
+                )
+end
+
+function generate_heatmap_sp(data::Array{T, 2}, cbmin, cbmax) where T<:Real
+  Plots.heatmap(data,
+                aspect_ratio=:equal,  # ensure square cells
+                color=:winter,  # use the Winter color map
+                cbar=:true,  # add the color bar
+                clims=(cbmin, cbmax),  # set the color limits
+                xlims=(0.5, size(data, 2) + 0.5),  # set the x-axis limits to include the full cells
+                ylims=(0.5, size(data, 1) + 0.5),  # set the y-axis limits to include the full cells
+                ticks=:none,  # remove the ticks
+                frame=:box,  # draw a box around the plot
+                grid=:none,  # remove the grid lines
+                margin = 15mm
+                )
+end
+
+function generate_heatmap_titled(data::Array{T, 2}, t, cbmin, cbmax) where T<:Real
+  Plots.heatmap(data,
+                aspect_ratio=:equal,  # ensure square cells
+                color=:winter,  # use the Winter color map
+                cbar=:true,  # add the color bar
+                xlabel="u",
+                ylabel="v",
+                title = t,
+                clims=(cbmin, cbmax),  # set the color limits
+                xlims=(0.5, size(data, 2) + 0.5),  # set the x-axis limits to include the full cells
+                ylims=(0.5, size(data, 1) + 0.5),  # set the y-axis limits to include the full cells
+                ticks=:none,  # remove the ticks
+                frame=:box,  # draw a box around the plot
+                grid=:none,  # remove the grid lines
+                titlefontsize=30, 
+                xguidefontsize=30, 
+                yguidefontsize=30,
+                margin = 25mm
+                )
 end
 
 #=
@@ -365,11 +366,6 @@ function plot_hm(r=r, c=c, outdir=outdir, sampled_indices=sampled_indices, starC
                     yguidefontsize=30, 
                     ylabel = "P(k)", 
                     margin = 25mm)
-
-end
-=#
-#=
-Revisit Later?
   
   #title1 = Plots.plot(title = "I(u,v) Model", titlefontsize=30, grid = false, showaxis = false, bottom_margin = -25Plots.px)
   #title2 = Plots.plot(title = "I(u,v) Data", titlefontsize=30, grid = false, showaxis = false, bottom_margin = -25Plots.px)
@@ -426,4 +422,30 @@ Revisit Later?
                             layout = (3,1),
                             size = (1920,1080)), 
                                 joinpath(outdir, "fftresiduals.pdf"))
+
+end
+=#
+#=
+Revisit Later?
+  
+=#
+#=
+#=
+661   scale = 1/0.29
+662   ks93, k0 = ks(g1_map, g2_map)
+663   ksCosmos = get_middle_15x15(imfilter(ks93, Kernel.gaussian(scale)))
+664   kshm = Plots.heatmap(ksCosmos,
+665                        title="Kaisser-Squires", 
+666                        xlabel="u", 
+667                        ylabel="v",
+668                        xlims=(0.5, size(ksCosmos, 2) + 0.5),  # set the x-axis limits to include the full cells
+669                        ylims=(0.5, size(ksCosmos, 1) + 0.5),  # set the y-axis limits to include the full cells
+670                        aspect_ratio=:equal,
+671                        ticks=:none,  # remove the ticks
+672                        frame=:box,  # draw a box around the plot
+673                        grid=:none,  # remove the grid lines
+674                        size=(1920,1080))
+675 
+676   Plots.savefig(kshm, joinpath("outdir","kaisserSquires.png"))
+677   =#  
 =#
