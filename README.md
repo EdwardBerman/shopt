@@ -155,7 +155,7 @@ dependencies.jl
 
 ## Config / YAML Information
 saveYaml
-> Set `true` if you want to save the YAML to the output directory for future reference, set to `false` otherwise
+- Set `true` if you want to save the YAML to the output directory for future reference, set to `false` otherwise
 
 NNparams
 - epochs
