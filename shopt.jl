@@ -429,7 +429,7 @@ function sample_indices(array, k)
 end
 
 total_samples = length(pixelGridFits)
-training_ratio = 0.8
+#training_ratio = 0.8
 training_samples = round(Int, training_ratio * total_samples)
 
 training_indices = sample_indices(pixelGridFits, training_samples)
@@ -527,9 +527,10 @@ fancyPrint("Plotting")
     push!(meanRelativeError, mean(RelativeError))
   end
 
+  plot_hist()
+  plot_err()
 
   sampled_indices = sort(sample_indices(validation_indices, 3))
-  #sampled_indices = [1,2]
 
   println("Sampled indices: ", sampled_indices)
 
@@ -594,7 +595,7 @@ fancyPrint("Plotting")
    
   CairoMakie.colgap!(fig1.layout, 5)
    
-  save(joinpath("outdir", "s_uv.png"), fig1)
+  save("s_uv.png", fig1)
 
   testField(u, v) = Point2f(dg1_du(u,v), dg1_dv(u,v)) # x'(t) = -x, y'(t) = 2y
   u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
@@ -623,7 +624,7 @@ fancyPrint("Plotting")
    
   CairoMakie.colgap!(fig2.layout, 5)
    
-  save(joinpath("outdir", "g1_uv.png"), fig2)
+  save("g1_uv.png", fig2)
 
   testField(u, v) = Point2f(dg2_du(u,v), dg2_dv(u,v)) # x'(t) = -x, y'(t) = 2y
   u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
@@ -652,7 +653,7 @@ fancyPrint("Plotting")
    
   CairoMakie.colgap!(fig3.layout, 5)
    
-  save(joinpath("outdir", "g2_uv.png"), fig3)
+  save("g2_uv.png", fig3)
 
   #=
   scale = 1/0.29
@@ -694,5 +695,7 @@ writeFitsData()
 
 # ---------------------------------------------------------#
 fancyPrint("Done! =]")
+end_time = Dates.now()
+println("━ Total Time: ", (end_time - start) / Dates.Millisecond(1000)) 
 #println("━ Total Time: ", Dates.format(now() - start, "HH:MM:SS"))
 println("For more on ShOpt.jl, see https://github.com/EdwardBerman/shopt")
