@@ -23,7 +23,7 @@ function readData()
   DataFrame(CSV.File(joinpath("outdir", "df.shopt")))
 end
 
-function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRelativeError, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, errVignets=errVignets, fancyPrint=fancyPrint, training_stars=training_stars, training_u_coords=training_u_coords, training_v_coords=training_v_coords, validation_stars=validation_stars, validation_u_coords=validation_u_coords, validation_v_coords=validation_v_coords, validation_star_catalog=validation_star_catalog, degree=degree, YAMLSAVE=YAMLSAVE)
+function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRelativeError, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, errVignets=errVignets, fancyPrint=fancyPrint, training_stars=training_stars, training_u_coords=training_u_coords, training_v_coords=training_v_coords, validation_stars=validation_stars, validation_u_coords=validation_u_coords, validation_v_coords=validation_v_coords, validation_star_catalog=validation_star_catalog, degree=degree, YAMLSAVE=YAMLSAVE, parametersHistogram=parametersHistogram, parametersScatterplot=parametersScatterplot, cairomakiePlots=cairomakiePlots)
   
   m, n = size(starCatalog[1])
   array_3d = zeros(m, n, length(starCatalog))
@@ -315,26 +315,32 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
   command5 = `mv $outdir/summary.shopt  $py_outdir`
   run(command5)
   
-  command6 = `mv s_uv.png  $py_outdir`
-  run(command6)
+  if cairomakiePlots 
+    command6 = `mv s_uv.png  $py_outdir`
+    run(command6)
+    
+    command7 = `mv g1_uv.png  $py_outdir`
+    run(command7)
+    
+    command8 = `mv g2_uv.png  $py_outdir`
+    run(command8)
+  end
+
+  if parametersScatterplot
+    command9 = `mv parametersScatterplot.png  $py_outdir`
+    run(command9)
+
+    command10 = `mv parametersScatterplot.pdf  $py_outdir`
+    run(command10)
+  end
   
-  command7 = `mv g1_uv.png  $py_outdir`
-  run(command7)
-  
-  command8 = `mv g2_uv.png  $py_outdir`
-  run(command8)
+  if parametersHistogram
+    command11 = `mv parametersHistogram.pdf  $py_outdir`
+    run(command11)
 
-  command9 = `mv parametersScatterplot.png  $py_outdir`
-  run(command9)
-
-  command10 = `mv parametersScatterplot.pdf  $py_outdir`
-  run(command10)
-
-  command11 = `mv parametersHistogram.pdf  $py_outdir`
-  run(command11)
-
-  command12 = `mv parametersHistogram.png  $py_outdir`
-  run(command12)
+    command12 = `mv parametersHistogram.png  $py_outdir`
+    run(command12)
+  end
 
   # run on sampled indices, copy diagnostics.py to py""" """ here
 end

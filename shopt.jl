@@ -568,93 +568,94 @@ fancyPrint("Plotting")
   println(UnicodePlots.histogram(g2_model, vertical=true, title="Histogram of g2 model"))
   println(UnicodePlots.histogram(g2_data, vertical=true, title="Histogram of g2 data"))
   =#
+  if cairomakiePlots
+    testField(u, v) = Point2f(ds_du(u,v), ds_dv(u,v)) # x'(t) = -x, y'(t) = 2y
+    u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
+    v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
 
-  testField(u, v) = Point2f(ds_du(u,v), ds_dv(u,v)) # x'(t) = -x, y'(t) = 2y
-  u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
-  v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
+    s_map = [s(u,v) for u in u, v in v]
+     
+    fig1 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
+    ax1 = fig1[1, 1] = CairoMakie.Axis(fig1, xlabel = L"u", ylabel = L"v",xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
+    fs1 = CairoMakie.heatmap!(ax1, u, v, s_map, colormap = Reverse(:plasma))
+    CairoMakie.streamplot!(ax1,
+                testField,
+                u,
+                v,
+                colormap = Reverse(:plasma),
+                gridsize = (32, 32),
+                density = 0.25,
+                arrow_size = 10)
 
-  s_map = [s(u,v) for u in u, v in v]
-   
-  fig1 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
-  ax1 = fig1[1, 1] = CairoMakie.Axis(fig1, xlabel = L"u", ylabel = L"v",xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
-  fs1 = CairoMakie.heatmap!(ax1, u, v, s_map, colormap = Reverse(:plasma))
-  CairoMakie.streamplot!(ax1,
-              testField,
-              u,
-              v,
-              colormap = Reverse(:plasma),
-              gridsize = (32, 32),
-              density = 0.25,
-              arrow_size = 10)
+    CairoMakie.Colorbar(fig1[1, 2],
+                        fs1,
+                        label = L"s(u,v)",
+                        width = 20,
+                        labelsize = 50,
+                        ticklabelsize = 14)
+     
+    CairoMakie.colgap!(fig1.layout, 5)
+     
+    save("s_uv.png", fig1)
 
-  CairoMakie.Colorbar(fig1[1, 2],
-                      fs1,
-                      label = L"s(u,v)",
-                      width = 20,
-                      labelsize = 50,
-                      ticklabelsize = 14)
-   
-  CairoMakie.colgap!(fig1.layout, 5)
-   
-  save("s_uv.png", fig1)
+    testField(u, v) = Point2f(dg1_du(u,v), dg1_dv(u,v)) # x'(t) = -x, y'(t) = 2y
+    u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
+    v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
 
-  testField(u, v) = Point2f(dg1_du(u,v), dg1_dv(u,v)) # x'(t) = -x, y'(t) = 2y
-  u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
-  v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
+    g1_map = [g1(u,v) for u in u, v in v]
+     
+    fig2 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
+    ax2 = fig2[1, 1] = CairoMakie.Axis(fig2, xlabel = L"u", ylabel = L"v",xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
+    fs2 = CairoMakie.heatmap!(ax2, u, v, g1_map, colormap = Reverse(:plasma))
+    CairoMakie.streamplot!(ax2,
+                testField,
+                u,
+                v,
+                colormap = Reverse(:plasma),
+                gridsize = (32, 32),
+                density = 0.25,
+                arrow_size = 10)
 
-  g1_map = [g1(u,v) for u in u, v in v]
-   
-  fig2 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
-  ax2 = fig2[1, 1] = CairoMakie.Axis(fig2, xlabel = L"u", ylabel = L"v",xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
-  fs2 = CairoMakie.heatmap!(ax2, u, v, g1_map, colormap = Reverse(:plasma))
-  CairoMakie.streamplot!(ax2,
-              testField,
-              u,
-              v,
-              colormap = Reverse(:plasma),
-              gridsize = (32, 32),
-              density = 0.25,
-              arrow_size = 10)
+    CairoMakie.Colorbar(fig2[1, 2],
+                        fs2,
+                        label = L"g1(u,v)",
+                        width = 20,
+                        labelsize = 50,
+                        ticklabelsize = 14)
+     
+    CairoMakie.colgap!(fig2.layout, 5)
+     
+    save("g1_uv.png", fig2)
 
-  CairoMakie.Colorbar(fig2[1, 2],
-                      fs2,
-                      label = L"g1(u,v)",
-                      width = 20,
-                      labelsize = 50,
-                      ticklabelsize = 14)
-   
-  CairoMakie.colgap!(fig2.layout, 5)
-   
-  save("g1_uv.png", fig2)
+    testField(u, v) = Point2f(dg2_du(u,v), dg2_dv(u,v)) # x'(t) = -x, y'(t) = 2y
+    u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
+    v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
 
-  testField(u, v) = Point2f(dg2_du(u,v), dg2_dv(u,v)) # x'(t) = -x, y'(t) = 2y
-  u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
-  v = range(minimum(v_coordinates), stop=maximum(v_coordinates), step=0.0001)            
+    g2_map = [g2(u,v) for u in u, v in v]
 
-  g2_map = [g2(u,v) for u in u, v in v]
+    fig3 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
+    ax3 = fig3[1, 1] = CairoMakie.Axis(fig3, xlabel = L"u", ylabel = L"v", xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
+    fs3 = CairoMakie.heatmap!(ax3, u, v, g2_map, colormap = Reverse(:plasma))
+    CairoMakie.streamplot!(ax3,
+                testField,
+                u,
+                v,
+                colormap = Reverse(:plasma),
+                gridsize = (32, 32),
+                density = 0.25,
+                arrow_size = 10)
 
-  fig3 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
-  ax3 = fig3[1, 1] = CairoMakie.Axis(fig3, xlabel = L"u", ylabel = L"v", xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
-  fs3 = CairoMakie.heatmap!(ax3, u, v, g2_map, colormap = Reverse(:plasma))
-  CairoMakie.streamplot!(ax3,
-              testField,
-              u,
-              v,
-              colormap = Reverse(:plasma),
-              gridsize = (32, 32),
-              density = 0.25,
-              arrow_size = 10)
-
-  CairoMakie.Colorbar(fig3[1, 2],
-                      fs3,
-                      label = L"g2(u,v)",
-                      width = 20,
-                      labelsize = 50,
-                      ticklabelsize = 14)
-   
-  CairoMakie.colgap!(fig3.layout, 5)
-   
-  save("g2_uv.png", fig3)
+    CairoMakie.Colorbar(fig3[1, 2],
+                        fs3,
+                        label = L"g2(u,v)",
+                        width = 20,
+                        labelsize = 50,
+                        ticklabelsize = 14)
+     
+    CairoMakie.colgap!(fig3.layout, 5)
+     
+    save("g2_uv.png", fig3)
+  end
 
   #=
   scale = 1/0.29

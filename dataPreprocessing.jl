@@ -9,6 +9,9 @@ minAnalyticGradientLearned = config["AnalyticFitParams"]["minGradientAnalyticLea
 AnalyticStampSize = config["AnalyticFitParams"]["analyticFitStampSize"]
 minPixelGradient = config["NNparams"]["minGradientPixel"]
 UnicodePlotsPrint = config["plots"]["unicodePlots"]
+parametersHistogram = config["plots"]["normalPlots"]["parametersHistogram"]
+parametersScatterplot = config["plots"]["normalPlots"]["parametersScatterplot"]
+cairomakiePlots = config["plots"]["cairomakiePlots"]["streamplots"]
 sLowerBound = config["dataProcessing"]["sLowerBound"]
 sUpperBound = config["dataProcessing"]["sUpperBound"]
 comments = config["CommentsOnRun"]
@@ -25,6 +28,9 @@ println("━ Stopping Analytic Fit Gradient Learned Vignets: ", minAnalyticGradi
 println("━ Analytic Fit Stamp Size: ", AnalyticStampSize)
 println("━ Stopping Pixel Fit Gradient: ", minPixelGradient)
 println("━ Print Unicode Plots: ", UnicodePlotsPrint)
+println("━ Parameters Histogram: ", parametersHistogram)
+println("━ Parameters Scatterplot: ", parametersScatterplot)
+println("━ Stream Plots: ", cairomakiePlots)
 println("━ s Lower Bound: ", sLowerBound)
 println("━ s Upper Bound: ", sUpperBound)
 println("━ Training Ratio: ", training_ratio)

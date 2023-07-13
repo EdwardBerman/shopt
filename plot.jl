@@ -107,45 +107,18 @@ function error_plot(model, learned, errorModel, errorLearned, t)
   Plots.plot!(legend=:topright, titlefontsize=30, xguidefontsize=30, yguidefontsize=30, margin = 25mm)
 end
 
-function plot_err(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data)
-  #=
-  s_modelClean = remove_outliers(s_model)
-  g1_modelClean = remove_outliers(g1_model)
-  g2_modelClean = remove_outliers(g2_model)
+function plot_err(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, parametersScatterplot=parametersScatterplot)
 
-  n_s = size(s_modelClean, 1)
-  n_g1 = size(g1_modelClean, 1)
-  n_g2 = size(g2_modelClean, 1)
-
-  s_dataClean = remove_outliers(s_data)
-  g1_dataClean = remove_outliers(g1_data)
-  g2_dataClean = remove_outliers(g2_data)
-
-  n_sD = size(s_modelClean, 1)
-  n_g1D = size(g1_modelClean, 1)
-  n_g2D = size(g2_modelClean, 1)
-  =#
-
-  #Plotting Error True Vs Learned
-  #Adapt for means and stds
-  
   n = size(s_model, 1)
-  ps1 = error_plot([mean(s_model), mean(g1_model), mean(g2_model)],
-                   [mean(s_data), mean(g1_data), mean(g2_data)],
-                   [std(s_model)/sqrt(n), std(g1_model)/sqrt(n), std(g2_model)/sqrt(n)],
-                   [std(s_data)/sqrt(n), std(g1_data)/sqrt(n), std(g2_data)/sqrt(n)],
-                   "Learned vs True Parameters")
-  #=
-  ps2 = error_plot([mean(s_modelClean), mean(g1_modelClean), mean(g2_modelClean)],
-                   [mean(s_dataClean), mean(g1_dataClean), mean(g2_dataClean)],
-                   [std(s_model)/sqrt(n_s), std(g1_model)/sqrt(n_g1), std(g2_model)/sqrt(n_g2)],
-                   [std(s_data)/sqrt(n_sD), std(g1_data)/sqrt(n_g1D), std(g2_data)/sqrt(n_g2D)],
-                   "Learned vs True Parameters Outliers Removed")
-  =#
-  #filepath = "$outdir/parametersScatterplot.pdf"
-  Plots.savefig(Plots.plot(ps1, size = (1920, 1080)), "parametersScatterplot.pdf")
-  #filepath = "$outdir/parametersScatterplot.png"
-  Plots.savefig(Plots.plot(ps1, size = (1920, 1080)), "parametersScatterplot.png")
+  if parametersScatterplot
+    ps1 = error_plot([mean(s_model), mean(g1_model), mean(g2_model)],
+                     [mean(s_data), mean(g1_data), mean(g2_data)],
+                     [std(s_model)/sqrt(n), std(g1_model)/sqrt(n), std(g2_model)/sqrt(n)],
+                     [std(s_data)/sqrt(n), std(g1_data)/sqrt(n), std(g2_data)/sqrt(n)],
+                     "Learned vs True Parameters")
+    Plots.savefig(Plots.plot(ps1, size = (1920, 1080)), "parametersScatterplot.pdf")
+    Plots.savefig(Plots.plot(ps1, size = (1920, 1080)), "parametersScatterplot.png")
+  end
 end
 
 function hist_1(x::Array{T, 1}, y::Array{T, 1}, t1, t2) where T<:Real
@@ -187,46 +160,48 @@ function hist_2(x::Array{T, 1}, y::Array{T, 1}, t1, t2) where T<:Real
   Plots.plot!(margin=15mm)
 end
 
-function plot_hist(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, hist_1=hist_1, hist_2=hist_2)
-  hist1 = hist_1(s_model, s_data, "s Model", "s Data")
-  hist2 = hist_2(g1_model, g1_data, "g1 Model", "g1 Data")
-  hist3 = hist_2(g2_model, g2_data, "g2 Model", "g2 Data")
-  bin_edges = range(-1, stop=1, step=0.1)
-  hist4 = Plots.histogram(s_model - s_data,
-                          alpha=0.5, 
-                          label="S Model and Data Residuals")
-  hist5 = Plots.histogram(g1_model - g1_data, 
-                          alpha=0.5, 
-                          closed =:both,
-                          bins=range(-2, stop=2, step=0.1), 
-                          label="g1 Model and Data Residuals", 
-                          xticks = -1:0.1:1)
-  hist6 = Plots.histogram(g2_model - g2_data, 
-                          alpha=0.5,
-                          closed =:both,
-                          bins=range(-2, stop=2, step=0.1), 
-                          label="g2 Model and Data Residuals", 
-                          xticks = -1:0.1:1)
+function plot_hist(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, hist_1=hist_1, hist_2=hist_2, parametersHistogram=parametersHistogram)
+  if parametersHistogram
+    hist1 = hist_1(s_model, s_data, "s Model", "s Data")
+    hist2 = hist_2(g1_model, g1_data, "g1 Model", "g1 Data")
+    hist3 = hist_2(g2_model, g2_data, "g2 Model", "g2 Data")
+    bin_edges = range(-1, stop=1, step=0.1)
+    hist4 = Plots.histogram(s_model - s_data,
+                            alpha=0.5, 
+                            label="S Model and Data Residuals")
+    hist5 = Plots.histogram(g1_model - g1_data, 
+                            alpha=0.5, 
+                            closed =:both,
+                            bins=range(-2, stop=2, step=0.1), 
+                            label="g1 Model and Data Residuals", 
+                            xticks = -1:0.1:1)
+    hist6 = Plots.histogram(g2_model - g2_data, 
+                            alpha=0.5,
+                            closed =:both,
+                            bins=range(-2, stop=2, step=0.1), 
+                            label="g2 Model and Data Residuals", 
+                            xticks = -1:0.1:1)
 
-  Plots.savefig(Plots.plot(hist1, 
-                           hist2, 
-                           hist3, 
-                           hist4, 
-                           hist5, 
-                           hist6, 
-                           layout = (2,3), 
-                           size = (1920,1080)), 
-                              "parametersHistogram.pdf")
-  
-  Plots.savefig(Plots.plot(hist1, 
-                           hist2, 
-                           hist3, 
-                           hist4, 
-                           hist5, 
-                           hist6, 
-                           layout = (2,3), 
-                           size = (1920,1080)), 
-                              "parametersHistogram.png")
+    Plots.savefig(Plots.plot(hist1, 
+                             hist2, 
+                             hist3, 
+                             hist4, 
+                             hist5, 
+                             hist6, 
+                             layout = (2,3), 
+                             size = (1920,1080)), 
+                                "parametersHistogram.pdf")
+    
+    Plots.savefig(Plots.plot(hist1, 
+                             hist2, 
+                             hist3, 
+                             hist4, 
+                             hist5, 
+                             hist6, 
+                             layout = (2,3), 
+                             size = (1920,1080)), 
+                                "parametersHistogram.png")
+  end
 end
 
 #=
