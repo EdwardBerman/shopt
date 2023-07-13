@@ -216,7 +216,7 @@ function plot_hist(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data
                            hist6, 
                            layout = (2,3), 
                            size = (1920,1080)), 
-                              joinpath("outdir", "parametersHistogram.pdf"))
+                              "parametersHistogram.pdf")
   
   Plots.savefig(Plots.plot(hist1, 
                            hist2, 
@@ -226,9 +226,10 @@ function plot_hist(s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data
                            hist6, 
                            layout = (2,3), 
                            size = (1920,1080)), 
-                              joinpath("outdir", "parametersHistogram.png"))
+                              "parametersHistogram.png")
 end
 
+#=
 function plot_hm(r=r, c=c, outdir=outdir, sampled_indices=sampled_indices, starCatalog=starCatalog, pixelGridFits=pixelGridFits, get_middle_15x15=get_middle_15x15, generate_heatmap_sp_t=generate_heatmap_sp_t, generate_heatmap_sp=generate_heatmap_sp,generate_heatmap_titled=generate_heatmap_titled)#p
   star1 = sampled_indices[1]
   star2 = sampled_indices[2]
@@ -389,6 +390,12 @@ function plot_hm(r=r, c=c, outdir=outdir, sampled_indices=sampled_indices, starC
                     yguidefontsize=30, 
                     ylabel = "P(k)", 
                     margin = 25mm)
+
+end
+=#
+#=
+Revisit Later?
+  
   #title1 = Plots.plot(title = "I(u,v) Model", titlefontsize=30, grid = false, showaxis = false, bottom_margin = -25Plots.px)
   #title2 = Plots.plot(title = "I(u,v) Data", titlefontsize=30, grid = false, showaxis = false, bottom_margin = -25Plots.px)
   #title3 = Plots.plot(title = "Chi-Square Residuals", titlefontsize=30, grid = false, showaxis = false, bottom_margin = -25Plots.px)
@@ -411,17 +418,6 @@ function plot_hm(r=r, c=c, outdir=outdir, sampled_indices=sampled_indices, starC
 
   Plots.savefig(RelativeErrorHM, joinpath("outdir", "relativeErrorHM.pdf"))
   Plots.savefig(RelativeErrorHM, joinpath("outdir", "relativeErrorHM.png"))
-  #Plots.savefig(Plots.plot(hm, hm6, hm7, layout = (1,3), size = (1920,1080)), joinpath("outdir", "pixelGridFit.pdf"))
-  
-  #=
-  Plots.savefig(Plots.plot(s1, 
-                           s2, 
-                           s3, 
-                           layout = (1,3),
-                           size = (1920,1080)), 
-                           joinpath("outdir", "3dPixelGridFit.pdf"))
-  =#
-
   Plots.savefig(Plots.plot(s1, 
                            s2, 
                            s3, 
@@ -455,5 +451,4 @@ function plot_hm(r=r, c=c, outdir=outdir, sampled_indices=sampled_indices, starC
                             layout = (3,1),
                             size = (1920,1080)), 
                                 joinpath(outdir, "fftresiduals.pdf"))
-  
-end
+=#

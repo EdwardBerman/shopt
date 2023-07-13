@@ -314,14 +314,27 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
   command5 = `mv $outdir/summary.shopt  $py_outdir`
   run(command5)
   
-  command6 = `mv $outdir/s_uv.png  $py_outdir`
+  command6 = `mv s_uv.png  $py_outdir`
   run(command6)
   
-  command7 = `mv $outdir/g1_uv.png  $py_outdir`
+  command7 = `mv g1_uv.png  $py_outdir`
   run(command7)
   
-  command8 = `mv $outdir/g2_uv.png  $py_outdir`
+  command8 = `mv g2_uv.png  $py_outdir`
   run(command8)
+
+  command9 = `mv parametersScatterplot.png  $py_outdir`
+  run(command9)
+
+  command10 = `mv parametersScatterplot.pdf  $py_outdir`
+  run(command10)
+
+  command11 = `mv parametersHistogram.pdf  $py_outdir`
+  run(command11)
+
+  command12 = `mv parametersHistogram.png  $py_outdir`
+  run(command12)
+
   # run on sampled indices, copy diagnostics.py to py""" """ here
 end
 
