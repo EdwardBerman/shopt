@@ -206,3 +206,6 @@ CommentsOnRun
 + The Northeastern Physics Department and Northeastern Undergraduate Research and Fellowships, for making this project possible with funding from the Northeastern Physics Co-Op Fellowship and PEAK Ascent Award respectively   
 + [David Rosen](https://github.com/david-m-rosen), who gave valuable input in the early stages of this project and during his course Math 7223, Riemannian Optimization
 + The COSMOS Web Collaboration for providing data from the James Webb Space Telescope and internal review
+
+{% include toc.html html=content %}
+
