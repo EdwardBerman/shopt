@@ -83,6 +83,12 @@ function signal_to_noise(I, e; nm=nanMask, nz=nanToZero)
   return snr
 end
 
+#=
+Consider 
+In [10]: len(f[2].data['DELTAWIN_J2000'])
+Out[10]: 290
+=#
+
 function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=outliers_filter)
   catalog = args[3]
   sci_image = args[4]
