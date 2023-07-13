@@ -1,3 +1,22 @@
+## Table of Contents
+- [About](#about)
+  - [Analytic Profile Fits](#analytic-profile-fits)
+  - [Pixel Grid Fits](#pixel-grid-fits)
+  - [Interpolation Across the Field of View](#interpolation-across-the-field-of-view)
+- [Inputs and Outputs](#inputs-and-outputs)
+  - [Inputs](#inputs)
+  - [Outputs](#outputs)
+- [Running](#running)
+  - [Command](#command)_
+  - [Dependencies](#dependencies)
+  - [Set Up](#set-up)
+- [Program Architecture](#program-architecture)
+- [Config / YAML Information](#config-/-yaml-information)
+- [Known Issues](#known-issues)
+- [Contributors](#contributors)
+- [Future Acknowledgements](#future-acknowledgements)
+
+
 ## About
  [![License](https://img.shields.io/pypi/l/jax-cosmo)](https://github.com/EdwardBerman/shopt/blob/main/LICENSE) [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors)
 
@@ -25,7 +44,7 @@ Currently, the inputs are JWST Point Spread Functions source catalogs. The curre
 | ![image](READMEassets/input.png)  | Star Taken From Input Catalog      |
 | shopt.yml                         | Config File for Tunable Parameters |
 | \* starcat.fits                   | Star Catalog to take  vignets from | 
-| \* SCI.fits                       | fits file containing WCS info.     |   
+| \* SCI.fits                       | fits file containing WCS info      |   
 
 ### Outputs
 
