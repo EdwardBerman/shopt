@@ -99,6 +99,7 @@ For some functionality we need to use wrappers for Python code, such as reading 
 
 ```julia
 using PyCall
+ # You may have to specify, ENV["PYTHON"] = "/path_desired_python_directory/python_executable"; import Pkg; Pkg.build("PyCall")
 pyimport("astropy")
 ```
 
@@ -121,7 +122,7 @@ On the off chance that none of these works, a final method may look like the fol
 ```julia
 using PyCall
 run(`$(PyCall.python) -m pip install --upgrade cython`)
-run(`$(PyCall.python) -m pip install astropy`)
+run(`$(PyCall.python) -m pip install astropy`) 
 ```
 
 After the file contents are downloaded the user can run ```julia shopt.jl [configdir] [outdir] [catalog] [scifile]``` as stated above. Alternatively, they can run the shellscript that calls shopt in whatever program they are working with to create their catalog. For example, in a julia program you may use ```run(`./runshopt.sh [configdir] [outdir] [catalog] [scifile]`)```

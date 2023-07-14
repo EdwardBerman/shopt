@@ -99,6 +99,7 @@ For some functionality we need to use wrappers for Python code, such as reading 
 
 ```julia                                                                                                                
 using PyCall                                                                                                            
+ # You may have to specify, ENV["PYTHON"] = "/path_desired_python_directory/python_executable"; import Pkg; Pkg.build("PyCall")
 pyimport("astropy")                                                                                                     
 ```                                                                                                                     
 
