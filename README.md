@@ -118,7 +118,7 @@ Conda.add("astropy", "/path/to/directory")
 Conda.add("astropy", "/path/to/directory"; channel="anaconda")
 ```
 
-On the off chance that none of these works, a final method may look like the following. This was how I was able to get astropy to work. 
+On the off chance that none of these works, a final method may look like the following 
 ```julia
 using PyCall
 run(`$(PyCall.python) -m pip install --upgrade cython`)
