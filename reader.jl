@@ -1,5 +1,15 @@
 using PyCall
 
+#=
+Functions for reading in summary.shopt file and returning the PSF at an arbitrary (u,v)
+=#
+
+#=
+Example:
+polyMatrix, deg = read_shopt("summary.shopt")
+p(0.5,0.5,polyMatrix, deg)
+=#
+
 function read_shopt(shoptFile)
   shoptFile = string(shoptFile)
   py"""
@@ -45,8 +55,3 @@ function p(u,v, polMatrix, degree)
   return star
 end
 
-#=
-Example:
-polyMatrix, deg = read_shopt("summary.shopt")
-p(0.5,0.5,polyMatrix, deg)
-=#

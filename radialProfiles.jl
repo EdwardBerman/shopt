@@ -1,3 +1,7 @@
+#=
+Gaussian and kolmogorov radial profiles
+=#
+
 function fGaussian(u, v, g1, g2, s, uc, vc)
   squareRadiusFactor = ([(1 + g1) g2; g2 (1 - g1)]*[(u - uc); (v- vc)])'*([(1 + g1) g2; g2 (1 - g1)]*[(u-uc);(v-vc)])
   matrixScalar = s^2/(1 - g1^2 - g2^2)

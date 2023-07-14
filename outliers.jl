@@ -1,3 +1,7 @@
+#=
+Functions for detecting and removing outliers from data, used in dataPreprocessing.jl
+=#
+
 function detect_outliers(data::AbstractVector{T}; k::Float64=1.5) where T<:Real
   q1 = quantile(data, 0.25)
   q3 = quantile(data, 0.75)

@@ -1,3 +1,7 @@
+#=
+Julia Plots
+=#
+
 function error_plot(model, learned, errorModel, errorLearned, t)
   # Generate example data
   x = [1, 5, 9]  # Three points on the x-axis

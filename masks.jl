@@ -1,3 +1,7 @@
+#=
+Masks for NaN Handeling, used in dataPreprocessing and for Pixel Grid Fitting 
+=#
+
 function nanMask(arr)
   dummyArr = zeros(size(arr,1),size(arr,2))
   for i in 1:size(arr,1)

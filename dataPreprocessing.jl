@@ -1,3 +1,7 @@
+#=
+Load in Config shopt.yml
+=#
+
 config = YAML.load_file(joinpath(configdir, "shopt.yml"))
 epochs = config["NNparams"]["epochs"]
 degree = config["polynomialDegree"]
@@ -16,6 +20,10 @@ sLowerBound = config["dataProcessing"]["sLowerBound"]
 sUpperBound = config["dataProcessing"]["sUpperBound"]
 comments = config["CommentsOnRun"]
 training_ratio = config["training_ratio"]
+
+#=
+Log these config choices
+=#
 
 println("Key Config Choices:")
 println("━ Max Epochs: ", epochs)
@@ -36,6 +44,9 @@ println("━ s Upper Bound: ", sUpperBound)
 println("━ Training Ratio: ", training_ratio)
 println("━ Comments: ", comments)
 
+#=
+Utility Function used to count NaNs in an image, was used in testing and may be useful for future debugging in the data preprocessing process
+=#
 function countNaNs(arr)
     count = 0
     
@@ -47,6 +58,10 @@ function countNaNs(arr)
     
     return count
 end
+
+#=
+Supply an array and the new dimension you want and get the middle nxn of that array
+=#
 
 function get_middle_nxn(array, n)
   rows, cols = size(array)
@@ -75,6 +90,9 @@ function get_middle_nxn(array, n)
   end
 end
 
+#=
+SnR function used to calculate the signal to noise ratio of an image
+=#
 
 function signal_to_noise(I, e; nm=nanMask, nz=nanToZero)
   signal_power = sum(nz(nm(I)).^2)

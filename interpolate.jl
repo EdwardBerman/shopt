@@ -1,3 +1,7 @@
+#=
+Helper functions to interpolate s(u,v), g1(u,v), g2(u,v) across the field of view
+=#
+
 #f(u, v) = a1u^3 + a2v^3 + a3u^2v + a4v^2u + a5u^2 + a6v^2 + a7uv + a8u + a9v + a10
 function interpCostS(p; truth=s_tuples)
   I(u, v) = p[1]*u^3 + p[2]*v^3 + p[3]*u^2*v + p[4]*v^2*u + p[5]*u^2 + p[6]*v^2 + p[7]*u*v + p[8]*u + p[9]*v + p[10]
