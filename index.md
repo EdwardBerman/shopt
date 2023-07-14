@@ -97,21 +97,30 @@ We also provide dependencies.jl, which you can run to download all of the Julia 
 
 For some functionality we need to use wrappers for Python code, such as reading in fits files or converting (x,y) -> (u,v). Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. If the Python snippets throw an error, run the following in the Julia REPL for each Python library:
 
-```julia
-using PyCall
-pyimport("treecorr")
-```
-If you have a Conda Enviornment setup, you may find it easier to run 
-```julia
-using PyCall
-pyimport_conda("treecorr", "tc") #tc is my choice of name and treecorr is what I am importing from my conda Enviornment 
-```
+```julia                                                                                                                
+using PyCall                                                                                                            
+pyimport("astropy")                                                                                                     
+```                                                                                                                     
 
-On the off chance that none of these works, a final method may look like 
-```julia
-using PyCall
-run(`$(PyCall.python) -m pip install --upgrade cython`)
-run(`$(PyCall.python) -m pip install astropy`)
+If you have a Conda Enviornment setup, you may find it easier to run                                                    
+```julia                                                                                                                
+using PyCall                                                                                                            
+pyimport_conda("astropy", "ap") #ap is my choice of name and astropy is what I am importing from my conda Enviornment   
+```                                                                                                                     
+
+Or Similarly,
+```julia                                                                                                                
+using Conda
+Conda.add("astropy", :my_env) #my conda enviornment is named my_env
+ # or Conda.add("astropy", "/path/to/directory")  
+ # or Conda.add("astropy", "/path/to/directory"; channel="anaconda")  
+```                                  
+
+On the off chance that none of these works, a final method may look like the following. This was how I was able to get astropy to work. 
+```julia                                                                                                                                           
+using PyCall                                                                                                                                       
+run(`$(PyCall.python) -m pip install --upgrade cython`)                                                                                            
+run(`$(PyCall.python) -m pip install astropy`)                                                                                                     
 ```
 
 After the file contents are downloaded the user can run ```julia shopt.jl [configdir] [outdir] [catalog] [scifile]``` as stated above. Alternatively, they can run the shellscript that calls shopt in whatever program they are working with to create their catalog. For example, in a julia program you may use ```run(`./runshopt.sh [configdir] [outdir] [catalog] [scifile]`)```

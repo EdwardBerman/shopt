@@ -95,19 +95,29 @@ import Pkg; Pkg.add("PyCall")
 
 We also provide dependencies.jl, which you can run to download all of the Julia libraries automatically by reading in the imports.txt file. Simply run ` julia dependencies.jl ` in the command line. For the three python requirements, you can similarly run `python dependenciesPy.py`. 
 
-For some functionality we need to use wrappers for Python code, such as reading in fits files or converting (x,y) -> (u,v). Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. If the Python snippets throw an error, run the following in the Julia REPL for each Python library:
+For some functionality we need to use wrappers for Python code, such as reading in fits files or converting (x,y) -> (u,v). Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. There are a number of ways to get Julia and Python to interopt nicely. If the Python snippets throw an error, run the following in the Julia REPL for each Python library:
 
 ```julia
 using PyCall
-pyimport("treecorr")
+pyimport("astropy")
 ```
+
 If you have a Conda Enviornment setup, you may find it easier to run 
 ```julia
 using PyCall
-pyimport_conda("treecorr", "tc") #tc is my choice of name and treecorr is what I am importing from my conda Enviornment 
+pyimport_conda("astropy", "ap") #ap is my choice of name and astropy is what I am importing from my conda Enviornment
 ```
 
-On the off chance that none of these works, a final method may look like 
+Or Similarly,
+
+```julia
+using Conda
+Conda.add("astropy", :my_env) #my conda enviornment is named my_env
+Conda.add("astropy", "/path/to/directory")
+Conda.add("astropy", "/path/to/directory"; channel="anaconda")
+```
+
+On the off chance that none of these works, a final method may look like the following. This was how I was able to get astropy to work. 
 ```julia
 using PyCall
 run(`$(PyCall.python) -m pip install --upgrade cython`)
