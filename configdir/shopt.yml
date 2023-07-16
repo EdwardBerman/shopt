@@ -1,0 +1,34 @@
+# Example YAML structure
+
+# Key-value pairs
+printStatements: 
+saveYaml: true
+
+NNparams:
+  epochs: 1000
+  minGradientPixel: 1e-5
+AnalyticFitParams:
+  minGradientAnalyticModel: 1e-6
+  minGradientAnalyticLearned: 1e-6
+  analyticFitStampSize: 64
+
+dataProcessing:
+  SnRPercentile: 0.33
+  sUpperBound: 1
+  sLowerBound: 0.075
+
+# Nested structure
+plots:
+  unicodePlots: true
+  normalPlots:
+    parametersHistogram: true
+    parametersScatterplot: true
+  cairomakiePlots:
+    streamplots: true
+
+polynomialDegree: 3
+stampSize: 131
+
+training_ratio: 0.8
+
+CommentsOnRun: "\n ** This is Where You Can Leave Comments or Notes To Self on the Run! ** \n"
