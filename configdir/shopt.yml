@@ -1,7 +1,3 @@
-# Example YAML structure
-
-# Key-value pairs
-printStatements: 
 saveYaml: true
 
 NNparams:
@@ -17,7 +13,6 @@ dataProcessing:
   sUpperBound: 1
   sLowerBound: 0.075
 
-# Nested structure
 plots:
   unicodePlots: true
   normalPlots:
