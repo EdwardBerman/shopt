@@ -19,7 +19,7 @@ plots:
     parametersHistogram: true
     parametersScatterplot: true
   cairomakiePlots:
-    streamplots: true
+    streamplots: false
   pythonPlots: false
 
 polynomialDegree: 3
