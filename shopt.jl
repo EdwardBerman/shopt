@@ -113,7 +113,6 @@ s_data = zeros(itr)
 g1_data = zeros(itr)
 g2_data = zeros(itr)
 
-ltPlots = []
 failedStars = []
 # ---------------------------------------------------------#
 fancyPrint("Analytic Profile Fit for Model Star")
@@ -151,15 +150,6 @@ fancyPrint("Analytic Profile Fit for Model Star")
       g1_model[i] = e1_guess/ratioData            
       g2_model[i] = e2_guess/ratioData  
       
-      #=
-      norm_data = zeros(r,c)
-      for u in 1:r
-        for v in 1:c
-          norm_data[u,v] = fGaussian(u, v, g1_model[i], g2_model[i], s_model[i], r/2, c/2)
-        end
-      end
-      =#
-      #A_model[i] = 1/sum(norm_data)
     catch
       println("Star $i failed")
       #push!(failedStars, i)
@@ -288,8 +278,9 @@ optimizer = ADAM()
   end
 end
 
+GC.gc()
 
-ltdPlots = []
+
 println("━ failed stars:", failedStars)
 # ---------------------------------------------------------#
 fancyPrint("Analytic Profile Fit for Learned Star")
@@ -328,15 +319,6 @@ fancyPrint("Analytic Profile Fit for Learned Star")
       g1_data[i] = e1_guess/ratioData            
       g2_data[i] = e2_guess/ratioData  
       
-      #=
-      norm_data = zeros(r,c)
-      for u in 1:r
-        for v in 1:c
-          norm_data[u,v] = fGaussian(u, v, g1_data[i], g2_data[i], s_data[i], r/2, c/2)
-        end
-      end
-      A_data[i] = 1/sum(norm_data)
-      =#
 
       if s_data[i] < sLowerBound || s_data[i] > sUpperBound 
         push!(failedStars, i) 
@@ -372,6 +354,8 @@ for i in sort(failedStars, rev=true)
   splice!(starCatalog, i)
   splice!(errVignets, i)
 end
+
+GC.gc()
 
 # ---------------------------------------------------------#
 fancyPrint("Transforming (x,y) -> (u,v) | Interpolation [s, g1, g2] Across the Field of View")
@@ -446,55 +430,53 @@ validation_star_catalog = starCatalog[validation_indices]
 
 fancyPrint("Transforming (x,y) -> (u,v) | Interpolation Pixel by Pixel Across the Field of View")
 
+function objective_function(p, x, y, degree)
+  num_coefficients = (degree + 1) * (degree + 2) ÷ 2
+  value = 0
+  counter = 0
+  for i in 1:(degree + 1)
+    for j in 1:(degree + 1)
+      if (i - 1) + (j - 1) <= degree
+        counter += 1
+        value += p[counter] * x^(i - 1) * y^(j - 1) #Make p 2-D then flatten
+      end
+    end
+  end
+
+  return value
+end
+
+function polynomial_optimizer(degree, x_data, y_data, z_data)
+  num_coefficients = (degree + 1) * (degree + 2) ÷ 2
+  initial_guess = ones(num_coefficients)  # Initial guess for the coefficients
+  function objective(p)
+    epsilon = 1e-8  # Small constant to avoid division by zero or negative infinity
+    loss = sum((objective_function(p, x_val, y_val, degree) - z_actual)^2  for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
+    #loss = sum(log(1 + (objective_function(p, x_val, y_val, degree) - z_actual)^2) for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
+    #loss = sum((objective_function(p, x_val, y_val, degree) - z_actual)^2 for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
+    return loss
+  end
+
+  result = optimize(objective, initial_guess, autodiff=:forward, LBFGS(), Optim.Options(f_tol=1e-40)) #autodiff=:forward
+
+  return Optim.minimizer(result)
+end
+
+x_data = training_u_coords  # Sample x data
+y_data = training_v_coords  # Sample y data
+
 @time begin
   for i in 1:r
     #pb = tqdm(1:c)
     for j in 1:c #1:c #pb
       #set_description(pb, "Working on Pixel ($i , $j)")
-      
-      function objective_function(p, x, y, degree)
-        num_coefficients = (degree + 1) * (degree + 2) ÷ 2
-        value = 0
-        counter = 0
-        for i in 1:(degree + 1)
-          for j in 1:(degree + 1)
-            if (i - 1) + (j - 1) <= degree
-              counter += 1
-              value += p[counter] * x^(i - 1) * y^(j - 1) #Make p 2-D then flatten
-            end
-          end
-        end
 
-        return value
-      end
-
-      function polynomial_optimizer(degree, x_data, y_data, z_data)
-        num_coefficients = (degree + 1) * (degree + 2) ÷ 2
-        initial_guess = ones(num_coefficients)  # Initial guess for the coefficients
-        function objective(p)
-          epsilon = 1e-8  # Small constant to avoid division by zero or negative infinity
-          loss = sum((objective_function(p, x_val, y_val, degree) - z_actual)^2  for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
-          #loss = sum(log(1 + (objective_function(p, x_val, y_val, degree) - z_actual)^2) for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
-          #loss = sum((objective_function(p, x_val, y_val, degree) - z_actual)^2 for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
-          return loss
-        end
- 
-        result = optimize(objective, initial_guess, autodiff=:forward, LBFGS(), Optim.Options(f_tol=1e-40)) #autodiff=:forward
-
-        return Optim.minimizer(result)
-      end
-
-      #degree = 3
-      x_data = training_u_coords  # Sample x data
-      y_data = training_v_coords  # Sample y data
-      z_data = []  # Sample z data
+      z_data = []  
       for k in 1:length(training_stars)
         push!(z_data, training_stars[k][i, j])
       end
 
       pC = polynomial_optimizer(degree, x_data, y_data, z_data)
-      #println("Optimized Polynomial Coefficients:")
-      #println(pC)
 
       #Create Optimization Scheme with Truh Values from the PixelGridFits
       for k in 1:length(pC)
@@ -504,36 +486,30 @@ fancyPrint("Transforming (x,y) -> (u,v) | Interpolation Pixel by Pixel Across th
   end 
 
 end
-#=
-println("Optimized Polynomial Coefficients:")
-println(coefficients)
+
+GC.gc()
+
+sampled_indices = sort(sample_indices(validation_indices, 3))
+println("Sampled indices: ", sampled_indices)
+meanRelativeError = []
+for i in 1:length(starCatalog)
+  RelativeError = []
+  for j in 1:size(starCatalog[i], 1)
+    for k in 1:size(starCatalog[i], 2)
+      push!(RelativeError, abs.(starCatalog[i][j,k] .- pixelGridFits[i][j,k]) ./ abs.(starCatalog[i][j,k] .+ 1e-10))
+    end
+  end
+  push!(meanRelativeError, mean(RelativeError))
+end
 
 
-=#
-
-#println("Polynomial Matrix: $(PolynomialMatrix)")
-
-#println(PolynomialMatrix[31,31,:])
 # ---------------------------------------------------------#
 fancyPrint("Plotting")
 @time begin
-  meanRelativeError = []
-  for i in 1:length(starCatalog)
-    RelativeError = []
-    for j in 1:size(starCatalog[i], 1)
-      for k in 1:size(starCatalog[i], 2)
-        push!(RelativeError, abs.(starCatalog[i][j,k] .- pixelGridFits[i][j,k]) ./ abs.(starCatalog[i][j,k] .+ 1e-10))
-      end
-    end
-    push!(meanRelativeError, mean(RelativeError))
-  end
 
   plot_hist()
   plot_err()
 
-  sampled_indices = sort(sample_indices(validation_indices, 3))
-
-  println("Sampled indices: ", sampled_indices)
 
   function get_middle_15x15(array::Array{T, 2}) where T
       rows, cols = size(array)
@@ -559,15 +535,6 @@ fancyPrint("Plotting")
     println(UnicodePlots.heatmap(get_middle_15x15(a - b), colormap=:inferno, title="Heatmap of Residuals"))
   end
 
-
-  #=
-  println(UnicodePlots.histogram(s_model, vertical=true, title="Histogram of s model"))
-  println(UnicodePlots.histogram(s_data, vertical=true, title="Histogram of s data"))
-  println(UnicodePlots.histogram(g1_model, vertical=true, title="Histogram of g1 model"))
-  println(UnicodePlots.histogram(g1_data, vertical=true, title="Histogram of g1 data"))
-  println(UnicodePlots.histogram(g2_model, vertical=true, title="Histogram of g2 model"))
-  println(UnicodePlots.histogram(g2_data, vertical=true, title="Histogram of g2 data"))
-  =#
   if cairomakiePlots
     testField(u, v) = Point2f(ds_du(u,v), ds_dv(u,v)) # x'(t) = -x, y'(t) = 2y
     u = range(minimum(u_coordinates), stop=maximum(u_coordinates), step=0.0001)            
@@ -683,17 +650,13 @@ if UnicodePlotsPrint
                               title="Boxplot of df.shopt"))
 end
 
+GC.gc()
+
 # ---------------------------------------------------------#
 fancyPrint("Saving Data to summary.shopt")
-#writeData(s_model, g1_model, g2_model, s_data, g1_data, g2_data)
-#println(readData())
-
-
-#errVignets = []
-#for i in 1:2
- # push!(errVignets, rand(161,161))
-#end
 writeFitsData()
+
+GC.gc()
 
 # ---------------------------------------------------------#
 fancyPrint("Done! =]")

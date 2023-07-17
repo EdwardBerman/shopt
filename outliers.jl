@@ -14,7 +14,9 @@ function detect_outliers(data::AbstractVector{T}; k::Float64=1.5) where T<:Real
 end
 
 function outliers_filter(snr::Vector{Any}, img::Vector{Any}, wht::Vector{Matrix{Float32}}, k::Float64) 
-  q1 = quantile(snr, k)
+  snr_cleaned = filter(!isnan, snr)
+  q1 = quantile(snr_cleaned, k)
+  snr = [isnan(x) ? -1000 : x for x in snr]
   println("━ Cutting off Stars below the $k Percentile of Signal to Noise Ratio: $q1 , based off of snr = 10log[Σpix(I²/σ²)]")
   q3 = quantile(snr, 0.75)
   iqr = q3 - q1

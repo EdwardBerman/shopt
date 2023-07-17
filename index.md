@@ -231,6 +231,7 @@ CommentsOnRun
 
 ## Known Issues
 + kolmogorov radial profile not yet functional
++ memory allocation concerns
 
 ## Contributors
 + Edward Berman

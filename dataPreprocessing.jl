@@ -185,6 +185,7 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   for (i, element) in enumerate(signal2noiseRatios)
     new_snr_arr[i] = element
   end
+  new_snr_arr = new_snr_arr[.!isnan.(new_snr_arr)] 
 
   println(UnicodePlots.boxplot(["snr"], [new_snr_arr], title="signal to noise ratio"))
 
