@@ -25,6 +25,7 @@ plots:
     parametersScatterplot: true
   cairomakiePlots:
     streamplots: true
+  pythonPlots: false
 
 polynomialDegree: 3
 stampSize: 131

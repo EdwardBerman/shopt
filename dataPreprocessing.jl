@@ -13,6 +13,7 @@ minAnalyticGradientLearned = config["AnalyticFitParams"]["minGradientAnalyticLea
 AnalyticStampSize = config["AnalyticFitParams"]["analyticFitStampSize"]
 minPixelGradient = config["NNparams"]["minGradientPixel"]
 UnicodePlotsPrint = config["plots"]["unicodePlots"]
+pythonPlots = config["plots"]["pythonPlots"]
 parametersHistogram = config["plots"]["normalPlots"]["parametersHistogram"]
 parametersScatterplot = config["plots"]["normalPlots"]["parametersScatterplot"]
 cairomakiePlots = config["plots"]["cairomakiePlots"]["streamplots"]
@@ -36,6 +37,7 @@ println("━ Stopping Analytic Fit Gradient Learned Vignets: ", minAnalyticGradi
 println("━ Analytic Fit Stamp Size: ", AnalyticStampSize)
 println("━ Stopping Pixel Fit Gradient: ", minPixelGradient)
 println("━ Print Unicode Plots: ", UnicodePlotsPrint)
+println("━ Python Plots: ", pythonPlots)
 println("━ Parameters Histogram: ", parametersHistogram)
 println("━ Parameters Scatterplot: ", parametersScatterplot)
 println("━ Stream Plots: ", cairomakiePlots)
