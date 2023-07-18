@@ -85,6 +85,33 @@ function polyG_g2!(storage, p)
   storage[10] = grad_cost[10]
 end
 
+function objective_function(p, x, y, degree)
+  num_coefficients = (degree + 1) * (degree + 2) ÷ 2
+  value = 0
+  counter = 0
+  for i in 1:(degree + 1)  
+    for j in 1:(degree + 1)
+      if (i - 1) + (j - 1) <= degree
+        counter += 1
+        value += p[counter] * x^(i - 1) * y^(j - 1) #Make p 2-D then flatten
+      end
+    end
+  end 
+  return value    
+end
+
+
+function polynomial_optimizer(degree, x_data, y_data, z_data)
+  num_coefficients = (degree + 1) * (degree + 2) ÷ 2
+  initial_guess = ones(num_coefficients)  # Initial guess for the coefficients
+  function objective(p)
+    loss = sum((objective_function(p, x_val, y_val, degree) - z_actual)^2  for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
+    return loss
+  end 
+  result = optimize(objective, initial_guess, autodiff=:forward, LBFGS(), Optim.Options(f_tol=1e-40)) #autodiff=:forward 
+  return Optim.minimizer(result)
+end
+
 #=
 I = optimize(interpCost, polyG!, rand(10), ConjugateGradient())
 learnedPolynomial = zeros(10,10)

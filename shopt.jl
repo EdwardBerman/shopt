@@ -69,6 +69,7 @@ fancyPrint("Reading .jl Files")
   include("webbpsfProcessing.jl")
   include("interpolate.jl")
   include("dataPreprocessing.jl")
+  include("pixelGridAutoencoder.jl")
 end
 # ---------------------------------------------------------#
 #fancyPrint("Running Source Extractor")
@@ -121,16 +122,6 @@ fancyPrint("Analytic Profile Fit for Model Star")
     initial_guess = rand(3) #println("\t initial guess [σ, e1, e2]: ", initial_guess)
     set_description(pb, "Star $i/$itr Complete")
     
-    #=
-    it = []
-    loss = []
-
-    function cb(opt_state:: Optim.OptimizationState)
-      push!(it, opt_state.iteration)
-      push!(loss, opt_state.value)
-      return false  
-    end
-    =#
     global iteration = i
     try
       global x_cg = optimize(cost, 
@@ -160,19 +151,6 @@ fancyPrint("Analytic Profile Fit for Model Star")
   end
 end
 
-
-#println("\t \t Outliers in s: ", detect_outliers(s_model))
-#println("\n\t \t Outliers in g1: ", detect_outliers(g1_model))
-#println("\n\t \t Outliers in g2: ", detect_outliers(g2_model))
-
-ns = length(detect_outliers(s_model))
-ng1 = length(detect_outliers(g1_model))
-ng2 = length(detect_outliers(g2_model))
-
-#println("\n\t \t Number of outliers in s: ", ns[1])
-#println("\n\t \t Number of outliers in g1: ", ng1[1])
-#println("\n\t \t Number of outliers in g2: ", ng2[1])
-
 s_blacklist = []
 for i in 1:length(s_model)
   if (s_model[i] < sLowerBound || s_model[i] > sUpperBound) #i in failedStars is optional Since Failed Stars are assigned s=0 
@@ -199,40 +177,11 @@ failedStars = []
 fancyPrint("Pixel Grid Fit")
 pixelGridFits = []
 
-encoder = Chain(
-                Dense(r*c, 128, leakyrelu),
-                Dense(128, 64, leakyrelu),
-                Dense(64, 32, leakyrelu),
-               )
-# Define the decoder
-decoder = Chain(
-                Dense(32, 64, leakyrelu),
-                Dense(64, 128, leakyrelu), #leakyrelu #relu
-                Dense(128, r*c, tanh),   #tanh #sigmoid
-               )
-
-# Define the full autoencoder
-autoencoder = Chain(encoder, decoder)
-
-#x̂ = autoencoder(x)
-loss(x) = mse(autoencoder(x), x)
-
-# Define the optimizer
-optimizer = ADAM()
-
 @time begin
   pb = tqdm(1:length(starCatalog))
   for i in pb
     set_description(pb, "Star $i/$(length(starCatalog)) Complete")
     global iteration = i
-    
-    function relative_error_loss(x)
-      #x = nanToZero(nanMask(x))
-      relative_error = abs.(x - autoencoder(x)) ./ abs.(x .+ 1e-10)  # Add a small value to avoid division by zero
-      mean(relative_error)
-    end
-
-
     
     # Format some random image data
     data = nanToGaussian(starCatalog[i], s_model[i], g1_model[i], g2_model[i], r/2, c/2)
@@ -255,13 +204,11 @@ optimizer = ADAM()
         end
       end
       # Take a sample input image
-      input_image = reshape(starCatalog[i], length(starCatalog[i]))
+      #input_image = reshape(starCatalog[i], length(starCatalog[i]))
   
       # Pass the input image through the autoencoder to get the reconstructed image
       reconstructed_image = autoencoder(data) #autoencoder(input_image)
 
-      #pg = optimize(pgCost, pg_g!, rand(r*c), ConjugateGradient())
-      #push!(pixelGridFits ,reshape(pg.minimizer, (r, c)))
       pgf_current = reshape(reconstructed_image, (r, c))./sum(reshape(reconstructed_image, (r, c)))
       push!(pixelGridFits, pgf_current)
     catch ex
@@ -272,8 +219,6 @@ optimizer = ADAM()
       continue
     end
 
- 
-  
   end
 end
 
@@ -290,16 +235,6 @@ fancyPrint("Analytic Profile Fit for Learned Star")
     initial_guess = rand(3) #println("\t initial guess [σ, e1, e2]: ", initial_guess)
     set_description(pb, "Star $i/$(length(starCatalog)) Complete")
     
-    #=
-    it = []
-    loss = []
-
-    function cb(opt_state:: Optim.OptimizationState)
-      push!(it, opt_state.iteration)
-      push!(loss, opt_state.value)
-      return false  
-    end
-    =#
     global iteration = i
     try 
       global y_cg = optimize(costD, 
@@ -445,21 +380,6 @@ function objective_function(p, x, y, degree)
   return value
 end
 
-function polynomial_optimizer(degree, x_data, y_data, z_data)
-  num_coefficients = (degree + 1) * (degree + 2) ÷ 2
-  initial_guess = ones(num_coefficients)  # Initial guess for the coefficients
-  function objective(p)
-    epsilon = 1e-8  # Small constant to avoid division by zero or negative infinity
-    loss = sum((objective_function(p, x_val, y_val, degree) - z_actual)^2  for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
-    #loss = sum(log(1 + (objective_function(p, x_val, y_val, degree) - z_actual)^2) for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
-    #loss = sum((objective_function(p, x_val, y_val, degree) - z_actual)^2 for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
-    return loss
-  end
-
-  result = optimize(objective, initial_guess, autodiff=:forward, LBFGS(), Optim.Options(f_tol=1e-40)) #autodiff=:forward
-
-  return Optim.minimizer(result)
-end
 
 x_data = training_u_coords  # Sample x data
 y_data = training_v_coords  # Sample y data

@@ -6,6 +6,7 @@ config = YAML.load_file(joinpath(configdir, "shopt.yml"))
 epochs = config["NNparams"]["epochs"]
 degree = config["polynomialDegree"]
 new_img_dim = config["stampSize"]
+r, c = new_img_dim, new_img_dim
 snrCutoff = config["dataProcessing"]["SnRPercentile"]
 YAMLSAVE = config["saveYaml"]
 minAnalyticGradientModel = config["AnalyticFitParams"]["minGradientAnalyticModel"]
