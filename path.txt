@@ -18,3 +18,6 @@ discovery
 [berman.ed@login-00 shopt]$ srun --constraint=haswell --pty /bin/bash
 module load julia
 julia dependencies.jl
+
+psfex
+python get_jwst_psf.py /home/eddieberman/research/mcclearygroup/claws/visit120/f115w/jw01727120001_02101_00001_nrca1_cal.fits -config configs/box_cutter.yaml

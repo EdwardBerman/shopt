@@ -44,7 +44,6 @@ Currently, the inputs are JWST Point Spread Functions source catalogs. The curre
 | ![image](READMEassets/input.png)  | Star Taken From Input Catalog      |
 | shopt.yml                         | Config File for Tunable Parameters | 
 | \* starcat.fits                   | Star Catalog to take  vignets from |
-| \* SCI.fits                       | fits file containing WCS info      |
 
 ### Outputs
 
@@ -67,7 +66,7 @@ To run `shopt.jl`
 
 First use Source Extractor to create a catalog for ShOpt to accept and save this catalog in the appropriate directory
 
-Run ```julia shopt.jl [configdir] [outdir] [catalog] [scifile]```
+Run ```julia shopt.jl [configdir] [outdir] [catalog]```
 
 There is also a shell script that runs this command so that the user may call shopt from a larger program they are running
 
@@ -125,7 +124,7 @@ run(`$(PyCall.python) -m pip install --upgrade cython`)
 run(`$(PyCall.python) -m pip install astropy`) 
 ```
 
-After the file contents are downloaded the user can run ```julia shopt.jl [configdir] [outdir] [catalog] [scifile]``` as stated above. Alternatively, they can run the shellscript that calls shopt in whatever program they are working with to create their catalog. For example, in a julia program you may use ```run(`./runshopt.sh [configdir] [outdir] [catalog] [scifile]`)```
+After the file contents are downloaded the user can run ```julia shopt.jl [configdir] [outdir] [catalog]``` as stated above. Alternatively, they can run the shellscript that calls shopt in whatever program they are working with to create their catalog. For example, in a julia program you may use ```run(`./runshopt.sh [configdir] [outdir] [catalog]`)```
 
 ## Program Architecture
 
