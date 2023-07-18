@@ -128,6 +128,9 @@ After the file contents are downloaded the user can run ```julia shopt.jl [confi
 
 ## Program Architecture
 
+TutorialNotebook.ipynb
+> Run ShOpt inside of a Jupyter Notebook and learn both how to run the program and how to reconstruct the PSF 
+
 shopt.jl 
 > A runner script for all functions in this software
 
