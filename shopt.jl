@@ -7,14 +7,13 @@
     process_arguments(ARGS)
   catch err
     println("Error: ", err)
-    println("Usage: julia shopt.jl <configdir> <outdir> <catalog> <sci>")
+    println("Usage: julia shopt.jl <configdir> <outdir> <catalog>")
     exit(1)
   end
 
   configdir = ARGS[1]
   outdir = ARGS[2]
   catalog = ARGS[3]
-  sci = ARGS[4]
 
   if isdir(outdir)
     println("━ Outdir found")
@@ -406,7 +405,7 @@ dg2_dv(u,v) = g2C[2]*3*v^2 + g2C[3]*u^2 + g2C[4]*2*u*v + g2C[6]*2*v + g2C[7]*u +
 
 #println("\n** Adding a Progress Bar Dramatically Increases the Run Time, but note that Interpolation across the FOV is taking place! **\n")
 
-PolynomialMatrix = ones(r,c, 10)
+#PolynomialMatrix = ones(r,c, 10)
   
 function sample_indices(array, k)
   indices = collect(1:length(array))  # Create an array of indices
@@ -464,6 +463,7 @@ end
 
 x_data = training_u_coords  # Sample x data
 y_data = training_v_coords  # Sample y data
+PolynomialMatrix = ones(r,c, (degree + 1) * (degree + 2) ÷ 2 )
 
 @time begin
   for i in 1:r
@@ -510,15 +510,6 @@ fancyPrint("Plotting")
   plot_hist()
   plot_err()
 
-
-  function get_middle_15x15(array::Array{T, 2}) where T
-      rows, cols = size(array)
-      row_start = div(rows, 2) - 7
-      col_start = div(cols, 2) - 7
-      
-      return array[row_start:(row_start+14), col_start:(col_start+14)]
-  end
-
   starSample = rand(1:length(starCatalog))
   a = starCatalog[starSample]
   b = pixelGridFits[starSample]
@@ -530,9 +521,9 @@ fancyPrint("Plotting")
   cmn = minimum([minimum(a), minimum(b)])
   
   if UnicodePlotsPrint
-    println(UnicodePlots.heatmap(get_middle_15x15(a), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of star $starSample"))
-    println(UnicodePlots.heatmap(get_middle_15x15(b), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
-    println(UnicodePlots.heatmap(get_middle_15x15(a - b), colormap=:inferno, title="Heatmap of Residuals"))
+    println(UnicodePlots.heatmap(get_middle_nxn(a,15), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of star $starSample"))
+    println(UnicodePlots.heatmap(get_middle_nxn(b,15), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
+    println(UnicodePlots.heatmap(get_middle_nxn(a - b, 15), colormap=:inferno, title="Heatmap of Residuals"))
   end
 
   if cairomakiePlots

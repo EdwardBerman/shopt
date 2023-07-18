@@ -10,7 +10,5 @@ function process_arguments(args)
   println("━ Output Directory: ", outdir)
   catalog = args[3]
   println("━ Catalog: ", catalog)
-  sci_file = args[4]
-  println("━ Science File: ", sci_file)
 end
 

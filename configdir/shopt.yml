@@ -6,10 +6,10 @@ NNparams:
 AnalyticFitParams:
   minGradientAnalyticModel: 1e-6
   minGradientAnalyticLearned: 1e-6
-  analyticFitStampSize: 64
+  analyticFitStampSize: 32
 
 dataProcessing:
-  SnRPercentile: 0.33
+  SnRPercentile: 0.40
   sUpperBound: 1
   sLowerBound: 0.075
 
@@ -22,7 +22,7 @@ plots:
     streamplots: false
   pythonPlots: false
 
-polynomialDegree: 3
+polynomialDegree: 1
 stampSize: 131
 
 training_ratio: 0.8

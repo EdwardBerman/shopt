@@ -111,55 +111,19 @@ Out[10]: 290
 
 function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=outliers_filter)
   catalog = args[3]
-  sci_image = args[4]
 
   py"""
   import numpy as np
   from astropy.io import fits
-  from astropy.table import Table, hstack, vstack
-  from astropy.wcs import WCS
-  from astropy import units as u
-  from astropy.coordinates import SkyCoord
   
   python_datadir = $catalog
   f = fits.open(python_datadir)
   vignets = f[2].data['VIGNET']
   err_vignets = f[2].data['ERR_VIGNET']
   l = len(vignets)
-  python_sci_file = $sci_image
-  g = fits.open(python_sci_file)
-  def find_wcs_info(filename):
-    with fits.open(filename) as hdul:
-      for idx, hdu in enumerate(hdul):
-        try:
-          wcs = WCS(hdu.header)
-          return wcs, idx  # Return the WCS and extension index
-        except Exception:
-          continue  # Skip if WCS info is not present or invalid
-        return None, None  # If no WCS info is found
-   
-  filename = python_sci_file
-  wcs, extension_idx = find_wcs_info(filename)
-  if wcs is not None:
-    print(f"WCS info found in extension {extension_idx}:")
-    print(wcs)
-    # Additional WCS operations can be performed here
-  else:
-    print("No WCS info found in any extension.")
-  
-  w = wcs
-  #w = WCS(g[0].header)
 
-  x_coords = f[2].data['XWIN_IMAGE']
-  y_coords = f[2].data['YWIN_IMAGE']
-  pixel_coords = []
-  for x, y in zip(x_coords, y_coords):
-      pixel_coords.append([x, y])
-  
-  origin = 0
-  ra_dec_coords = w.all_pix2world(pixel_coords, origin)
-  u = ra_dec_coords[:,0]
-  v = ra_dec_coords[:,1]
+  u = f[2].data['ALPHAWIN_J2000'] 
+  v = f[2].data['DELTAWIN_J2000']
   """
 
   datadir = py"python_datadir"
@@ -167,7 +131,7 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   err = py"err_vignets"
   catalog = py"list(map(np.array, $v))"
   errVignets = py"list(map(np.array, $err))"
-  uv_coords = convert(Array{Float64,2}, py"ra_dec_coords")
+  #uv_coords = convert(Array{Float64,2}, py"ra_dec_coords")
   u_coords = convert(Array{Float64,1}, py"u")
   v_coords = convert(Array{Float64,1}, py"v")
 
