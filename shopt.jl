@@ -52,7 +52,7 @@ fancyPrint("Handling Imports")
   using Flux: onehotbatch, throttle, @epochs, mse, msle
   using CairoMakie
   using Dates
-  using Interpolations
+  #using Interpolations
 end
 println("━ Start Time ", Dates.now())
 start = Dates.now()
