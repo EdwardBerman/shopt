@@ -62,6 +62,61 @@ function countNaNs(arr)
     return count
 end
 
+function oversample_image(image, new_dim)
+  oversampled_image = zeros(new_dim, new_dim)
+  scale_factor = 1/(new_dim / size(image)[1])
+  for y in 1:new_dim
+    for x in 1:new_dim
+      src_x = (x - 0.5) * scale_factor + 0.5
+      src_y = (y - 0.5) * scale_factor + 0.5
+      x0 = max(1, floor(Int, src_x))
+      x1 = min(size(image)[1], x0 + 1)
+      y0 = max(1, floor(Int, src_y))
+      y1 = min(size(image)[2], y0 + 1)
+      dx = src_x - x0
+      dy = src_y - y0
+      oversampled_image[y, x] =
+        (1 - dx) * (1 - dy) * image[y0, x0] +
+        dx * (1 - dy) * image[y0, x1] +
+        (1 - dx) * dy * image[y1, x0] +
+        dx * dy * image[y1, x1]
+    end
+  end
+  return oversampled_image
+end
+  
+function undersample_image(image, new_dim)
+  undersampled_image = imresize(image, new_dim, new_dim, algorithm =:bicubic)
+  return undersampled_image
+end
+#=
+function undersample_image(image, new_dim)
+    # Get the original dimensions of the image
+    height, width = size(image)
+
+    # Create Lanczos interpolation object
+    interp = interpolate(image, Lanczos(4))
+
+    # Calculate the scaling factors
+    scale_height = (height - 1) / (new_dim - 1)
+    scale_width = (width - 1) / (new_dim - 1)
+
+    # Generate coordinates for the new image
+    x_coords = 1:new_dim
+    y_coords = 1:new_dim
+
+    # Perform downsampling with Lanczos interpolation
+    undersampled_image = zeros(new_dim, new_dim)
+
+    for y in 1:new_dim
+        for x in 1:new_dim
+            undersampled_image[y, x] = interp(scale_height * (y - 1) + 1, scale_width * (x - 1) + 1)
+        end
+    end
+
+    return undersampled_image
+end
+=#
 #=
 Supply an array and the new dimension you want and get the middle nxn of that array
 =#
@@ -158,15 +213,36 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   catalogNew, errVignets = dout(signal2noiseRatios, catalogNew, errVignets, snrCutoff)
   println("━ Number of vignets: ", length(catalog))
   println("━ Removed $(length(catalog) - length(catalogNew)) outliers on the basis of Signal to Noise Ratio")
-  
+ 
+ #= 
   for i in 1:length(catalogNew)
     catalogNew[i] = get_middle_nxn(catalogNew[i], new_img_dim)
     errVignets[i] = get_middle_nxn(errVignets[i], new_img_dim)
   end
-  println("━ Sampled all vignets to $(new_img_dim) x $(new_img_dim) from $(r) x $(c)")
+  println("━ Sampled all vignets to $(new_img_dim) x $(new_img_dim) from $(r) x $(c) via cropping")
   r = size(catalogNew[1], 1)
   c = size(catalogNew[1], 2)
+  =#
+
+  if new_img_dim/size(catalogNew[1], 1) !=1
+    if new_img_dim/size(catalogNew[1], 1) < 1
+      for i in 1:length(catalogNew)
+        catalogNew[i] = get_middle_nxn(catalogNew[i], new_img_dim)/sum(nz(nm(get_middle_nxn(catalogNew[i], new_img_dim))))
+        errVignets[i] = get_middle_nxn(errVignets[i], new_img_dim)
+      end
+    else
+      for i in 1:length(catalogNew)
+        catalogNew[i] = oversample_image(catalogNew[i], new_img_dim)/sum(nz(nm(oversample_image(catalogNew[i], new_img_dim))))
+        errVignets[i] = oversample_image(errVignets[i], new_img_dim)
+      end
+    end
+  end
   
+  println("━ Sampled all vignets to $(size(catalogNew[1], 1)) x $(size(catalogNew[1], 2)) from $(r) x $(c) via over/under sampling")
+  r = size(catalogNew[1], 1)
+  c = size(catalogNew[1], 2)
+  k = rand(1:length(catalogNew))
+  println(UnicodePlots.heatmap(nz(nm(get_middle_nxn(catalogNew[k],15))), title="Sampled Vignet $k")) 
   return catalogNew, errVignets, r, c, length(catalogNew), u_coords, v_coords
 end
 

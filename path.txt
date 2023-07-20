@@ -21,3 +21,10 @@ julia dependencies.jl
 
 psfex
 python get_jwst_psf.py /home/eddieberman/research/mcclearygroup/claws/visit120/f115w/jw01727120001_02101_00001_nrca1_cal.fits -config configs/box_cutter.yaml
+
+master diagnostic
+python master_psf_diagnostic.py /home/eddieberman/research/mcclearygroup/cweb_psf /home/eddieberman/research/mcclearygroup/cweb_psf/working/jw01727116001_02101_00001_nrca1_cal_starcat.fits -outdir /home/eddieberman/research/mcclearygroup
+
+webb get jwst 
+python get_jwst_psf.py data_tmw/jw01727116001_02101_00001_nrca1_cal.fits -config configs/box_cutter.yaml 
+In data_tmw
