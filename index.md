@@ -22,7 +22,7 @@
 
 **Shear Optimization** with **ShOpt.jl**, a julia library for empirical point spread function characterizations. We aim to improve upon the current state of Point Spread Function Modeling by using Julia to leverage performance gains, use a different mathematical formulation than the literature to provide more robust analytic and pixel grid fits, improve the diagnostic plots, and add features such as wavelets and shapelets. At this projects conclusion we will compare to existing software such as PIFF and PSFex. Work done under [McCleary's Group](https://github.com/mcclearyj).
 
-Start by **Cloning This Repository**. Then see **TutorialNotebook.ipynb** or follow along the rest of this **README.md** to get started! 
+Start by **Cloning This Repository**. Then see **TutorialNotebook.ipynb** or follow along the rest of this **README.md** to get started!
 
 ### Analytic Profile Fits 
 We adopt the following procedure to ensure our gradient steps never take us outside of our constraints
@@ -44,8 +44,8 @@ Currently, the inputs are JWST Point Spread Functions source catalogs. The curre
 | Image                             | Description                        |
 |-----------------------------------|------------------------------------|
 | ![image](READMEassets/input.png)  | Star Taken From Input Catalog      |
-| shopt.yml                         | Config File for Tunable Parameters |
-| \* starcat.fits                   | Star Catalog to take  vignets from | 
+| shopt.yml                         | Config File for Tunable Parameters | 
+| \* starcat.fits                   | Star Catalog to take  vignets from |
 
 ### Outputs
 
@@ -94,35 +94,36 @@ The dependencies can be installed in the Julia REPL. For example:
 import Pkg; Pkg.add("PyCall")
 ```
 
-We also provide dependencies.jl, which you can run to download all of the Julia libraries automatically by reading in the imports.txt file. Simply run `julia dependencies.jl` in the command line. For the three python requirements, you can similarly run `python dependenciesPy.py`.  
+We also provide dependencies.jl, which you can run to download all of the Julia libraries automatically by reading in the imports.txt file. Simply run ` julia dependencies.jl ` in the command line. For the three python requirements, you can similarly run `python dependenciesPy.py`. 
 
-For some functionality we need to use wrappers for Python code, such as reading in fits files or converting (x,y) -> (u,v). Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. If the Python snippets throw an error, run the following in the Julia REPL for each Python library:
+For some functionality we need to use wrappers for Python code, such as reading in fits files or converting (x,y) -> (u,v). Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. There are a number of ways to get Julia and Python to interopt nicely. If the Python snippets throw an error, run the following in the Julia REPL for each Python library:
 
-```julia                                                                                                                
-using PyCall                                                                                                            
+```julia
+using PyCall
  # You may have to specify, ENV["PYTHON"] = "/path_desired_python_directory/python_executable"; import Pkg; Pkg.build("PyCall")
-pyimport("astropy")                                                                                                     
-```                                                                                                                     
+pyimport("astropy")
+```
 
-If you have a Conda Enviornment setup, you may find it easier to run                                                    
-```julia                                                                                                                
-using PyCall                                                                                                            
-pyimport_conda("astropy", "ap") #ap is my choice of name and astropy is what I am importing from my conda Enviornment   
-```                                                                                                                     
+If you have a Conda Enviornment setup, you may find it easier to run 
+```julia
+using PyCall
+pyimport_conda("astropy", "ap") #ap is my choice of name and astropy is what I am importing from my conda Enviornment
+```
 
 Or Similarly,
-```julia                                                                                                                
+
+```julia
 using Conda
 Conda.add("astropy", :my_env) #my conda enviornment is named my_env
- # or Conda.add("astropy", "/path/to/directory")  
- # or Conda.add("astropy", "/path/to/directory"; channel="anaconda")  
-```                                  
+Conda.add("astropy", "/path/to/directory")
+Conda.add("astropy", "/path/to/directory"; channel="anaconda")
+```
 
 On the off chance that none of these works, a final method may look like the following 
-```julia                                                                                                                                           
-using PyCall                                                                                                                                       
-run(`$(PyCall.python) -m pip install --upgrade cython`)                                                                                            
-run(`$(PyCall.python) -m pip install astropy`)                                                                                                     
+```julia
+using PyCall
+run(`$(PyCall.python) -m pip install --upgrade cython`)
+run(`$(PyCall.python) -m pip install astropy`) 
 ```
 
 After the file contents are downloaded the user can run ```julia shopt.jl [configdir] [outdir] [catalog]``` as stated above. Alternatively, they can run the shellscript that calls shopt in whatever program they are working with to create their catalog. For example, in a julia program you may use ```run(`./runshopt.sh [configdir] [outdir] [catalog]`)```
@@ -152,6 +153,9 @@ radialProfiles.jl
 
 analyticLBFGS.jl 
 > Provides the necessary arguments (cost function and gradient) to the optimize function for analytic fits 
+
+pixelGridAutoencoder.jl
+> Houses the function defining the autoencoder and other machine learning functions supplied to Flux's training call
 
 interpolate.jl 
 > For Point Spread Functions that vary across the Field of View, interpolate.jl will fit a nth degree polynomial in u and v to show how each of the pixel grid parameters change across the (u,v) plane
@@ -185,8 +189,8 @@ imports.txt
 
 packages.txt
 > List of Python Libraries used in the program
-                             
-dependencies.jl             
+
+dependencies.jl 
 > Download all of the imports from imports.txt automatically
 
 dependenciesPy.py 
@@ -225,7 +229,7 @@ polynomialDegree
 - The degree of the polynomial used to interpolate each pixel in the stamp across the field of view. Set to `3` by default
 
 stampSize
-- The subset of the vignet for which use wish to fit. Be sure to make this number be less than the size of the input vignets. Set to `131` by default to fit and interpolate the middle `131 x 131` pixels
+- The size of the vignet for which use wish to fit. Used interpolation for oversampling and a simple crop for undersampling. Set to `131` by default to fit and interpolate `131 x 131` pixels
 
 training_ratio
 - Before doing a polynomial interpolation, the remaining stars will be divided into training and validation stars based off of this float. Set to `0.8` by default, indicating 80% training stars 20% validation stars
@@ -246,5 +250,3 @@ CommentsOnRun
 + The Northeastern Physics Department and Northeastern Undergraduate Research and Fellowships, for making this project possible with funding from the Northeastern Physics Co-Op Fellowship and PEAK Ascent Award respectively   
 + [David Rosen](https://github.com/david-m-rosen), who gave valuable input in the early stages of this project and during his course Math 7223, Riemannian Optimization
 + The COSMOS Web Collaboration for providing data from the James Webb Space Telescope and internal review
-
-
