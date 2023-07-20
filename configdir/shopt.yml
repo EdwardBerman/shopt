@@ -1,7 +1,7 @@
 saveYaml: true
 
 NNparams:
-  epochs: 1000
+  epochs: 100
   minGradientPixel: 1e-5
 AnalyticFitParams:
   minGradientAnalyticModel: 1e-6
@@ -9,7 +9,7 @@ AnalyticFitParams:
   analyticFitStampSize: 64
 
 dataProcessing:
-  SnRPercentile: 0.40
+  SnRPercentile: 0.50
   sUpperBound: 1
   sLowerBound: 0.075
 

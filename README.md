@@ -154,6 +154,9 @@ radialProfiles.jl
 analyticLBFGS.jl 
 > Provides the necessary arguments (cost function and gradient) to the optimize function for analytic fits 
 
+pixelGridAutoencoder.jl
+> Houses the function defining the autoencoder and other machine learning functions supplied to Flux's training call
+
 interpolate.jl 
 > For Point Spread Functions that vary across the Field of View, interpolate.jl will fit a nth degree polynomial in u and v to show how each of the pixel grid parameters change across the (u,v) plane
 
@@ -226,7 +229,7 @@ polynomialDegree
 - The degree of the polynomial used to interpolate each pixel in the stamp across the field of view. Set to `3` by default
 
 stampSize
-- The subset of the vignet for which use wish to fit. Be sure to make this number be less than the size of the input vignets. Set to `131` by default to fit and interpolate the middle `131 x 131` pixels
+- The size of the vignet for which use wish to fit. Used interpolation for oversampling and a simple crop for undersampling. Set to `131` by default to fit and interpolate `131 x 131` pixels
 
 training_ratio
 - Before doing a polynomial interpolation, the remaining stars will be divided into training and validation stars based off of this float. Set to `0.8` by default, indicating 80% training stars 20% validation stars
