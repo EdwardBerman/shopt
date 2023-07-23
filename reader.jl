@@ -17,7 +17,7 @@ function read_shopt(shoptFile)
   from astropy.io import fits
   f = fits.open(shoptFile)
   polyMatrix = f[0].data
-  degree = f[1].data['polynomial degree'][0]
+  degree = f[1].data['POLYNOMIAL_DEGREE'][0]
   """
   polynomialMatrix = convert(Array{Float64,3}, py"polyMatrix")
   degree = convert(Int64, py"degree")

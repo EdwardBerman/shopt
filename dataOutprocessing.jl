@@ -73,37 +73,37 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
   degree_array = np.array([deg_element], dtype=np.float64)
 
   hdu1 = fits.PrimaryHDU(PolynomialMatrix)
-  hdu1.header['EXTNAME'] = 'Polynomial Matrix'
+  hdu1.header['EXTNAME'] = 'POLYNOMIAL_MATRIX'
   
-  c00 = fits.Column(name='u coordinates', array=u_coordinates, format='D')
-  c01 = fits.Column(name='v coordinates', array=v_coordinates, format='D')
-  c02 = fits.Column(name='Training_u_coords', array=training_u_coords, format='D')
-  c03 = fits.Column(name='Training_v_coords', array=training_v_coords, format='D')
-  c04 = fits.Column(name='validation_u_coords', array=validation_u_coords, format='D')
-  c05 = fits.Column(name='validation_v_coords', array=validation_v_coords, format='D')
-  c1 = fits.Column(name='s model', array=s_model, format='D')
-  c2 = fits.Column(name='g1 model', array=g1_model, format='D')
-  c3 = fits.Column(name='g2 model', array=g2_model, format='D')
-  c4 = fits.Column(name='s data', array=s_data, format='D')
-  c5 = fits.Column(name='g1 data', array=g1_data, format='D')
-  c6 = fits.Column(name='g2 data', array=g2_data, format='D')
-  c7 = fits.Column(name='mean relative error', array=meanRelativeError, format='D')
-  c8 = fits.Column(name='polynomial degree', array=degree_array, format='D')
+  c00 = fits.Column(name='U_COORDINATES', array=u_coordinates, format='D')
+  c01 = fits.Column(name='V_COORDINATES', array=v_coordinates, format='D')
+  c02 = fits.Column(name='TRAINING_U_COORDS', array=training_u_coords, format='D')
+  c03 = fits.Column(name='TRAINING_V_COORDS', array=training_v_coords, format='D')
+  c04 = fits.Column(name='VALIDATION_U_COORDS', array=validation_u_coords, format='D')
+  c05 = fits.Column(name='VALIDATION_V_COORDS', array=validation_v_coords, format='D')
+  c1 = fits.Column(name='S_MODEL', array=s_model, format='D')
+  c2 = fits.Column(name='g1_MODEL', array=g1_model, format='D')
+  c3 = fits.Column(name='g2_MODEL', array=g2_model, format='D')
+  c4 = fits.Column(name='s_DATA', array=s_data, format='D')
+  c5 = fits.Column(name='g1_DATA', array=g1_data, format='D')
+  c6 = fits.Column(name='g2_DATA', array=g2_data, format='D')
+  c7 = fits.Column(name='MEAN_RELATIVE_ERROR', array=meanRelativeError, format='D')
+  c8 = fits.Column(name='POLYNOMIAL_DEGREE', array=degree_array, format='D')
 
   VIGNETS_hdu = fits.ImageHDU(starCatalog)
   VIGNETS_hdu.header['EXTNAME'] = 'VIGNETS'
 
   errVignets_hdu = fits.ImageHDU(errVignets)
-  errVignets_hdu.header['EXTNAME'] = 'Error Vignets'
+  errVignets_hdu.header['EXTNAME'] = 'ERR_VIGNETS'
 
   pixelGridFits_hdu = fits.ImageHDU(pixelGridFits)
-  pixelGridFits_hdu.header['EXTNAME'] = 'Pixel Grid Fits'
+  pixelGridFits_hdu.header['EXTNAME'] = 'PIXEL_GRID_FITS'
 
   validation_hdu = fits.ImageHDU(validation_stars)
-  validation_hdu.header['EXTNAME'] = 'Validation Stars'
+  validation_hdu.header['EXTNAME'] = 'VALIDATION_STARS'
 
   summary_statistics_hdu = fits.BinTableHDU.from_columns([c00, c01, c02, c03, c04, c05, c1, c2, c3, c4, c5, c6, c7, c8]) 
-  summary_statistics_hdu.header['EXTNAME'] = 'Summary Statistics'
+  summary_statistics_hdu.header['EXTNAME'] = 'SUMMARY_STATISTICS'
 
   hdul = fits.HDUList([hdu1, summary_statistics_hdu, VIGNETS_hdu, errVignets_hdu, pixelGridFits_hdu, validation_hdu])
 
