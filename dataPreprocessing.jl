@@ -175,21 +175,24 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   python_datadir = $catalog
   f = fits.open(python_datadir)
   vignets = f[2].data['VIGNET']
-  err_vignets = f[2].data['ERR_VIGNET']
+  #err_vignets = f[2].data['ERR_VIGNET']
   l = len(vignets)
 
   u = f[2].data['ALPHAWIN_J2000'] 
   v = f[2].data['DELTAWIN_J2000']
+
+  snr = f[2].data['SNR_WIN']
   """
 
   datadir = py"python_datadir"
   v = py"vignets"
-  err = py"err_vignets"
+  #err = py"err_vignets"
   catalog = py"list(map(np.array, $v))"
-  errVignets = py"list(map(np.array, $err))"
-  #uv_coords = convert(Array{Float64,2}, py"ra_dec_coords")
+  #errVignets = py"list(map(np.array, $err))"
+  
   u_coords = convert(Array{Float64,1}, py"u")
   v_coords = convert(Array{Float64,1}, py"v")
+  snr = convert(Array{Float32,1}, py"snr")
 
   r = size(catalog[1], 1)
   c = size(catalog[1], 2)
@@ -198,19 +201,19 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   signal2noiseRatios = []
   for i in 1:length(catalog)
     push!(catalogNew, nm(catalog[i])./sum(nz(nm(catalog[i]))))
-    push!(signal2noiseRatios, snr(catalog[i], errVignets[i]))
+    #push!(signal2noiseRatios, snr(catalog[i], errVignets[i]))
   end
-
-  new_snr_arr = Array{Float64}(undef, length(signal2noiseRatios))
-  for (i, element) in enumerate(signal2noiseRatios)
+  
+  new_snr_arr = Array{Float64}(undef, length(snr))
+  for (i, element) in enumerate(snr)
     new_snr_arr[i] = element
   end
   new_snr_arr = new_snr_arr[.!isnan.(new_snr_arr)] 
-
+  
   println(UnicodePlots.boxplot(["snr"], [new_snr_arr], title="signal to noise ratio"))
 
 
-  catalogNew, errVignets, outlier_indices = dout(signal2noiseRatios, catalogNew, errVignets, snrCutoff)
+  catalogNew, outlier_indices = dout(snr, catalogNew, snrCutoff)
   println("━ Number of vignets: ", length(catalog))
   println("━ Removed $(length(catalog) - length(catalogNew)) outliers on the basis of Signal to Noise Ratio")
  
@@ -228,12 +231,12 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
     if new_img_dim/size(catalogNew[1], 1) < 1
       for i in 1:length(catalogNew)
         catalogNew[i] = nm(get_middle_nxn(catalogNew[i], new_img_dim))/sum(nz(nm(get_middle_nxn(catalogNew[i], new_img_dim))))
-        errVignets[i] = get_middle_nxn(errVignets[i], new_img_dim)
+        #errVignets[i] = get_middle_nxn(errVignets[i], new_img_dim)
       end
     else
       for i in 1:length(catalogNew)
         catalogNew[i] = nm(oversample_image(catalogNew[i], new_img_dim))/sum(nz(nm(oversample_image(catalogNew[i], new_img_dim))))
-        errVignets[i] = oversample_image(errVignets[i], new_img_dim)
+        #errVignets[i] = oversample_image(errVignets[i], new_img_dim)
       end
     end
   end
@@ -242,8 +245,11 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   r = size(catalogNew[1], 1)
   c = size(catalogNew[1], 2)
   k = rand(1:length(catalogNew))
-  println(UnicodePlots.heatmap(nz(nm(get_middle_nxn(catalogNew[k],15))), title="Sampled Vignet $k")) 
-  return catalogNew, errVignets, r, c, length(catalogNew), u_coords, v_coords, outlier_indices
+  if UnicodePlotsPrint
+    println(UnicodePlots.heatmap(nz(nm(get_middle_nxn(catalogNew[k],15))), colormap=:inferno, title="Sampled Vignet $k")) 
+  end
+
+  return catalogNew, r, c, length(catalogNew), u_coords, v_coords, outlier_indices
 end
 
 

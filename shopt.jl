@@ -79,11 +79,11 @@ end
 fancyPrint("Processing Data for Fit")
 @time begin
   
-  starCatalog, errVignets, r, c, itr, u_coordinates, v_coordinates, outlier_indices = cataloging(ARGS)
-  starCatalog = starCatalog
-  errVignets = errVignets
-  u_coordinates = u_coordinates
-  v_coordinates = v_coordinates
+  starCatalog, r, c, itr, u_coordinates, v_coordinates, outlier_indices = cataloging(ARGS)
+  #starCatalog = starCatalog
+  #errVignets = errVignets
+  #u_coordinates = u_coordinates
+  #v_coordinates = v_coordinates
   itr = length(starCatalog)
   
   
@@ -160,11 +160,11 @@ for i in 1:length(s_model)
 end
 
 println("\n━ Blacklisted Stars: ", s_blacklist)
-println("\n━ Blacklisted $(length(s_blacklist)) stars on the basis of s < $sLowerBound or s > $sUpperBound (Failed Stars Assigned 0). NB: These blacklisted stars are being indexed after the initial removal on the basis of signal to noise, not based off of their original location in the star catalog." )
-
+println("\n━ Blacklisted $(length(s_blacklist)) stars on the basis of s < $sLowerBound or s > $sUpperBound (Failed Stars Assigned 0)." )
+println("\n━ NB: These blacklisted stars are being indexed after the initial removal on the basis of signal to noise, not based off of their original location in the star catalog.")
 for i in sort(s_blacklist, rev=true)
   splice!(starCatalog, i)
-  splice!(errVignets, i)
+  #splice!(errVignets, i)
   splice!(s_model, i)
   splice!(g1_model, i)
   splice!(g2_model, i)
@@ -272,8 +272,8 @@ end
 
 
 println("━ failed stars: ", unique(failedStars))
-println("\n━ Rejected $(length(unique(failedStars))) more stars for failing or having either s < $sLowerBound or s > $sUpperBound when fitting an analytic profile to an autoencoded image. NB: These failed stars are being indexed after the blacklisted stars were removed.")
-
+println("\n━ Rejected $(length(unique(failedStars))) more stars for failing or having either s < $sLowerBound or s > $sUpperBound when fitting an analytic profile to an autoencoded image.")
+println("\n━ NB: These failed stars are being indexed after both the screening of signal to noise and the blacklisting of s values.")
 failedStars = unique(failedStars)
 
 for i in sort(failedStars, rev=true)
@@ -287,7 +287,7 @@ for i in sort(failedStars, rev=true)
   splice!(u_coordinates, i)
   splice!(v_coordinates, i)
   splice!(starCatalog, i)
-  splice!(errVignets, i)
+  #splice!(errVignets, i)
 end
 
 GC.gc()
@@ -411,6 +411,7 @@ end
 GC.gc()
 
 sampled_indices = sort(sample_indices(validation_indices, 3))
+#=
 println("Sampled indices: ", sampled_indices)
 meanRelativeError = []
 for i in 1:length(starCatalog)
@@ -422,7 +423,7 @@ for i in 1:length(starCatalog)
   end
   push!(meanRelativeError, mean(RelativeError))
 end
-
+=#
 
 # ---------------------------------------------------------#
 fancyPrint("Plotting")
