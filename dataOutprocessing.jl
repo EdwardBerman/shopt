@@ -23,7 +23,7 @@ function readData()
   DataFrame(CSV.File(joinpath("outdir", "df.shopt")))
 end
 
-function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRelativeError, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, errVignets=errVignets, fancyPrint=fancyPrint, training_stars=training_stars, training_u_coords=training_u_coords, training_v_coords=training_v_coords, validation_stars=validation_stars, validation_u_coords=validation_u_coords, validation_v_coords=validation_v_coords, validation_star_catalog=validation_star_catalog, degree=degree, YAMLSAVE=YAMLSAVE, parametersHistogram=parametersHistogram, parametersScatterplot=parametersScatterplot, cairomakiePlots=cairomakiePlots, pythonPlots=pythonPlots)
+function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRelativeError, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, errVignets=errVignets, fancyPrint=fancyPrint, training_stars=training_stars, training_u_coords=training_u_coords, training_v_coords=training_v_coords, validation_stars=validation_stars, validation_u_coords=validation_u_coords, validation_v_coords=validation_v_coords, validation_star_catalog=validation_star_catalog, degree=degree, YAMLSAVE=YAMLSAVE, parametersHistogram=parametersHistogram, parametersScatterplot=parametersScatterplot, cairomakiePlots=cairomakiePlots, pythonPlots=pythonPlots, outlier_indices=outlier_indices , failedStars=failedStars, s_blacklist=s_blacklist)
   
   m, n = size(starCatalog[1])
   array_3d = zeros(m, n, length(starCatalog))
@@ -90,6 +90,7 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
   c7 = fits.Column(name='MEAN_RELATIVE_ERROR', array=meanRelativeError, format='D')
   c8 = fits.Column(name='POLYNOMIAL_DEGREE', array=degree_array, format='D')
 
+
   VIGNETS_hdu = fits.ImageHDU(starCatalog)
   VIGNETS_hdu.header['EXTNAME'] = 'VIGNETS'
 
@@ -104,8 +105,17 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
 
   summary_statistics_hdu = fits.BinTableHDU.from_columns([c00, c01, c02, c03, c04, c05, c1, c2, c3, c4, c5, c6, c7, c8]) 
   summary_statistics_hdu.header['EXTNAME'] = 'SUMMARY_STATISTICS'
+  
+  outlier_indices = np.array($outlier_indices, dtype=np.float64)
+  s_blacklist = np.array($s_blacklist, dtype=np.float64)
+  failedStars = np.array($failedStars, dtype=np.float64)
+  col00 = fits.Column(name='FLAG_SNR', array=outlier_indices, format='D')
+  col01 = fits.Column(name='FLAG_S_BLACKLIST', array=s_blacklist, format='D')
+  col02 = fits.Column(name='FLAG_PIXEL_GRID_OR_S_BLACKLIST_LEARNED', array=failedStars, format='D')
+  flag_hdu = fits.BinTableHDU.from_columns([col00, col01, col02])
+  flag_hdu.header['EXTNAME'] = 'FLAGS'
 
-  hdul = fits.HDUList([hdu1, summary_statistics_hdu, VIGNETS_hdu, errVignets_hdu, pixelGridFits_hdu, validation_hdu])
+  hdul = fits.HDUList([hdu1, summary_statistics_hdu, VIGNETS_hdu, errVignets_hdu, pixelGridFits_hdu, validation_hdu, flag_hdu])
 
   hdul.writeto('summary.shopt', overwrite=True)
   """

@@ -210,7 +210,7 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   println(UnicodePlots.boxplot(["snr"], [new_snr_arr], title="signal to noise ratio"))
 
 
-  catalogNew, errVignets = dout(signal2noiseRatios, catalogNew, errVignets, snrCutoff)
+  catalogNew, errVignets, outlier_indices = dout(signal2noiseRatios, catalogNew, errVignets, snrCutoff)
   println("━ Number of vignets: ", length(catalog))
   println("━ Removed $(length(catalog) - length(catalogNew)) outliers on the basis of Signal to Noise Ratio")
  
@@ -227,12 +227,12 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   if new_img_dim/size(catalogNew[1], 1) !=1
     if new_img_dim/size(catalogNew[1], 1) < 1
       for i in 1:length(catalogNew)
-        catalogNew[i] = get_middle_nxn(catalogNew[i], new_img_dim)/sum(nz(nm(get_middle_nxn(catalogNew[i], new_img_dim))))
+        catalogNew[i] = nm(get_middle_nxn(catalogNew[i], new_img_dim))/sum(nz(nm(get_middle_nxn(catalogNew[i], new_img_dim))))
         errVignets[i] = get_middle_nxn(errVignets[i], new_img_dim)
       end
     else
       for i in 1:length(catalogNew)
-        catalogNew[i] = oversample_image(catalogNew[i], new_img_dim)/sum(nz(nm(oversample_image(catalogNew[i], new_img_dim))))
+        catalogNew[i] = nm(oversample_image(catalogNew[i], new_img_dim))/sum(nz(nm(oversample_image(catalogNew[i], new_img_dim))))
         errVignets[i] = oversample_image(errVignets[i], new_img_dim)
       end
     end
@@ -243,7 +243,7 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   c = size(catalogNew[1], 2)
   k = rand(1:length(catalogNew))
   println(UnicodePlots.heatmap(nz(nm(get_middle_nxn(catalogNew[k],15))), title="Sampled Vignet $k")) 
-  return catalogNew, errVignets, r, c, length(catalogNew), u_coords, v_coords
+  return catalogNew, errVignets, r, c, length(catalogNew), u_coords, v_coords, outlier_indices
 end
 
 

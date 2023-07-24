@@ -9,7 +9,7 @@ AnalyticFitParams:
   analyticFitStampSize: 64
 
 dataProcessing:
-  SnRPercentile: 0.50
+  SnRPercentile: 0.33
   sUpperBound: 1
   sLowerBound: 0.075
 

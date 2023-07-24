@@ -23,13 +23,14 @@ function outliers_filter(snr::Vector{Any}, img::Vector{Any}, wht::Vector{Matrix{
   lower_fence = q1 - k * iqr 
   upper_fence = q3 + k * iqr
   outlier_indices = findall(x -> x < q1, snr) #outlier_indices = findall(x -> x < lower_fence || x > upper_fence, snr)
+  println("━ outlier indices: $outlier_indices")
   img_snr_cleaned = img
   wht_snr_cleaned = wht
   for i in sort(outlier_indices, rev=true)
     splice!(img_snr_cleaned, i)
     splice!(wht_snr_cleaned, i)
   end
-  return img_snr_cleaned, wht_snr_cleaned
+  return img_snr_cleaned, wht_snr_cleaned, outlier_indices
 end
 
 function remove_outliers(data::AbstractVector{T}; k::Float64=1.5) where T<:Real

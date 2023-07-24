@@ -79,7 +79,7 @@ end
 fancyPrint("Processing Data for Fit")
 @time begin
   
-  starCatalog, errVignets, r, c, itr, u_coordinates, v_coordinates = cataloging(ARGS)
+  starCatalog, errVignets, r, c, itr, u_coordinates, v_coordinates, outlier_indices = cataloging(ARGS)
   starCatalog = starCatalog
   errVignets = errVignets
   u_coordinates = u_coordinates
@@ -160,7 +160,7 @@ for i in 1:length(s_model)
 end
 
 println("\n━ Blacklisted Stars: ", s_blacklist)
-println("\n━ Blacklisted $(length(s_blacklist)) stars on the basis of s < $sLowerBound or s > $sUpperBound (Failed Stars Assigned 0)" )
+println("\n━ Blacklisted $(length(s_blacklist)) stars on the basis of s < $sLowerBound or s > $sUpperBound (Failed Stars Assigned 0). NB: These blacklisted stars are being indexed after the initial removal on the basis of signal to noise, not based off of their original location in the star catalog." )
 
 for i in sort(s_blacklist, rev=true)
   splice!(starCatalog, i)
@@ -185,9 +185,9 @@ pixelGridFits = []
     global iteration = i
     
     # Format some random image data
-    data = nanToGaussian(starCatalog[i], s_model[i], g1_model[i], g2_model[i], r/2, c/2)
-    data = reshape(data, length(data))
-    #data = nanToZero(reshape(starCatalog[i], length(starCatalog[i])))
+    #data = nanToGaussian(starCatalog[i], s_model[i], g1_model[i], g2_model[i], r/2, c/2)
+    #data = reshape(data, length(data))
+    data = nanToZero(reshape(starCatalog[i], length(starCatalog[i])))
     
    
     # Train the autoencoder
