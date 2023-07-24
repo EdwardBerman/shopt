@@ -110,7 +110,7 @@ function writeFitsData(sampled_indices=sampled_indices, meanRelativeError=meanRe
   s_blacklist = np.array($s_blacklist, dtype=np.float64)
   failedStars = np.array($failedStars, dtype=np.float64)
   col00 = fits.Column(name='FLAG_SNR', array=outlier_indices, format='D')
-  col01 = fits.Column(name='FLAG_S_BLACKLIST', array=s_blacklist, format='D')
+  col01 = fits.Column(name='FLAG_S_BLACKLIST_MODEL', array=s_blacklist, format='D')
   col02 = fits.Column(name='FLAG_PIXEL_GRID_OR_S_BLACKLIST_LEARNED', array=failedStars, format='D')
   flag_hdu = fits.BinTableHDU.from_columns([col00, col01, col02])
   flag_hdu.header['EXTNAME'] = 'FLAGS'
