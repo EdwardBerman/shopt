@@ -48,7 +48,7 @@ function catalogingWEBBPSF()
   push!(catalogNew, blur(julia_array2))
   return catalogNew, rows, cols, 2
 end
-
+#=
 function gridPSFS()
   py"""
   import numpy as np
@@ -110,4 +110,4 @@ function gridPSFS()
   rows, cols = size(catalogNew[1])
   return catalogNew, rows, cols, u_coords, v_coords
 end
-
+=#
