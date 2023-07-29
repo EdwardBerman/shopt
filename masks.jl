@@ -75,3 +75,5 @@ function nanMask2(arr)
   end
   return dummyArr
 end
+
+#note to self add nan to sky background
