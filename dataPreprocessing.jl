@@ -21,6 +21,7 @@ cairomakiePlots = config["plots"]["cairomakiePlots"]["streamplots"]
 sLowerBound = config["dataProcessing"]["sLowerBound"]
 sUpperBound = config["dataProcessing"]["sUpperBound"]
 comments = config["CommentsOnRun"]
+unity_sum = config["sum_pixel_grid_and_inputs_to_unity"]
 training_ratio = config["training_ratio"]
 
 #=
@@ -45,6 +46,7 @@ println("━ Stream Plots: ", cairomakiePlots)
 println("━ s Lower Bound: ", sLowerBound)
 println("━ s Upper Bound: ", sUpperBound)
 println("━ Training Ratio: ", training_ratio)
+println("━ Sum Pixel Grid and Inputs to Unity: ", unity_sum)
 println("━ Comments: ", comments)
 
 #=
@@ -200,7 +202,12 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   catalogNew = []
   signal2noiseRatios = []
   for i in 1:length(catalog)
-    push!(catalogNew, nm(catalog[i])./sum(nz(nm(catalog[i]))))
+    if unity_sum
+      push!(catalogNew, nm(catalog[i])./sum(nz(nm(catalog[i]))))
+    else
+      push!(catalogNew, nm(catalog[i]))
+    end
+    #push!(catalogNew, nm(catalog[i])./sum(nz(nm(catalog[i]))))
     #push!(signal2noiseRatios, snr(catalog[i], errVignets[i]))
   end
   

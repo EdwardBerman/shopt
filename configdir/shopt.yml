@@ -26,5 +26,6 @@ polynomialDegree: 1
 stampSize: 131
 
 training_ratio: 0.8
+sum_pixel_grid_and_inputs_to_unity: true
 
 CommentsOnRun: "\n ** This is Where You Can Leave Comments or Notes To Self on the Run! ** \n"

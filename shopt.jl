@@ -210,7 +210,11 @@ pixelGridFits = []
       # Pass the input image through the autoencoder to get the reconstructed image
       reconstructed_image = autoencoder(data) #autoencoder(input_image)
 
-      pgf_current = reshape(reconstructed_image, (r, c))./sum(reshape(reconstructed_image, (r, c)))
+      if unity_sum
+        pgf_current = reshape(reconstructed_image, (r, c))./sum(reshape(reconstructed_image, (r, c)))
+      else
+        pgf_current = reshape(reconstructed_image, (r, c))
+      end
       push!(pixelGridFits, pgf_current)
     catch ex
       println(ex)
