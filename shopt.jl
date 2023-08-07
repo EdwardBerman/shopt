@@ -49,7 +49,7 @@ fancyPrint("Handling Imports")
   using Flux
   using Flux.Optimise
   using Flux.Losses
-  using Flux: onehotbatch, throttle, @epochs, mse, msle
+  using Flux: onehotbatch, throttle, @epochs, mse, msle, mae
   using CairoMakie
   using Dates
   #using Interpolations
@@ -67,10 +67,11 @@ fancyPrint("Reading .jl Files")
   include("dataOutprocessing.jl")
   include("powerSpectrum.jl")
   include("kaisserSquires.jl")
-  include("webbpsfProcessing.jl")
+  #include("webbpsfProcessing.jl")
   include("interpolate.jl")
   include("dataPreprocessing.jl")
   include("pixelGridAutoencoder.jl")
+  include("lk.jl")
 end
 # ---------------------------------------------------------#
 #fancyPrint("Running Source Extractor")
@@ -178,55 +179,58 @@ failedStars = []
 fancyPrint("Pixel Grid Fit")
 pixelGridFits = []
 
-@time begin
-  pb = tqdm(1:length(starCatalog))
-  for i in pb
-    set_description(pb, "Star $i/$(length(starCatalog)) Complete")
-    global iteration = i
-    
-    # Format some random image data
-    #data = nanToGaussian(starCatalog[i], s_model[i], g1_model[i], g2_model[i], r/2, c/2)
-    #data = reshape(data, length(data))
-    data = nanToZero(reshape(starCatalog[i], length(starCatalog[i])))
-    
-   
-    # Train the autoencoder
-    try
-      min_gradient = minPixelGradient
-      for epoch in 1:epochs
-        Flux.train!(loss, Flux.params(autoencoder), [(data,)], optimizer) #loss#Flux.params(autoencoder))
-        grad = Flux.gradient(Flux.params(autoencoder)) do
-          loss(data)
-        end
-        grad_norm = norm(grad)
-        if (grad_norm < min_gradient) #min_gradient
-          #println(epoch)
-          break
-        end
-      end
-      # Take a sample input image
-      #input_image = reshape(starCatalog[i], length(starCatalog[i]))
-  
-      # Pass the input image through the autoencoder to get the reconstructed image
-      reconstructed_image = autoencoder(data) #autoencoder(input_image)
+if mode == "autoencoder"
+  println("━ Autoencoder Mode...")
+  @time begin
+    pb = tqdm(1:length(starCatalog))
+    for i in pb
+      set_description(pb, "Star $i/$(length(starCatalog)) Complete")
+      global iteration = i
+      
+      # Format some random image data
+      #data = nanToGaussian(starCatalog[i], s_model[i], g1_model[i], g2_model[i], r/2, c/2)
+      #data = reshape(data, length(data))
+      data = nanToZero(reshape(starCatalog[i], length(starCatalog[i])))
+      #data = Float32.(reshape(nanToZero(starCatalog[i]), r, c, 1, 1))
+      
+      # Train the autoencoder
+      #data_x̂ = sample_image(autoencoder(data_x),r)
+      try
+        min_gradient = minPixelGradient
+        for epoch in 1:epochs
+          Flux.train!(loss, Flux.params(autoencoder), [(data, )], optimizer) #loss#Flux.params(autoencoder))
 
-      if unity_sum
-        pgf_current = reshape(reconstructed_image, (r, c))./sum(reshape(reconstructed_image, (r, c)))
-      else
-        pgf_current = reshape(reconstructed_image, (r, c))
+          grad = Flux.gradient(Flux.params(autoencoder)) do
+            loss(data)
+          end
+          grad_norm = norm(grad)
+          if (grad_norm < min_gradient) #min_gradient
+            #println(epoch)
+            break
+          end
+        end
+        # Take a sample input image
+        #input_image = reshape(starCatalog[i], length(starCatalog[i]))
+    
+        # Pass the input image through the autoencoder to get the reconstructed image
+        reconstructed_image = autoencoder(data) #autoencoder(input_image)
+
+        if unity_sum
+          pgf_current = reshape(reconstructed_image, (r, c))./sum(reshape(reconstructed_image, (r, c)))
+        else
+          pgf_current = reshape(reconstructed_image, (r, c))
+        end
+        push!(pixelGridFits, pgf_current)
+      catch ex
+        println(ex)
+        println("Star $i failed")
+        push!(failedStars, i)
+        push!(pixelGridFits, zeros(r,c))
+        continue
       end
-      push!(pixelGridFits, pgf_current)
-    catch ex
-      println(ex)
-      println("Star $i failed")
-      push!(failedStars, i)
-      push!(pixelGridFits, zeros(r,c))
-      continue
     end
-
   end
 end
-
 GC.gc()
 
 

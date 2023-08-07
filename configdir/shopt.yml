@@ -1,6 +1,8 @@
 saveYaml: true
 
-mode: autoencoder # Options: auotoencoder, lanczos
+mode: "auotoencoder" # Options: auotoencoder, PCA. Make sure mode is a string with double quotes
+
+PCAterms: 6
 
 NNparams:
   epochs: 100
@@ -11,7 +13,7 @@ AnalyticFitParams:
   analyticFitStampSize: 64
 
 dataProcessing:
-  SnRPercentile: 0.33
+  SnRPercentile: 0.5
   sUpperBound: 1
   sLowerBound: 0.075
 
@@ -27,7 +29,7 @@ plots:
 polynomialDegree: 1
 stampSize: 130 
 
-training_ratio: 0.8
+training_ratio: 0.9
 sum_pixel_grid_and_inputs_to_unity: true
 
 summary_name: ''

@@ -23,12 +23,19 @@ sUpperBound = config["dataProcessing"]["sUpperBound"]
 comments = config["CommentsOnRun"]
 unity_sum = config["sum_pixel_grid_and_inputs_to_unity"]
 training_ratio = config["training_ratio"]
+summary_name = config["summary_name"]
+mode = config["mode"] # Options: auotoencoder, lanczos
+PCAterms = config["PCAterms"]
+
 
 #=
 Log these config choices
 =#
 
 println("Key Config Choices:")
+println("━ Mode: ", mode)
+println("━ Summary Name: ", summary_name)
+println("━ PCA Terms: ", PCAterms)
 println("━ Max Epochs: ", epochs)
 println("━ Polynomial Degree: ", degree)
 println("━ Stamp Size: ", new_img_dim)
@@ -90,6 +97,14 @@ end
 function undersample_image(image, new_dim)
   undersampled_image = imresize(image, new_dim, new_dim, algorithm =:bicubic)
   return undersampled_image
+end
+
+function sample_image(image, new_dim)
+  if new_dim > size(image)[1]
+    return oversample_image(image, new_dim)
+  else
+    return undersample_image(image, new_dim)
+  end
 end
 #=
 function undersample_image(image, new_dim)

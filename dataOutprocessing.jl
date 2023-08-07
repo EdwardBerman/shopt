@@ -23,7 +23,7 @@ function readData()
   DataFrame(CSV.File(joinpath("outdir", "df.shopt")))
 end
 
-function writeFitsData(sampled_indices=sampled_indices, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, fancyPrint=fancyPrint, training_stars=training_stars, training_u_coords=training_u_coords, training_v_coords=training_v_coords, validation_stars=validation_stars, validation_u_coords=validation_u_coords, validation_v_coords=validation_v_coords, validation_star_catalog=validation_star_catalog, degree=degree, YAMLSAVE=YAMLSAVE, parametersHistogram=parametersHistogram, parametersScatterplot=parametersScatterplot, cairomakiePlots=cairomakiePlots, pythonPlots=pythonPlots, outlier_indices=outlier_indices , failedStars=failedStars, s_blacklist=s_blacklist)
+function writeFitsData(summary_name=summary_name, sampled_indices=sampled_indices, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, fancyPrint=fancyPrint, training_stars=training_stars, training_u_coords=training_u_coords, training_v_coords=training_v_coords, validation_stars=validation_stars, validation_u_coords=validation_u_coords, validation_v_coords=validation_v_coords, validation_star_catalog=validation_star_catalog, degree=degree, YAMLSAVE=YAMLSAVE, parametersHistogram=parametersHistogram, parametersScatterplot=parametersScatterplot, cairomakiePlots=cairomakiePlots, pythonPlots=pythonPlots, outlier_indices=outlier_indices , failedStars=failedStars, s_blacklist=s_blacklist)
   
   m, n = size(starCatalog[1])
   array_3d = zeros(m, n, length(starCatalog))
@@ -47,6 +47,7 @@ function writeFitsData(sampled_indices=sampled_indices, s_model=s_model, g1_mode
   end
   errVignets = array_3d
   =#
+  summary_name = summary_name*"summary.shopt"
 
   py"""
   from astropy.io import fits
@@ -118,10 +119,11 @@ function writeFitsData(sampled_indices=sampled_indices, s_model=s_model, g1_mode
   flag_hdu.header['EXTNAME'] = 'FLAGS'
 
   hdul = fits.HDUList([hdu1, summary_statistics_hdu, VIGNETS_hdu, pixelGridFits_hdu, validation_hdu, flag_hdu])
-
-  hdul.writeto('summary.shopt', overwrite=True)
+  py_summary_name = $summary_name
+  hdul.writeto(py_summary_name, overwrite=True)
   """
-  command1 = `mv summary.shopt $outdir`
+
+  command1 = `mv $summary_name $outdir`
   run(command1)
 
   if YAMLSAVE
@@ -337,7 +339,7 @@ function writeFitsData(sampled_indices=sampled_indices, s_model=s_model, g1_mode
   command4 = `mv $outdir/$(Dates.format(Time(current_time), "HH:MM:SS")*"_shopt.yml")  $py_outdir`
   run(command4)
   
-  command5 = `mv $outdir/summary.shopt  $py_outdir`
+  command5 = `cp $outdir/$summary_name  $py_outdir`
   run(command5)
   
   if cairomakiePlots 
