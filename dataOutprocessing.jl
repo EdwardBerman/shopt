@@ -23,7 +23,7 @@ function readData()
   DataFrame(CSV.File(joinpath("outdir", "df.shopt")))
 end
 
-function writeFitsData(summary_name=summary_name, sampled_indices=sampled_indices, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, fancyPrint=fancyPrint, training_stars=training_stars, training_u_coords=training_u_coords, training_v_coords=training_v_coords, validation_stars=validation_stars, validation_u_coords=validation_u_coords, validation_v_coords=validation_v_coords, validation_star_catalog=validation_star_catalog, degree=degree, YAMLSAVE=YAMLSAVE, parametersHistogram=parametersHistogram, parametersScatterplot=parametersScatterplot, cairomakiePlots=cairomakiePlots, pythonPlots=pythonPlots, outlier_indices=outlier_indices , failedStars=failedStars, s_blacklist=s_blacklist)
+function writeFitsData(g2C = g2C, g1C = g1C, sC = sC, summary_name=summary_name, sampled_indices=sampled_indices, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, fancyPrint=fancyPrint, training_stars=training_stars, training_u_coords=training_u_coords, training_v_coords=training_v_coords, validation_stars=validation_stars, validation_u_coords=validation_u_coords, validation_v_coords=validation_v_coords, validation_star_catalog=validation_star_catalog, degree=degree, YAMLSAVE=YAMLSAVE, parametersHistogram=parametersHistogram, parametersScatterplot=parametersScatterplot, cairomakiePlots=cairomakiePlots, pythonPlots=pythonPlots, outlier_indices=outlier_indices , failedStars=failedStars, s_blacklist=s_blacklist)
   
   m, n = size(starCatalog[1])
   array_3d = zeros(m, n, length(starCatalog))
@@ -53,6 +53,9 @@ function writeFitsData(summary_name=summary_name, sampled_indices=sampled_indice
   from astropy.io import fits
   import numpy as np
   
+  sC = np.array($sC, dtype=np.float64)
+  g1C = np.array($g1C, dtype=np.float64)
+  g2C = np.array($g2C, dtype=np.float64)
   s_model = np.array($s_model, dtype=np.float64)
   g1_model = np.array($g1_model, dtype=np.float64)
   g2_model = np.array($g2_model, dtype=np.float64)
@@ -106,6 +109,13 @@ function writeFitsData(summary_name=summary_name, sampled_indices=sampled_indice
   validation_hdu = fits.ImageHDU(validation_stars)
   validation_hdu.header['EXTNAME'] = 'VALIDATION_STARS'
 
+  s_col = fits.Column(name='s_MATRIX', array=sC, format='D')
+  g1_col = fits.Column(name='g1_MATRIX', array=g1C, format='D')
+  g2_col = fits.Column(name='g2_MATRIX', array=g2C, format='D')
+
+  analytic_profile_hdu = fits.BinTableHDU.from_columns([s_col, g1_col, g2_col])
+  analytic_profile_hdu.header['EXTNAME'] = 'ANALYTIC_PROFILE'
+
   summary_statistics_hdu = fits.BinTableHDU.from_columns([c00, c01, c02, c03, c04, c05, c1, c2, c3, c4, c5, c6, c7]) 
   summary_statistics_hdu.header['EXTNAME'] = 'SUMMARY_STATISTICS'
   
@@ -118,7 +128,7 @@ function writeFitsData(summary_name=summary_name, sampled_indices=sampled_indice
   flag_hdu = fits.BinTableHDU.from_columns([col00, col01, col02])
   flag_hdu.header['EXTNAME'] = 'FLAGS'
 
-  hdul = fits.HDUList([hdu1, summary_statistics_hdu, VIGNETS_hdu, pixelGridFits_hdu, validation_hdu, flag_hdu])
+  hdul = fits.HDUList([hdu1, summary_statistics_hdu, VIGNETS_hdu, pixelGridFits_hdu, validation_hdu, flag_hdu, analytic_profile_hdu])
   py_summary_name = $summary_name
   hdul.writeto(py_summary_name, overwrite=True)
   """

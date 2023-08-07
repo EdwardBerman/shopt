@@ -26,7 +26,7 @@ training_ratio = config["training_ratio"]
 summary_name = config["summary_name"]
 mode = config["mode"] # Options: auotoencoder, lanczos
 PCAterms = config["PCAterms"]
-
+polynomial_interpolation_stopping_gradient = config["polynomial_interpolation_stopping_gradient"]
 
 #=
 Log these config choices
@@ -36,6 +36,7 @@ println("Key Config Choices:")
 println("━ Mode: ", mode)
 println("━ Summary Name: ", summary_name)
 println("━ PCA Terms: ", PCAterms)
+println("━ Polynomial Interpolation Stopping Gradient: ", polynomial_interpolation_stopping_gradient)
 println("━ Max Epochs: ", epochs)
 println("━ Polynomial Degree: ", degree)
 println("━ Stamp Size: ", new_img_dim)

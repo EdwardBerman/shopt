@@ -43,6 +43,7 @@ fancyPrint("Handling Imports")
   using FFTW
   using CSV
   using Images, ImageFiltering
+  using ImageTransformations
   using Measures
   using ProgressBars
   using UnicodePlots
@@ -68,9 +69,8 @@ fancyPrint("Reading .jl Files")
   include("dataOutprocessing.jl")
   include("powerSpectrum.jl")
   include("kaisserSquires.jl")
-  #include("webbpsfProcessing.jl")
-  include("interpolate.jl")
   include("dataPreprocessing.jl")
+  include("interpolate.jl")
   include("pixelGridAutoencoder.jl")
   include("pca.jl")
   #include("lk.jl")

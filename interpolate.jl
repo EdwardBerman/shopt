@@ -108,20 +108,7 @@ function polynomial_optimizer(degree, x_data, y_data, z_data)
     loss = sum((objective_function(p, x_val, y_val, degree) - z_actual)^2  for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
     return loss
   end 
-  result = optimize(objective, initial_guess, autodiff=:forward, LBFGS(), Optim.Options(f_tol=1e-40)) #autodiff=:forward 
+  result = optimize(objective, initial_guess, autodiff=:forward, LBFGS(), Optim.Options(g_tol = polynomial_interpolation_stopping_gradient, f_tol=1e-40)) #autodiff=:forward 
   return Optim.minimizer(result)
 end
 
-#=
-I = optimize(interpCost, polyG!, rand(10), ConjugateGradient())
-learnedPolynomial = zeros(10,10)
-IC = I.minimizer
-
-for i in 1:10
-  for j in 1:10
-    learnedPolynomial[i,j] = IC[1]*i^3 + IC[2]*j^3 + IC[3]*i^2*j + IC[4]*j^2*i + IC[5]*i^2 + IC[6]*j^2 + IC[7]*i*j + IC[8]*i + IC[9]*j + IC[10]
-  end
-end
-
-plot(heatmap(my_truth), heatmap(learnedPolynomial), heatmap(my_truth - learnedPolynomial))
-=#

@@ -40,7 +40,7 @@ function nanToZero(arr)
   for i in 1:size(arr,1)
     for j in 1:size(arr,2)
       if isnan(arr[i,j])
-        dummyArr[i,j] = 0
+        dummyArr[i,j] = 0.001
       else
         dummyArr[i,j] = arr[i,j]
       end
