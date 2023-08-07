@@ -52,6 +52,7 @@ fancyPrint("Handling Imports")
   using Flux: onehotbatch, throttle, @epochs, mse, msle, mae
   using CairoMakie
   using Dates
+  using MultivariateStats
   #using Interpolations
 end
 println("━ Start Time ", Dates.now())
@@ -71,7 +72,8 @@ fancyPrint("Reading .jl Files")
   include("interpolate.jl")
   include("dataPreprocessing.jl")
   include("pixelGridAutoencoder.jl")
-  include("lk.jl")
+  include("pca.jl")
+  #include("lk.jl")
 end
 # ---------------------------------------------------------#
 #fancyPrint("Running Source Extractor")
@@ -231,6 +233,29 @@ if mode == "autoencoder"
     end
   end
 end
+
+if mode == "PCA"
+  @time begin
+    pb = tqdm(1:length(starCatalog))
+    for i in pb
+      set_description(pb, "Star $i/$(length(starCatalog)) Complete")
+      global iteration = i
+      data = nanToZero(starCatalog[i])
+      try
+        push!(pixelGridFits, pca_image(nanToZero(reshape(starCatalog[i], (r,c))) ,PCAterms))
+      catch
+        println("Star $i failed")
+        push!(failedStars, i)
+        push!(pixelGridFits, zeros(r,c))
+        continue
+      end
+
+    end
+  end
+end
+
+
+
 GC.gc()
 
 

@@ -1,12 +1,12 @@
 saveYaml: true
 
-mode: "auotoencoder" # Options: auotoencoder, PCA. Make sure mode is a string with double quotes
+mode: "PCA" # Options: auotoencoder, PCA. Make sure mode is a string with double quotes
 
-PCAterms: 6
+PCAterms: 500
 
 NNparams:
   epochs: 100
-  minGradientPixel: 1e-6
+  minGradientPixel: 1e-5
 AnalyticFitParams:
   minGradientAnalyticModel: 1e-6
   minGradientAnalyticLearned: 1e-6
