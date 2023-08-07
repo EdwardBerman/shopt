@@ -1,8 +1,10 @@
 saveYaml: true
 
+mode: autoencoder # Options: auotoencoder, lanczos
+
 NNparams:
   epochs: 100
-  minGradientPixel: 1e-5
+  minGradientPixel: 1e-6
 AnalyticFitParams:
   minGradientAnalyticModel: 1e-6
   minGradientAnalyticLearned: 1e-6
@@ -23,9 +25,10 @@ plots:
   pythonPlots: false
 
 polynomialDegree: 1
-stampSize: 131
+stampSize: 130 
 
 training_ratio: 0.8
 sum_pixel_grid_and_inputs_to_unity: true
 
-CommentsOnRun: "\n ** This is Where You Can Leave Comments or Notes To Self on the Run! ** \n"
+summary_name: ''
+CommentsOnRun: "f115w_mosaic_mock"
