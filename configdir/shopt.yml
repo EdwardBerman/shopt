@@ -4,6 +4,8 @@ mode: "PCA" # Options: auotoencoder, PCA. Make sure mode is a string with double
 
 PCAterms: 50
 
+lanczos: 5
+
 NNparams:
   epochs: 100
   minGradientPixel: 1e-5
@@ -30,9 +32,9 @@ polynomialDegree: 1
 stampSize: 130 
 
 training_ratio: 0.9
-sum_pixel_grid_and_inputs_to_unity: true
+sum_pixel_grid_and_inputs_to_unity: false
 
 polynomial_interpolation_stopping_gradient: 1e-12
 
 summary_name: ''
-CommentsOnRun: "f115w_mosaic_mock"
+CommentsOnRun: "** This is where you can leave comments or notes to self on the run! **"
