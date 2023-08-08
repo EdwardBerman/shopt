@@ -27,7 +27,7 @@ summary_name = config["summary_name"]
 mode = config["mode"] # Options: auotoencoder, lanczos
 PCAterms = config["PCAterms"]
 polynomial_interpolation_stopping_gradient = config["polynomial_interpolation_stopping_gradient"]
-
+lanczos = config["lanczos"]
 #=
 Log these config choices
 =#
@@ -36,6 +36,7 @@ println("Key Config Choices:")
 println("━ Mode: ", mode)
 println("━ Summary Name: ", summary_name)
 println("━ PCA Terms: ", PCAterms)
+println("━ Lanczos n: ", lanczos)
 println("━ Polynomial Interpolation Stopping Gradient: ", polynomial_interpolation_stopping_gradient)
 println("━ Max Epochs: ", epochs)
 println("━ Polynomial Degree: ", degree)
@@ -70,6 +71,53 @@ function countNaNs(arr)
     end
     
     return count
+end
+
+function sinc(x)
+    if x == 0
+        return 1
+    else
+        return sin(x) / x
+    end
+end
+
+function lanczos_kernel(x, a)
+    if abs(x) >= a
+        return 0
+    elseif x == 0
+        return 1
+    else
+        return a * sinc(pi*x) * sinc(pi*x/a)
+    end
+end
+
+function smooth(data, a)
+    kernel = [lanczos_kernel(i, a) * lanczos_kernel(j, a) for i in -a:a, j in -a:a]
+    kernel = kernel ./ sum(kernel)  # Normalize the kernel
+
+    nx, ny = size(data)
+    smoothed_data = copy(data)  # Initialize with original data to keep NaN positions
+
+    for i in 1:nx
+        for j in 1:ny
+            if isnan(data[i, j])
+                continue  # Skip smoothing for NaN values
+            end
+            norm_factor = 0.0  # This is to normalize considering non-NaN values
+            smoothed_value = 0.0
+            for di in max(1, i-a):min(nx, i+a)
+                for dj in max(1, j-a):min(ny, j+a)
+                    if !isnan(data[di, dj])
+                        smoothed_value += kernel[di-i+a+1, dj-j+a+1] * data[di, dj]
+                        norm_factor += kernel[di-i+a+1, dj-j+a+1]
+                    end
+                end
+            end
+            smoothed_data[i, j] = smoothed_value / norm_factor
+        end
+    end
+
+    return smoothed_data
 end
 
 function oversample_image(image, new_dim)
@@ -253,12 +301,12 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   if new_img_dim/size(catalogNew[1], 1) !=1
     if new_img_dim/size(catalogNew[1], 1) < 1
       for i in 1:length(catalogNew)
-        catalogNew[i] = nm(get_middle_nxn(catalogNew[i], new_img_dim))/sum(nz(nm(get_middle_nxn(catalogNew[i], new_img_dim))))
+        catalogNew[i] = smooth(nm(get_middle_nxn(catalogNew[i], new_img_dim))/sum(nz(nm(get_middle_nxn(catalogNew[i], new_img_dim)))), lanczos)
         #errVignets[i] = get_middle_nxn(errVignets[i], new_img_dim)
       end
     else
       for i in 1:length(catalogNew)
-        catalogNew[i] = nm(oversample_image(catalogNew[i], new_img_dim))/sum(nz(nm(oversample_image(catalogNew[i], new_img_dim))))
+        catalogNew[i] = smooth(nm(oversample_image(catalogNew[i], new_img_dim))/sum(nz(nm(oversample_image(catalogNew[i], new_img_dim)))), lanczos)
         #errVignets[i] = oversample_image(errVignets[i], new_img_dim)
       end
     end

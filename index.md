@@ -30,6 +30,11 @@ We adopt the following procedure to ensure our gradient steps never take us outs
 ![image](READMEassets/reparameterization.png)
 
 ### Pixel Grid Fits                                                                                                        
+
+#### PCA Mode 
+We used the first n weights of a Principal Component Analysis and use that to construct our PSF in addition to a smoothing kernel to account for aliasing
+                                                                                                                                                                             
+#### Autoencoder Mode                                                                                                                                                      
 For doing Pixel Grid Fits we use an autoencoder model to reconstruct the Star                                              
 ![image](READMEassets/nn.png) 
 

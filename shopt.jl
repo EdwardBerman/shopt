@@ -242,7 +242,11 @@ if mode == "PCA"
       global iteration = i
       data = nanToZero(starCatalog[i])
       try
-        push!(pixelGridFits, pca_image(nanToZero(reshape(starCatalog[i], (r,c))) ,PCAterms))
+        if unity_sum
+          push!(pixelGridFits, smooth(pca_image(data,PCAterms), lanczos)./sum(smooth(pca_image(data,PCAterms), lanczos)))
+        else
+          push!(pixelGridFits, smooth(pca_image(data,PCAterms), lanczos))
+        end
       catch
         println("Star $i failed")
         push!(failedStars, i)
