@@ -447,7 +447,11 @@ end
 
 GC.gc()
 
-sampled_indices = sort(sample_indices(validation_indices, 3))
+try
+  sampled_indices = sort(sample_indices(validation_indices, 3))
+catch
+  sampled_indices = rand(3)
+end
 #=
 println("Sampled indices: ", sampled_indices)
 meanRelativeError = []

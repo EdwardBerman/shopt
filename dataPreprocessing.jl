@@ -28,6 +28,9 @@ mode = config["mode"] # Options: auotoencoder, lanczos
 PCAterms = config["PCAterms"]
 polynomial_interpolation_stopping_gradient = config["polynomial_interpolation_stopping_gradient"]
 lanczos = config["lanczos"]
+truncate_summary_file = config["truncate_summary_file"]
+
+
 #=
 Log these config choices
 =#
@@ -56,6 +59,7 @@ println("━ s Lower Bound: ", sLowerBound)
 println("━ s Upper Bound: ", sUpperBound)
 println("━ Training Ratio: ", training_ratio)
 println("━ Sum Pixel Grid and Inputs to Unity: ", unity_sum)
+println("━ Truncate Summary File: ", truncate_summary_file)
 println("━ Comments: ", comments)
 
 #=

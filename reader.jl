@@ -18,9 +18,14 @@ function read_shopt(shoptFile)
   f = fits.open(shoptFile)
   polyMatrix = f[0].data
   degree = f[1].data['POLYNOMIAL_DEGREE'][0]
-  s_matrix = f[6].data['s_MATRIX']
-  g1_matrix = f[6].data['g1_MATRIX']
-  g2_matrix = f[6].data['g2_MATRIX']
+  try:
+    s_matrix = f[6].data['s_MATRIX']
+    g1_matrix = f[6].data['g1_MATRIX']
+    g2_matrix = f[6].data['g2_MATRIX']
+  except:
+    g1_matrix = f[3].data['g1_MATRIX']
+    g2_matrix = f[3].data['g2_MATRIX']
+    s_matrix = f[3].data['s_MATRIX']
   """
   polynomialMatrix = convert(Array{Float64,3}, py"polyMatrix")
   degree = convert(Int64, py"degree")

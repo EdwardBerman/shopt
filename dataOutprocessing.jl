@@ -23,7 +23,7 @@ function readData()
   DataFrame(CSV.File(joinpath("outdir", "df.shopt")))
 end
 
-function writeFitsData(g2C = g2C, g1C = g1C, sC = sC, summary_name=summary_name, sampled_indices=sampled_indices, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, fancyPrint=fancyPrint, training_stars=training_stars, training_u_coords=training_u_coords, training_v_coords=training_v_coords, validation_stars=validation_stars, validation_u_coords=validation_u_coords, validation_v_coords=validation_v_coords, validation_star_catalog=validation_star_catalog, degree=degree, YAMLSAVE=YAMLSAVE, parametersHistogram=parametersHistogram, parametersScatterplot=parametersScatterplot, cairomakiePlots=cairomakiePlots, pythonPlots=pythonPlots, outlier_indices=outlier_indices , failedStars=failedStars, s_blacklist=s_blacklist)
+function writeFitsData(truncate_summary_file = truncate_summary_file, g2C = g2C, g1C = g1C, sC = sC, summary_name=summary_name, sampled_indices=sampled_indices, s_model=s_model, g1_model=g1_model, g2_model=g2_model, s_data=s_data, g1_data=g1_data, g2_data=g2_data, u_coordinates = u_coordinates, v_coordinates = v_coordinates, PolynomialMatrix = PolynomialMatrix, outdir = outdir, configdir=configdir, starCatalog = starCatalog, pixelGridFits=pixelGridFits, fancyPrint=fancyPrint, training_stars=training_stars, training_u_coords=training_u_coords, training_v_coords=training_v_coords, validation_stars=validation_stars, validation_u_coords=validation_u_coords, validation_v_coords=validation_v_coords, validation_star_catalog=validation_star_catalog, degree=degree, YAMLSAVE=YAMLSAVE, parametersHistogram=parametersHistogram, parametersScatterplot=parametersScatterplot, cairomakiePlots=cairomakiePlots, pythonPlots=pythonPlots, outlier_indices=outlier_indices , failedStars=failedStars, s_blacklist=s_blacklist)
   
   m, n = size(starCatalog[1])
   array_3d = zeros(m, n, length(starCatalog))
@@ -49,89 +49,125 @@ function writeFitsData(g2C = g2C, g1C = g1C, sC = sC, summary_name=summary_name,
   =#
   summary_name = summary_name*"summary.shopt"
 
-  py"""
-  from astropy.io import fits
-  import numpy as np
-  
-  sC = np.array($sC, dtype=np.float64)
-  g1C = np.array($g1C, dtype=np.float64)
-  g2C = np.array($g2C, dtype=np.float64)
-  s_model = np.array($s_model, dtype=np.float64)
-  g1_model = np.array($g1_model, dtype=np.float64)
-  g2_model = np.array($g2_model, dtype=np.float64)
-  s_data = np.array($s_data, dtype=np.float64)
-  g1_data = np.array($g1_data, dtype=np.float64)
-  g2_data = np.array($g2_data, dtype=np.float64)
-  u_coordinates = np.array($u_coordinates, dtype=np.float64)
-  v_coordinates = np.array($v_coordinates, dtype=np.float64)
-  PolynomialMatrix = np.array($PolynomialMatrix, dtype=np.float64)
-  starCatalog = np.array($starCatalog, dtype=np.float64)
-  pixelGridFits = np.array($pixelGridFits, dtype=np.float64)
-  #errVignets = np.array($errVignets, dtype=np.float64)
-  #meanRelativeError = np.array($meanRelativeError, dtype=np.float64)
-  training_u_coords = np.array($training_u_coords, dtype=np.float64)
-  training_v_coords = np.array($training_v_coords, dtype=np.float64)
-  validation_u_coords = np.array($validation_u_coords, dtype=np.float64)
-  validation_v_coords = np.array($validation_v_coords, dtype=np.float64)
-  training_stars = np.array($training_stars, dtype=np.float64)
-  validation_stars = np.array($validation_stars, dtype=np.float64)
-  deg_element = $degree
-  degree_array = np.array([deg_element], dtype=np.float64)
+  if truncate_summary_file
+    py"""
+    from astropy.io import fits
+    import numpy as np
 
-  hdu1 = fits.PrimaryHDU(PolynomialMatrix)
-  hdu1.header['EXTNAME'] = 'POLYNOMIAL_MATRIX'
-  
-  c00 = fits.Column(name='U_COORDINATES', array=u_coordinates, format='D')
-  c01 = fits.Column(name='V_COORDINATES', array=v_coordinates, format='D')
-  c02 = fits.Column(name='TRAINING_U_COORDS', array=training_u_coords, format='D')
-  c03 = fits.Column(name='TRAINING_V_COORDS', array=training_v_coords, format='D')
-  c04 = fits.Column(name='VALIDATION_U_COORDS', array=validation_u_coords, format='D')
-  c05 = fits.Column(name='VALIDATION_V_COORDS', array=validation_v_coords, format='D')
-  c1 = fits.Column(name='S_MODEL', array=s_model, format='D')
-  c2 = fits.Column(name='g1_MODEL', array=g1_model, format='D')
-  c3 = fits.Column(name='g2_MODEL', array=g2_model, format='D')
-  c4 = fits.Column(name='s_DATA', array=s_data, format='D')
-  c5 = fits.Column(name='g1_DATA', array=g1_data, format='D')
-  c6 = fits.Column(name='g2_DATA', array=g2_data, format='D')
-  #c7 = fits.Column(name='MEAN_RELATIVE_ERROR', array=meanRelativeError, format='D')
-  c7 = fits.Column(name='POLYNOMIAL_DEGREE', array=degree_array, format='D')
+    PolynomialMatrix = np.array($PolynomialMatrix, dtype=np.float64)
+    deg_element = $degree
+    degree_array = np.array([deg_element], dtype=np.float64)
+    
+    c = fits.Column(name='POLYNOMIAL_DEGREE', array=degree_array, format='D')
+    
+    sC = np.array($sC, dtype=np.float64)
+    g1C = np.array($g1C, dtype=np.float64)
+    g2C = np.array($g2C, dtype=np.float64)
+    
+    summary_statistics_hdu = fits.BinTableHDU.from_columns([c7]) 
+    summary_statistics_hdu.header['EXTNAME'] = 'SUMMARY_STATISTICS'
+    
+    hdu1 = fits.PrimaryHDU(PolynomialMatrix)
+    hdu1.header['EXTNAME'] = 'POLYNOMIAL_MATRIX'
+    
+    s_col = fits.Column(name='s_MATRIX', array=sC, format='D')
+    g1_col = fits.Column(name='g1_MATRIX', array=g1C, format='D')
+    g2_col = fits.Column(name='g2_MATRIX', array=g2C, format='D')
+
+    analytic_profile_hdu = fits.BinTableHDU.from_columns([s_col, g1_col, g2_col])
+    analytic_profile_hdu.header['EXTNAME'] = 'ANALYTIC_PROFILE'
+    
+    hdul = fits.HDUList([hdu1, summary_statistics_hdu, analytic_profile_hdu])
+    py_summary_name = $summary_name
+    hdul.writeto(py_summary_name, overwrite=True)
+    
+    """
+  else
+
+    py"""
+    from astropy.io import fits
+    import numpy as np
+    
+    sC = np.array($sC, dtype=np.float64)
+    g1C = np.array($g1C, dtype=np.float64)
+    g2C = np.array($g2C, dtype=np.float64)
+    s_model = np.array($s_model, dtype=np.float64)
+    g1_model = np.array($g1_model, dtype=np.float64)
+    g2_model = np.array($g2_model, dtype=np.float64)
+    s_data = np.array($s_data, dtype=np.float64)
+    g1_data = np.array($g1_data, dtype=np.float64)
+    g2_data = np.array($g2_data, dtype=np.float64)
+    u_coordinates = np.array($u_coordinates, dtype=np.float64)
+    v_coordinates = np.array($v_coordinates, dtype=np.float64)
+    PolynomialMatrix = np.array($PolynomialMatrix, dtype=np.float64)
+    starCatalog = np.array($starCatalog, dtype=np.float64)
+    pixelGridFits = np.array($pixelGridFits, dtype=np.float64)
+    #errVignets = np.array($errVignets, dtype=np.float64)
+    #meanRelativeError = np.array($meanRelativeError, dtype=np.float64)
+    training_u_coords = np.array($training_u_coords, dtype=np.float64)
+    training_v_coords = np.array($training_v_coords, dtype=np.float64)
+    validation_u_coords = np.array($validation_u_coords, dtype=np.float64)
+    validation_v_coords = np.array($validation_v_coords, dtype=np.float64)
+    training_stars = np.array($training_stars, dtype=np.float64)
+    validation_stars = np.array($validation_stars, dtype=np.float64)
+    deg_element = $degree
+    degree_array = np.array([deg_element], dtype=np.float64)
+
+    hdu1 = fits.PrimaryHDU(PolynomialMatrix)
+    hdu1.header['EXTNAME'] = 'POLYNOMIAL_MATRIX'
+    
+    c00 = fits.Column(name='U_COORDINATES', array=u_coordinates, format='D')
+    c01 = fits.Column(name='V_COORDINATES', array=v_coordinates, format='D')
+    c02 = fits.Column(name='TRAINING_U_COORDS', array=training_u_coords, format='D')
+    c03 = fits.Column(name='TRAINING_V_COORDS', array=training_v_coords, format='D')
+    c04 = fits.Column(name='VALIDATION_U_COORDS', array=validation_u_coords, format='D')
+    c05 = fits.Column(name='VALIDATION_V_COORDS', array=validation_v_coords, format='D')
+    c1 = fits.Column(name='S_MODEL', array=s_model, format='D')
+    c2 = fits.Column(name='g1_MODEL', array=g1_model, format='D')
+    c3 = fits.Column(name='g2_MODEL', array=g2_model, format='D')
+    c4 = fits.Column(name='s_DATA', array=s_data, format='D')
+    c5 = fits.Column(name='g1_DATA', array=g1_data, format='D')
+    c6 = fits.Column(name='g2_DATA', array=g2_data, format='D')
+    #c7 = fits.Column(name='MEAN_RELATIVE_ERROR', array=meanRelativeError, format='D')
+    c7 = fits.Column(name='POLYNOMIAL_DEGREE', array=degree_array, format='D')
 
 
-  VIGNETS_hdu = fits.ImageHDU(starCatalog)
-  VIGNETS_hdu.header['EXTNAME'] = 'VIGNETS'
+    VIGNETS_hdu = fits.ImageHDU(starCatalog)
+    VIGNETS_hdu.header['EXTNAME'] = 'VIGNETS'
 
-  #errVignets_hdu = fits.ImageHDU(errVignets)
-  #errVignets_hdu.header['EXTNAME'] = 'ERR_VIGNETS'
+    #errVignets_hdu = fits.ImageHDU(errVignets)
+    #errVignets_hdu.header['EXTNAME'] = 'ERR_VIGNETS'
 
-  pixelGridFits_hdu = fits.ImageHDU(pixelGridFits)
-  pixelGridFits_hdu.header['EXTNAME'] = 'PIXEL_GRID_FITS'
+    pixelGridFits_hdu = fits.ImageHDU(pixelGridFits)
+    pixelGridFits_hdu.header['EXTNAME'] = 'PIXEL_GRID_FITS'
 
-  validation_hdu = fits.ImageHDU(validation_stars)
-  validation_hdu.header['EXTNAME'] = 'VALIDATION_STARS'
+    validation_hdu = fits.ImageHDU(validation_stars)
+    validation_hdu.header['EXTNAME'] = 'VALIDATION_STARS'
 
-  s_col = fits.Column(name='s_MATRIX', array=sC, format='D')
-  g1_col = fits.Column(name='g1_MATRIX', array=g1C, format='D')
-  g2_col = fits.Column(name='g2_MATRIX', array=g2C, format='D')
+    s_col = fits.Column(name='s_MATRIX', array=sC, format='D')
+    g1_col = fits.Column(name='g1_MATRIX', array=g1C, format='D')
+    g2_col = fits.Column(name='g2_MATRIX', array=g2C, format='D')
 
-  analytic_profile_hdu = fits.BinTableHDU.from_columns([s_col, g1_col, g2_col])
-  analytic_profile_hdu.header['EXTNAME'] = 'ANALYTIC_PROFILE'
+    analytic_profile_hdu = fits.BinTableHDU.from_columns([s_col, g1_col, g2_col])
+    analytic_profile_hdu.header['EXTNAME'] = 'ANALYTIC_PROFILE'
 
-  summary_statistics_hdu = fits.BinTableHDU.from_columns([c00, c01, c02, c03, c04, c05, c1, c2, c3, c4, c5, c6, c7]) 
-  summary_statistics_hdu.header['EXTNAME'] = 'SUMMARY_STATISTICS'
-  
-  outlier_indices = np.array($outlier_indices, dtype=np.float64)
-  s_blacklist = np.array($s_blacklist, dtype=np.float64)
-  failedStars = np.array($failedStars, dtype=np.float64)
-  col00 = fits.Column(name='FLAG_SNR', array=outlier_indices, format='D')
-  col01 = fits.Column(name='FLAG_S_BLACKLIST_MODEL', array=s_blacklist, format='D')
-  col02 = fits.Column(name='FLAG_PIXEL_GRID_OR_S_BLACKLIST_LEARNED', array=failedStars, format='D')
-  flag_hdu = fits.BinTableHDU.from_columns([col00, col01, col02])
-  flag_hdu.header['EXTNAME'] = 'FLAGS'
+    summary_statistics_hdu = fits.BinTableHDU.from_columns([c00, c01, c02, c03, c04, c05, c1, c2, c3, c4, c5, c6, c7]) 
+    summary_statistics_hdu.header['EXTNAME'] = 'SUMMARY_STATISTICS'
+    
+    outlier_indices = np.array($outlier_indices, dtype=np.float64)
+    s_blacklist = np.array($s_blacklist, dtype=np.float64)
+    failedStars = np.array($failedStars, dtype=np.float64)
+    col00 = fits.Column(name='FLAG_SNR', array=outlier_indices, format='D')
+    col01 = fits.Column(name='FLAG_S_BLACKLIST_MODEL', array=s_blacklist, format='D')
+    col02 = fits.Column(name='FLAG_PIXEL_GRID_OR_S_BLACKLIST_LEARNED', array=failedStars, format='D')
+    flag_hdu = fits.BinTableHDU.from_columns([col00, col01, col02])
+    flag_hdu.header['EXTNAME'] = 'FLAGS'
 
-  hdul = fits.HDUList([hdu1, summary_statistics_hdu, VIGNETS_hdu, pixelGridFits_hdu, validation_hdu, flag_hdu, analytic_profile_hdu])
-  py_summary_name = $summary_name
-  hdul.writeto(py_summary_name, overwrite=True)
-  """
+    hdul = fits.HDUList([hdu1, summary_statistics_hdu, VIGNETS_hdu, pixelGridFits_hdu, validation_hdu, flag_hdu, analytic_profile_hdu])
+    py_summary_name = $summary_name
+    hdul.writeto(py_summary_name, overwrite=True)
+    """
+  end
 
   command1 = `mv $summary_name $outdir`
   run(command1)

@@ -37,4 +37,6 @@ sum_pixel_grid_and_inputs_to_unity: false
 polynomial_interpolation_stopping_gradient: 1e-12
 
 summary_name: ''
+truncate_summary_file: true
+
 CommentsOnRun: "** This is where you can leave comments or notes to self on the run! **"
