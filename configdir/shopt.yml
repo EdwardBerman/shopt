@@ -35,7 +35,7 @@ stampSize: 130 #how many pixels should the pixel grid PSF model
 training_ratio: 0.9 #how many stars are you using the train versus to validate the PSF fit
 sum_pixel_grid_and_inputs_to_unity: false #Sum flux to unity true or false
 
-polynomial_interpolation_stopping_gradient: 1e-12 #stopping gradient for LFBGS used for polynomial interpolation
+polynomial_interpolation_stopping_gradient: 1e-8 #stopping gradient for LFBGS used for polynomial interpolation
 
 summary_name: '' #name to prefix summary.shopt
 truncate_summary_file: true # do you want to save storage by only storing essential information, how to reconstruct the PSF and analytic models
