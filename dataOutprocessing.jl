@@ -64,7 +64,7 @@ function writeFitsData(truncate_summary_file = truncate_summary_file, g2C = g2C,
     g1C = np.array($g1C, dtype=np.float64)
     g2C = np.array($g2C, dtype=np.float64)
     
-    summary_statistics_hdu = fits.BinTableHDU.from_columns([c7]) 
+    summary_statistics_hdu = fits.BinTableHDU.from_columns([c]) 
     summary_statistics_hdu.header['EXTNAME'] = 'SUMMARY_STATISTICS'
     
     hdu1 = fits.PrimaryHDU(PolynomialMatrix)
