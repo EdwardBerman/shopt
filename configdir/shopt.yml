@@ -18,7 +18,7 @@ AnalyticFitParams: # for fitting analytic profile
 dataProcessing:
   SnRPercentile: 0.33 #Filter this % of stars based off of signal to noise
   sUpperBound: 1 #Filter stars based off of this s value found by analytic profile fits as an upper bound
-  sLowerBound: 0.075 #Filter stars based off of this s value found by analytic profile fits as an lower bound 
+  sLowerBound: 0.075 #Filter stars based off of this s value found by analytic profile fits as a lower bound 
 
 plots: #What plots do you want?
   unicodePlots: true
