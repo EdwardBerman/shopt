@@ -1,25 +1,26 @@
-saveYaml: true
+saveYaml: true #save this file with each run
 
 mode: "PCA" # Options: auotoencoder, PCA. Make sure mode is a string with double quotes
 
-PCAterms: 50
+PCAterms: 50 #If PCA mode is enabled, how many moments do you want to use for your pixel grid fit
 
-lanczos: 5
+lanczos: 5 #The size of the smoothing kernel
 
-NNparams:
-  epochs: 100
-  minGradientPixel: 1e-5
-AnalyticFitParams:
-  minGradientAnalyticModel: 1e-6
-  minGradientAnalyticLearned: 1e-6
-  analyticFitStampSize: 64
+NNparams: #For if Autoencoder mode is enabled
+  epochs: 100 # max number of training epochs for each pixel grid fit
+  minGradientPixel: 1e-5 # the stopping gradient of the loss function for the pixel grid fit 
+
+AnalyticFitParams: # for fitting analytic profile
+  minGradientAnalyticModel: 1e-6 #stopping gradient for LFBGS on vignets
+  minGradientAnalyticLearned: 1e-6 #stopping gradient for LFBGS on pixel grid models
+  analyticFitStampSize: 64 #the subset of pixels you wish to fit the analytic profile to 
 
 dataProcessing:
-  SnRPercentile: 0.5
-  sUpperBound: 1
-  sLowerBound: 0.075
+  SnRPercentile: 0.33 #Filter this % of stars based off of signal to noise
+  sUpperBound: 1 #Filter stars based off of this s value found by analytic profile fits as an upper bound
+  sLowerBound: 0.075 #Filter stars based off of this s value found by analytic profile fits as an lower bound 
 
-plots:
+plots: #What plots do you want?
   unicodePlots: true
   normalPlots:
     parametersHistogram: true
@@ -28,15 +29,15 @@ plots:
     streamplots: false
   pythonPlots: false
 
-polynomialDegree: 1
-stampSize: 130 
+polynomialDegree: 1 #degree of polynomial for interpolation
+stampSize: 130 #how many pixels should the pixel grid PSF model
 
-training_ratio: 0.9
-sum_pixel_grid_and_inputs_to_unity: false
+training_ratio: 0.9 #how many stars are you using the train versus to validate the PSF fit
+sum_pixel_grid_and_inputs_to_unity: false #Sum flux to unity true or false
 
-polynomial_interpolation_stopping_gradient: 1e-12
+polynomial_interpolation_stopping_gradient: 1e-12 #stopping gradient for LFBGS used for polynomial interpolation
 
-summary_name: ''
-truncate_summary_file: true
+summary_name: '' #name to prefix summary.shopt
+truncate_summary_file: true # do you want to save storage by only storing essential information, how to reconstruct the PSF and analytic models
 
 CommentsOnRun: "** This is where you can leave comments or notes to self on the run! **"
