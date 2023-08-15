@@ -33,3 +33,5 @@ In data_tmw
 srun --constraint=zen2 --pty /bin/bash
 squeue -u [your_username] -o "%.8i %.8j %.8t %.10M %.12l"
 source /work/mccleary_group/berman.ed/minicondaInstall/bin/activate
+
+pandoc yourfile.md -o yourfile.pdf
