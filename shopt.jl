@@ -405,22 +405,6 @@ PolynomialMatrix = ones(r,c, (degree + 1) * (degree + 2) ÷ 2 )
 
 fancyPrint("Transforming (x,y) -> (u,v) | Interpolation Pixel by Pixel Across the Field of View")
 
-function objective_function(p, x, y, degree)
-  num_coefficients = (degree + 1) * (degree + 2) ÷ 2
-  value = 0
-  counter = 0
-  for i in 1:(degree + 1)
-    for j in 1:(degree + 1)
-      if (i - 1) + (j - 1) <= degree
-        counter += 1
-        value += p[counter] * x^(i - 1) * y^(j - 1) #Make p 2-D then flatten
-      end
-    end
-  end
-
-  return value
-end
-
 function compute_single_star_reconstructed_value(PolynomialMatrix, x, y, degree)
     r, c, _ = size(PolynomialMatrix)
     reconstructed_star = zeros(r, c)
