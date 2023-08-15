@@ -28,3 +28,8 @@ python master_psf_diagnostic.py /home/eddieberman/research/mcclearygroup/cweb_ps
 webb get jwst 
 python get_jwst_psf.py data_tmw/jw01727116001_02101_00001_nrca1_cal.fits -config configs/box_cutter.yaml 
 In data_tmw
+
+
+srun --constraint=zen2 --pty /bin/bash
+squeue -u [your_username] -o "%.8i %.8j %.8t %.10M %.12l"
+source /work/mccleary_group/berman.ed/minicondaInstall/bin/activate

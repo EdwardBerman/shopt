@@ -73,6 +73,7 @@ fancyPrint("Reading .jl Files")
   include("interpolate.jl")
   include("pixelGridAutoencoder.jl")
   include("pca.jl")
+  include("reader.jl")
   #include("lk.jl")
 end
 # ---------------------------------------------------------#
@@ -400,6 +401,8 @@ validation_u_coords = u_coordinates[validation_indices]
 validation_v_coords = v_coordinates[validation_indices]
 validation_star_catalog = starCatalog[validation_indices]
 
+PolynomialMatrix = ones(r,c, (degree + 1) * (degree + 2) ÷ 2 )
+
 fancyPrint("Transforming (x,y) -> (u,v) | Interpolation Pixel by Pixel Across the Field of View")
 
 function objective_function(p, x, y, degree)
@@ -418,39 +421,75 @@ function objective_function(p, x, y, degree)
   return value
 end
 
+function compute_single_star_reconstructed_value(PolynomialMatrix, x, y, degree)
+    r, c, _ = size(PolynomialMatrix)
+    reconstructed_star = zeros(r, c)
+    for i in 1:r
+        for j in 1:c
+            p = PolynomialMatrix[i, j, :]
+            reconstructed_star[i, j] = objective_function(p, x, y, degree)
+        end
+    end
+    return reconstructed_star
+end
 
-x_data = training_u_coords  # Sample x data
-y_data = training_v_coords  # Sample y data
-PolynomialMatrix = ones(r,c, (degree + 1) * (degree + 2) ÷ 2 )
+function compute_mse(reconstructed_matrix, true_matrix)
+    return mean((reconstructed_matrix .- true_matrix) .^ 2)
+end
+
+function worst_10_percent(errors)
+    n = length(errors)
+    star_errors = [(i, errors[i]) for i in 1:n]
+    sort!(star_errors, by = x->x[2], rev=true)
+    threshold_idx = Int(ceil(0.10 * n))
+    worst_stars = star_errors[1:threshold_idx]
+    return [star[1] for star in worst_stars]
+end
 
 @time begin
-  for i in 1:r
-    #pb = tqdm(1:c)
-    for j in 1:c #1:c #pb
-      #set_description(pb, "Working on Pixel ($i , $j)")
-
-      z_data = []  
-      for k in 1:length(training_stars)
-        push!(z_data, training_stars[k][i, j])
-      end
-
-      pC = polynomial_optimizer(degree, x_data, y_data, z_data)
-
-      #Create Optimization Scheme with Truh Values from the PixelGridFits
-      for k in 1:length(pC)
-        PolynomialMatrix[i,j,k] = pC[k]
+  global training_stars, training_u_coords, training_v_coords
+  for _ in 1:iterationsPolyfit
+    #print(length(iterationsPolyfit))
+    #print("_")
+    for i in 1:r
+      for j in 1:c
+        z_data = [star[i, j] for star in training_stars]
+        pC = polynomial_optimizer(degree, training_u_coords, training_v_coords, z_data)
+        PolynomialMatrix[i,j,:] .= pC
       end
     end
-  end 
 
+    training_errors = []
+    for idx in 1:length(training_stars)
+      reconstructed_star = compute_single_star_reconstructed_value(PolynomialMatrix, training_u_coords[idx], training_v_coords[idx], degree)
+      push!(training_errors, compute_mse(reconstructed_star, training_stars[idx]))
+    end
+
+    bad_indices = worst_10_percent(training_errors)
+    
+    new_training_stars = []
+    new_training_u_coords = []
+    new_training_v_coords = []
+    for i in 1:length(training_stars)
+        if i ∉ bad_indices
+            push!(new_training_stars, training_stars[i])
+            push!(new_training_u_coords, training_u_coords[i])
+            push!(new_training_v_coords, training_v_coords[i])
+        end
+    end
+    
+    global training_stars = new_training_stars
+    global training_u_coords = new_training_u_coords
+    global training_v_coords = new_training_v_coords
+  end
 end
 
 GC.gc()
 
 try
-  sampled_indices = sort(sample_indices(validation_indices, 3))
+  global sampled_indices = sort(sample_indices(validation_indices, 3))
 catch
-  sampled_indices = rand(3)
+  global sampled_indices = rand(3)
 end
 #=
 println("Sampled indices: ", sampled_indices)

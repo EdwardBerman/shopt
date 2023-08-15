@@ -29,7 +29,7 @@ PCAterms = config["PCAterms"]
 polynomial_interpolation_stopping_gradient = config["polynomial_interpolation_stopping_gradient"]
 lanczos = config["lanczos"]
 truncate_summary_file = config["truncate_summary_file"]
-
+iterationsPolyfit = config["iterations"]
 
 #=
 Log these config choices
@@ -37,6 +37,7 @@ Log these config choices
 
 println("Key Config Choices:")
 println("━ Mode: ", mode)
+println("━ Iterations: ", iterationsPolyfit)
 println("━ Summary Name: ", summary_name)
 println("━ PCA Terms: ", PCAterms)
 println("━ Lanczos n: ", lanczos)
@@ -243,6 +244,7 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   from astropy.io import fits
   
   python_datadir = $catalog
+  print(python_datadir)
   f = fits.open(python_datadir)
   vignets = f[2].data['VIGNET']
   #err_vignets = f[2].data['ERR_VIGNET']
