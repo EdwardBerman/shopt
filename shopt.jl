@@ -184,6 +184,7 @@ pixelGridFits = []
 
 if mode == "autoencoder"
   println("━ Autoencoder Mode...")
+  println(autoencoder)
   @time begin
     pb = tqdm(1:length(starCatalog))
     for i in pb
@@ -236,6 +237,7 @@ if mode == "autoencoder"
 end
 
 if mode == "PCA"
+  println("━ PCA Mode...")
   @time begin
     pb = tqdm(1:length(starCatalog))
     for i in pb
