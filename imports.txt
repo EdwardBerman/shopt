@@ -12,6 +12,7 @@ CSV
 FFTW
 Images
 ImageFiltering
+ImageTransformations
 DataFrames
 PyCall
 BenchmarkTools
@@ -23,3 +24,4 @@ Flux
 QuadGK
 Statistics
 IJulia
+MultivariateStats
