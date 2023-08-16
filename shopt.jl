@@ -434,9 +434,9 @@ end
 
 @time begin
   global training_stars, training_u_coords, training_v_coords
-  for _ in 1:iterationsPolyfit
+  for loop in 1:iterationsPolyfit
     #print(length(iterationsPolyfit))
-    #print("_")
+    println("━ Iteration: $loop")
     for i in 1:r
       for j in 1:c
         z_data = [star[i, j] for star in training_stars]

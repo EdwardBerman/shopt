@@ -26,6 +26,7 @@ function read_shopt(shoptFile)
     g1_matrix = f[3].data['g1_MATRIX']
     g2_matrix = f[3].data['g2_MATRIX']
     s_matrix = f[3].data['s_MATRIX']
+  f.close()
   """
   polynomialMatrix = convert(Array{Float64,3}, py"polyMatrix")
   degree = convert(Int64, py"degree")

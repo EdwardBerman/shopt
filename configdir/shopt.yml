@@ -40,6 +40,6 @@ polynomial_interpolation_stopping_gradient: 1e-8 #stopping gradient for LFBGS us
 summary_name: '' #name to prefix summary.shopt
 truncate_summary_file: true # do you want to save storage by only storing essential information, how to reconstruct the PSF and analytic models
 
-iterations: 2
+iterations: 3
 
 CommentsOnRun: "** This is where you can leave comments or notes to self on the run! **"
