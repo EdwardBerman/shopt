@@ -11,7 +11,7 @@ NNparams: #For if Autoencoder mode is enabled
   minGradientPixel: 1e-5 # the stopping gradient of the loss function for the pixel grid fit 
 
 AnalyticFitParams: # for fitting analytic profile
-  minGradientAnalyticModel: 1e-6 #stopping gradient for LFBGS on vignets
+  minGradientAnalyticModel: 1e-6 #stopping gradient for LFBGS (nonlinear algorithm for parameter estimation) on vignets
   minGradientAnalyticLearned: 1e-6 #stopping gradient for LFBGS on pixel grid models
   analyticFitStampSize: 64 #the subset of pixels you wish to fit the analytic profile to 
 
@@ -23,8 +23,8 @@ dataProcessing:
 plots: #What plots do you want?
   unicodePlots: true
   normalPlots:
-    parametersHistogram: true
-    parametersScatterplot: true
+    parametersHistogram: false
+    parametersScatterplot: false
   cairomakiePlots:
     streamplots: false
   pythonPlots: false
