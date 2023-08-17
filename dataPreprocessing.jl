@@ -191,7 +191,18 @@ end
 #=
 Supply an array and the new dimension you want and get the middle nxn of that array
 =#
+function get_middle_nxn(array, n)
+    rows, cols = size(array)
 
+    # Calculate the starting row and column indices
+    row_start = div(rows - n, 2) + 1
+    col_start = div(cols - n, 2) + 1
+
+    # Return the sub-matrix
+    return array[row_start:(row_start + n - 1), col_start:(col_start + n - 1)]
+end
+
+#=
 function get_middle_nxn(array, n)
   rows, cols = size(array)
   if isodd(rows)
@@ -218,6 +229,7 @@ function get_middle_nxn(array, n)
     end
   end
 end
+=#
 
 #=
 SnR function used to calculate the signal to noise ratio of an image
