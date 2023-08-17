@@ -246,12 +246,23 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   python_datadir = $catalog
   print(python_datadir)
   f = fits.open(python_datadir)
-  vignets = f[2].data['VIGNET']
-  #err_vignets = f[2].data['ERR_VIGNET']
+  def find_extension_with_colname(fits_file, target_colname):
+    with fits.open(fits_file) as hdulist:
+        matching_extensions = []
+        
+        for idx, hdu in enumerate(hdulist):
+            if isinstance(hdu, fits.BinTableHDU) or isinstance(hdu, fits.TableHDU):
+                if target_colname in hdu.columns.names:
+                    matching_extensions.append(idx)
+                    
+        return matching_extensions
+  idx = find_extension_with_colname(python_datadir, 'VIGNET')[0]
+  vignets = f[idx].data['VIGNET']
+  #err_vignets = f[idx].data['ERR_VIGNET']
   l = len(vignets)
 
-  u = f[2].data['ALPHAWIN_J2000'] 
-  v = f[2].data['DELTAWIN_J2000']
+  u = f[idx].data['ALPHAWIN_J2000'] 
+  v = f[idx].data['DELTAWIN_J2000']
 
   snr = f[2].data['SNR_WIN']
   """
