@@ -1,6 +1,6 @@
 #=
 Helper functions to interpolate s(u,v), g1(u,v), g2(u,v) across the field of view
-Reminder to make s, g1, g2 (u,v) of arbitrary degree
+Reminder to make s, g1, g2 (u,v) of arbitrary degree!
 =#
 
 #f(u, v) = a1u^3 + a2v^3 + a3u^2v + a4v^2u + a5u^2 + a6v^2 + a7uv + a8u + a9v + a10
