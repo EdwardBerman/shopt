@@ -50,7 +50,7 @@ fancyPrint("Handling Imports")
   using Flux
   using Flux.Optimise
   using Flux.Losses
-  using Flux: onehotbatch, throttle, @epochs, mse, msle, mae
+  using Flux: onehotbatch, throttle, mse, msle, mae
   using CairoMakie
   using Dates
   using MultivariateStats
@@ -183,8 +183,8 @@ fancyPrint("Pixel Grid Fit")
 pixelGridFits = []
 
 if mode == "autoencoder"
-  println("━ Autoencoder Mode...")
-  println(autoencoder)
+  println("━ Autoencoder Mode...\n")
+  println(autoencoder,"\n")
   @time begin
     pb = tqdm(1:length(starCatalog))
     for i in pb

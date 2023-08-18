@@ -38,3 +38,8 @@ pandoc yourfile.md -o yourfile.pdf
 
 julia shopt.jl /home/eddieberman/research/mcclearygroup/shopt/configdir /home/eddieberman/research/mcclearygroup/shopt/outdir/f115w_mosaic_mock ../cweb_psf/mock_data_outputs_and_cats/mosaic_nircam_f115w_COSMOS-Web_i2d_train_starcat.fits ; cd ../cweb_psf/ ; python mosaic_catalog_runner.py ; so
 
+history | grep "STRING_TO_SEARCH_HERE'
+
+
+
+
