@@ -10,7 +10,7 @@ jobs:
 
       - name: Compile PDF
         run: |
-          sudo apt-get install -y pandoc texlive-xetex
+          sudo apt-get install -y --fix-missing pandoc texlive-xetex
           pandoc paper.md -o paper.pdf
       - name: Build draft PDF
         uses: openjournals/openjournals-draft-action@master
