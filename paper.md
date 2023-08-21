@@ -1,16 +1,23 @@
 ---
-title: 'Gala: A Python package for galactic dynamics'
+title: 'ShOpt.jl | A Julia Library for Empirical Point Spread Function Characterization of JWST Sources'
 tags:
-  - milky way
+  - JWST 
+  - Deep Learning
+  - Julia 
+  - Point Spread Function
+
 authors:
-  - name: Adrian M. Price-Whelan
-    orcid: 0000-0000-0000-0000
-    equal-contrib: true
-    affiliation: "1, 2" # (Multiple affiliations must be quoted)
+  - name: Edward Berman
+    orcid: 0000-0002-8494-3123
+    corresponding: true
+    affiliation: 1
+  - name: Jacqueline McCleary
+    orcid: 0000-0002-9883-7460
+    affiliation: 1
 affiliations:
- - name: Lyman Spitzer, Jr. Fellow, Princeton University, USA
+ - name: Northeastern University, USA
    index: 1
-date: 13 August 2017
+date: 08 August 2023
 bibliography: paper.bib
 
 ---
@@ -18,13 +25,17 @@ bibliography: paper.bib
 # Summary
 
 # Statement of need
+ to fit the needs of JWST Sources ...
 
+# State of the Field
+ quick speed and quality checks ... Reduced Chi-Square (Real-Data publicly available) and Speed for 75 x 75 Images (argue 75 x 75 well approximates 131 x 131)
 
-# Mathematics
+# Key Methods
+
 # Citations
-
+[@author2023title]
 
 # Acknowledgements
-
+This project was made possible by The Northeastern Physics Department and Northeastern Undergraduate Research and Fellowships via the Physics Research Co-Op Fellowship and PEAK Ascent Award respectively
 
 # References
