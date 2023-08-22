@@ -452,21 +452,23 @@ end
     end
 
     bad_indices = worst_10_percent(training_errors)
-    
-    new_training_stars = []
-    new_training_u_coords = []
-    new_training_v_coords = []
-    for i in 1:length(training_stars)
-        if i ∉ bad_indices
-            push!(new_training_stars, training_stars[i])
-            push!(new_training_u_coords, training_u_coords[i])
-            push!(new_training_v_coords, training_v_coords[i])
-        end
+   
+    if loop != iterationsPolyfit
+      new_training_stars = []
+      new_training_u_coords = []
+      new_training_v_coords = []
+      for i in 1:length(training_stars)
+          if i ∉ bad_indices
+              push!(new_training_stars, training_stars[i])
+              push!(new_training_u_coords, training_u_coords[i])
+              push!(new_training_v_coords, training_v_coords[i])
+          end
+      end
+      
+      global training_stars = new_training_stars
+      global training_u_coords = new_training_u_coords
+      global training_v_coords = new_training_v_coords
     end
-    
-    global training_stars = new_training_stars
-    global training_u_coords = new_training_u_coords
-    global training_v_coords = new_training_v_coords
   end
 end
 

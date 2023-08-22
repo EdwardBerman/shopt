@@ -242,8 +242,13 @@ training_ratio
 CommentsOnRun
 - This is Where You Can Leave Comments or Notes To Self on the Run! Could be very useful if you save the yaml file with each run
 
-## Known Issues
-+ kolmogorov radial profile not yet functional
+## How Can I contribute?
+Do one of the following:
++ Contact berman.ed@northeastern.edu
++ Fork this repository or submit a pull request
+
+## Known Issues/Enhancements
++ We are working on more configurability in the YAML for a smoother user experience, however, everything in this repository is functional and ready to work out of the box
 
 ## Contributors
 + Edward Berman
