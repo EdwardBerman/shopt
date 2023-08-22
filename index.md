@@ -1,5 +1,6 @@
 ## Table of Contents
 - [About](#about)
+  - [Who Should Use ShOpt](#who-should-use)
   - [Analytic Profile Fits](#analytic-profile-fits)
   - [Pixel Grid Fits](#pixel-grid-fits)
   - [Interpolation Across the Field of View](#interpolation-across-the-field-of-view)
@@ -24,6 +25,9 @@
 **Shear Optimization** with **ShOpt.jl**, a julia library for empirical point spread function characterizations. We aim to improve upon the current state of Point Spread Function Modeling by using Julia to leverage performance gains, use a different mathematical formulation than the literature to provide more robust analytic and pixel grid fits, improve the diagnostic plots, and add features such as wavelets and shapelets. At this projects conclusion we will compare to existing software such as PIFF and PSFex. Work done under [McCleary's Group](https://github.com/mcclearyj).
 
 Start by **Cloning This Repository**. Then see **TutorialNotebook.ipynb** or follow along the rest of this **README.md** to get started!
+
+### Who Should Use  
+Users looking for empirical point spread function characterization software tailored for the data coming from the James Webb Space Telescope, or on a dataset with the similar characteristics. For example, the point spread function spans 100s of pixels because of the pixel scale of your camera, the point spread function is not well approximated by an analytic profile, or the point spread function varies alot across the field of view. For any of these reasons, you should consider using ShOpt.jl. 
 
 ### Analytic Profile Fits 
 We adopt the following procedure to ensure our gradient steps never take us outside of our constraints
