@@ -32,9 +32,9 @@ We adopt the following procedure to ensure our gradient steps never take us outs
 ### Pixel Grid Fits                                                                                                        
 
 #### PCA Mode 
-We used the first n weights of a Principal Component Analysis and use that to construct our PSF in addition to a smoothing kernel to account for aliasing
-                                                                                                                                                                             
-#### Autoencoder Mode                                                                                                                                                      
+We used the first n weights of a Principal Component Analysis and use that to construct our PSF in addition to a smoothing kernel to account for aliasing 
+
+#### Autoencoder Mode
 For doing Pixel Grid Fits we use an autoencoder model to reconstruct the Star                                              
 ![image](READMEassets/nn.png) 
 
@@ -105,7 +105,7 @@ For some functionality we need to use wrappers for Python code, such as reading 
 
 ```julia
 using PyCall
- # You may have to specify, ENV["PYTHON"] = "/path_desired_python_directory/python_executable"; import Pkg; Pkg.build("PyCall")
+ENV["PYTHON"] = "/path_desired_python_directory/python_executable"; import Pkg; Pkg.build("PyCall")
 pyimport("astropy")
 ```
 
@@ -242,8 +242,13 @@ training_ratio
 CommentsOnRun
 - This is Where You Can Leave Comments or Notes To Self on the Run! Could be very useful if you save the yaml file with each run
 
-## Known Issues
-+ kolmogorov radial profile not yet functional
+## How Can I contribute?
+Do one of the following:
++ Contact berman.ed@northeastern.edu
++ Fork this repository or submit a pull request
+
+## Known Issues/Enhancements
++ We are working on more configurability in the YAML for a smoother user experience, however, everything in this repository is functional and ready to work out of the box
 
 ## Contributors
 + Edward Berman
@@ -253,4 +258,4 @@ CommentsOnRun
 + The Northeastern Cosmology Group for Their Continued Support and Guidance                                                           
 + The Northeastern Physics Department and Northeastern Undergraduate Research and Fellowships, for making this project possible with funding from the Northeastern Physics Research Co-Op Fellowship and PEAK Ascent Award respectively   
 + [David Rosen](https://github.com/david-m-rosen), who gave valuable input in the early stages of this project and during his course Math 7223, Riemannian Optimization
-+ The COSMOS Web Collaboration for providing data from the James Webb Space Telescope and internal review
++ The COSMOS Web Collaboration for providing data from the James Webb Space Telescope and internal feedback
