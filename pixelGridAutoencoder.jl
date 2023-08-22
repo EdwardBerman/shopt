@@ -4,13 +4,13 @@ encoder = Chain(
                 Dense(128, 64, leakyrelu),
                 Dense(64, 32, leakyrelu),
                )
-
+#Decoder
 decoder = Chain(
                 Dense(32, 64, leakyrelu),
                 Dense(64, 128, leakyrelu),
                 Dense(128, r*c, tanh),
                )
-
+#Full autoencoder
 autoencoder = Chain(encoder, decoder)
 
 #x̂ = autoencoder(x)
