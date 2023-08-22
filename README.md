@@ -11,6 +11,7 @@
   - [Dependencies](#dependencies)
   - [Set Up](#set-up)
 - [Program Architecture](#program-architecture)
+- [How Can I Contribute?](#how-to-contribute)
 - [Config / YAML Information](#config--yaml-information)
 - [Known Issues](#known-issues)
 - [Contributors](#contributors)
@@ -242,7 +243,7 @@ training_ratio
 CommentsOnRun
 - This is Where You Can Leave Comments or Notes To Self on the Run! Could be very useful if you save the yaml file with each run
 
-## How Can I contribute?
+## How to Contribute
 Do one of the following:
 + Contact berman.ed@northeastern.edu
 + Fork this repository or submit a pull request
