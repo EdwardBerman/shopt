@@ -14,7 +14,7 @@
 - [Program Architecture](#program-architecture)
 - [How Can I Contribute?](#how-to-contribute)
 - [Config / YAML Information](#config--yaml-information)
-- [Known Issues](#known-issues)
+- [Known Issues](#known-issues-and-enhancements)
 - [Contributors](#contributors)
 - [Further Acknowledgements](#further-acknowledgements)
 
@@ -252,7 +252,7 @@ Do one of the following:
 + Contact berman.ed@northeastern.edu
 + Fork this repository or submit a pull request
 
-## Known Issues/Enhancements
+## Known Issues and Enhancements
 + We are working on more configurability in the YAML for a smoother user experience, however, everything in this repository is functional and ready to work out of the box
 
 ## Contributors
