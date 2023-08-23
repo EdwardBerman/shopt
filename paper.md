@@ -17,22 +17,25 @@ authors:
 affiliations:
  - name: Northeastern University, USA
    index: 1
-date: 08 August 2023
+date: 23 August 2023
 bibliography: paper.bib
 
 ---
 
 # Summary
-Shear Optimization with \texttt{ShOpt.jl} introduces modern techniques for empirical Point Spread Function (PSF) characterization across the Full Field of View tailored to the data captured by the James Webb Space Telescope. 
+When cosmologists try to take pictures of space, a combination of the photometry of the camera and atmospheric affects distort the light that comes from stars. Stars are examples of what Astronomers call point sources, and so the aptly named Point Spread Function (PSF) is a mathematical model that quantifies exactly how the light is being distorted. The point spread function takes as input a delta function and a position and outputs a lensed image. The goal of empirical point spread function characterization is to be able to point to any position on your camera and predict what the lensed image looks like. Once we have a model that can do this well, we can deconvolve our images with the point spread function to obtain what the image would look like in the absense of lensing. The empirical way to do this is to take our images of lensed stars and seperate them into training and validation set. Our point spread function will be found by interpolating the training stars across the field of view of the camera and validated by comparing the reserved stars to the point spread function's prediction.
 
-Shear Optimization with \texttt{ShOpt.jl} strives to advance the mathematical formulation of empirical Point Spread Function Modeling forward while remaining feasible to compute. \texttt{ShOpt.jl} first takes inspiration from robotics algorithms that run on manifold valued data, such as SE-Sync [@doi:10.1177/0278364918784361]. [@Bernstein_2002] outlined the manifold properties of shears which we expand on to provide more robust analytic profile fits. For a more rigorous treament of Optimization Methods on manifold valued data, we encourage you to see [@AbsMahSep2008] and [@boumal2023intromanifolds]. \texttt{ShOpt.jl} also advances the state of fitting a model pixel by pixel of point sources. \texttt{ShOpt.jl} uses two modes for pixel grid fits, \texttt{PCA mode} and \texttt{Autoencoder mode}. The modes are similar in that they provide the end user with tunable parameters that allow for both perfect reconstruction of the model vignets and low dimensional representations. \texttt{PCA mode} approximates the original image by summing the first \texttt{n} principal components, where \texttt{n} is supplied by the user. We also introduce \texttt{Autoencoder mode}, which uses the deep learning autoencoder architecture to learn what the model point spread function should look like and is robust enough to provide a good fit even in the presence of high signal to noise due to the nonlinearity of the network. 
+Shear Optimization with `ShOpt.jl` introduces modern techniques for empirical Point Spread Function characterization across the Full Field of View tailored to the data captured by the James Webb Space Telescope. To first order, we can approximate our images with analytic profiles. We adopt a multivariate gaussian because it is cheap to fit to an image. This function is parameterized by three variables, $[s, g_1, g_2]$, where $s$ corresponds to size and $g_1 , g_2$ correspond to shear. After we fit this function to our stars with `Optim.jl` and `ForwardDiff.jl` [@Mogensen2018; @RevelsLubinPapamarkou2016], we interpolate the parameters across the field of view according to position. Essentially, each star is a datapoint, and the three variables are given polynomials in focal plane coordinates of degree $n$, where $n$ is supplied by the user. For a more precise model, we also give each pixel in our images a polynomial and interpolate it across the field of view. This is referred to in the literature as a pixel grid fit [@Jarvis_2020]. 
 
-The programming language and paradigm are an integral part of the software. \texttt{ShOpt.jl} is written in \texttt{Julia}, which enables us to write code that can run quickly while also being readable enough to be accessible for an open source community of \texttt{Julia} programmers to write in their own functions as they see fit. \texttt{Julia} also an abundance of support for working with manifolds such as \texttt{Manopt}, which may be pertinent in future releases for advances in fitting analytic profiles [@Bergmann2022].
+`ShOpt.jl` takes inspiration from a number of algorithms outside of astronomy. Mainly, SE-Sync [@doi:10.1177/0278364918784361], an algorithm that provides a certifiably correct solution to a robotting mapping problem by considering the manifold properites of the data. We borrow this idea to put a constraint on the solutions we obtain to $[s, g_1, g_2]$. [@Bernstein_2002] outlined the manifold properties of shears for us, so we knew from the get go that our solution was constrained to the manifold $B_2(r) \times \mathbb{R}_{+}$. While it was known that this constrain existed in the literature, the parameter estimation tasked had been framed as an unconstrained problem prior to our work  [@Jarvis_2020]. For a more rigorous treatment of optimization on manifolds see [@AbsMahSep2008] and [@boumal2023intromanifolds]. `Julia` has lots of support for working with manifolds with `Manopt`, which we may leverage in future releases [@Bergmann2022]. 
 
+`ShOpt.jl` provides two modes for pixel grid fits, `PCA mode` and `Autoencoder mode`. Each mode provides the end user with tunable parameters that allow for both perfect reconstruction of the model vignets and low dimensional representations. The advantage of these modes is that they provide good reconstructions of the lensed images while fixating on the actual star and not the background noise. In this way it generates a datapoint for our empirical point spread function to learn and denoises the image in one step.
+
+`PCA mode`, outlined here, reconstructs it's images using the first n principal components.
 ```Julia
-function pca_image(image_path, ncomponents)    
-  # Load the image    
-  img_matrix = image_path    
+function pca_image(image, ncomponents)    
+  #Load img Matrix
+  img_matrix = image
     
   # Perform PCA    
   M = fit(PCA, img_matrix; maxoutdim=ncomponents)    
@@ -47,7 +50,7 @@ function pca_image(image_path, ncomponents)
   reconstructed_image = reshape(reconstructed, size(img_matrix)...)    
 end    
 ```
-
+`Autoencoder mode` uses a neural network to reconstruct the image from a lower dimensional latent space. The network code written with `Flux.jl` is below [@innes:2018]
 ```Julia
 # Encoder    
 encoder = Chain(    
@@ -73,7 +76,7 @@ optimizer = ADAM()
 ```
 
 # Statement of need
-While there are many existing empirical PSF fitters, they were created as apart of the efforts of The Dark Energy Survey \textbf{[cite]}. The recent data from the James Webb Space Telescope poses new challenges. 
+While there are many existing empirical PSF fitters, they were created as apart of the efforts of other collaborations with their own cameras and science goals. Mainly, The Dark Energy Survey and DESCam [@Jarvis_2020;@2015AJ]. The recent data from the James Webb Space Telescope poses new challenges. 
 
 (1) The James Webb PSFs are not well approximated by analytic profiles. This calls for well thought out parametric free models that can capture the full dynamic range of the Point Spread Function without fixating on the noise in the background.  
 
@@ -81,14 +84,13 @@ While there are many existing empirical PSF fitters, they were created as apart 
 
 
 # State of the Field
-There are several existing empirical PSF fitters in addition to a theoretical prediction of the James Webb PSFs developed by STScI. We describe them here and draw attention to their strenghts and weaknesses to motivate the development of \texttt{ShOpt.jl}. The first empirical PSF fitter developed was \texttt{PSFex}. It used statistical methods that were natural starting points for the problem at hand and prove to be sufficient in many cases to this day. Moreover, \texttt{PSFex} was written in \texttt{C}, a compiled language known for it's speed of computation, including for tasks such as numerical linear algebra and optimization problems. However, as Mike Jarvis and his collaborators with DES noticed, \texttt{PSFex} produced a systematic size bias of the Point Spread Function with how it calculated spatial variation across the field of view. \textbf{[cite]}
+There are several existing empirical PSF fitters in addition to a theoretical prediction of the James Webb PSFs developed by STScI [@Jarvis_2020 ; @2011ASPC; @2014SPIE ; @2012SPIE]. We describe them here and draw attention to their strenghts and weaknesses to motivate the development of `ShOpt.jl`. The first empirical PSF fitter developed was `PSFex`. It used statistical methods that were natural starting points for the problem at hand and prove to be sufficient in many cases to this day. However, as Mike Jarvis and his collaborators with DES noticed, `PSFex` produced a systematic size bias of the Point Spread Function with how it calculated spatial variation across the field of view [@Jarvis_2020] 
 
-\texttt{PIFF} (Point Spread Functions in the Full Field of View) followed \texttt{PSFex} in the effort to correct this issue. The DES camera was $2.2$" across, which was large enough for the size bias to become noticable for their efforts. \texttt{PIFF} works in focal plane coordinates as opposed to sky coordinates which fixes the systematic size bias. \texttt{PIFF} was written in \texttt{Python}, a language with much more infrastructure built to do computations relevant to Astronomy. The cost of working with such robust tools is that \texttt{PIFF} runs much slower than \texttt{PSFex}. 
+`PIFF` (Point Spread Functions in the Full Field of View) followed `PSFex` in the effort to correct this issue. The DES camera was $2.2$ degrees across, which was large enough for the size bias to become noticable for their efforts. `PIFF` works in focal plane coordinates as opposed to sky coordinates which fixes the systematic size bias. Jarvis and DES also used the `Python` libraries of astropy [@2022ApJ] and Galsim [@rowe2015galsim] to make the software more accessible than PSFex. PSFex was written in `C` and had been active for more than 20 years before the systematic size bias was discovered. Due to being so old and written in a low level language it is much less approachable. One of the motivations of `ShOpt` was to write astrophysics specific software in `Julia`, because `Julia` provides a nice balance of readability and speed with it's high level functional paradigm and just in time compiler.
 
-Finally, we do have theoretical models of the PSF. The issue is that these models are for single exposure images. The James Webb images have both single exposure and mosaiced images, and the theoretical models are not the same.
+While we do have theoretical models of the James Webb PSF, there is yet to be any validation of these models on real data in the literature. Additionally, these models are for single exposure images. The James Webb images have both single exposure and mosaiced images [@2014SPIE; @2012SPIE]. Mosaiced images are essentially single exposure detector images concatenated together side by side. The PSF models for single exposures do not generalize to the mosaics, so empirical models are all we have for those images.  
 
-# Citations
-[@author2023title]
+The COMOS-Web survey is the largest extragalactic survey according to area and prime time allocation [@casey2023cosmosweb], and takes up $0.54 deg^2$ [@10.1117/12.925447; @Rieke_2023]. This is a large enough portion of the sky that we should prepare to see a lot of variation across the field of view. This gives `ShOpt` the oppurtunity to validate PIFF's correction for handeling PSF variations and underscore just how impactful (or not impactful) PSFex's size bias is. 
 
 # Acknowledgements
 This project was made possible by The Northeastern Physics Department and Northeastern Undergraduate Research and Fellowships via the Physics Research Co-Op Fellowship and PEAK Ascent Award respectively.

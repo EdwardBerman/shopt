@@ -73,3 +73,7 @@ function analytic_profile(u,v, s_matrix, g1_matrix, g2_matrix, radial_function)
   g2 = g2_matrix[1]*u^3 + g2_matrix[2]*v^3 + g2_matrix[3]*u^2*v + g2_matrix[4]*v^2*u + g2_matrix[5]*u^2 + g2_matrix[6]*v^2 + g2_matrix[7]*u*v + g2_matrix[8]*u + g2_matrix[9]*v + g2_matrix[10]
   return radial_function(s,g1,g2)
 end
+
+function export_bibtext()
+  return ""
+end

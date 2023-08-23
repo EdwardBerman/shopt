@@ -1,0 +1,426 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={ShOpt.jl \textbar{} A Julia Library for Empirical Point Spread Function Characterization of JWST Sources},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\newenvironment{Shaded}{}{}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newenvironment{cslreferences}%
+  {\setlength{\parindent}{0pt}%
+  \everypar{\setlength{\hangindent}{\cslhangindent}}\ignorespaces}%
+  {\par}
+
+\title{ShOpt.jl \textbar{} A Julia Library for Empirical Point Spread
+Function Characterization of JWST Sources}
+\author{}
+\date{23 August 2023}
+
+\begin{document}
+\maketitle
+
+\hypertarget{summary}{%
+\section{Summary}\label{summary}}
+
+When cosmologists try to take pictures of space, a combination of the
+photometry of the camera and atmospheric affects distort the light that
+comes from stars. Stars are examples of what Astronomers call point
+sources, and so the aptly named Point Spread Function (PSF) is a
+mathematical model that quantifies exactly how the light is being
+distorted. The point spread function takes as input a delta function and
+a position and outputs a lensed image. The goal of empirical point
+spread function characterization is to be able to point to any position
+on your camera and predict what the lensed image looks like. Once we
+have a model that can do this well, we can deconvolve our images with
+the point spread function to obtain what the image would look like in
+the absense of lensing. The empirical way to do this is to take our
+images of lensed stars and seperate them into training and validation
+set. Our point spread function will be found by interpolating the
+training stars across the field of view of the camera and validated by
+comparing the reserved stars to the point spread function's prediction.
+
+Shear Optimization with \texttt{ShOpt.jl} introduces modern techniques
+for empirical Point Spread Function characterization across the Full
+Field of View tailored to the data captured by the James Webb Space
+Telescope. To first order, we can approximate our images with analytic
+profiles. We adopt a multivariate gaussian because it is cheap to fit to
+an image. This function is parameterized by three variables,
+\([s, g_1, g_2]\), where \(s\) corresponds to size and \(g_1 , g_2\)
+correspond to shear. After we fit this function to our stars with
+\texttt{Optim.jl} and \texttt{ForwardDiff.jl} (Mogensen and Riseth 2018;
+Revels, Lubin, and Papamarkou 2016), we interpolate the parameters
+across the field of view according to position. Essentially, each star
+is a datapoint, and the three variables are given polynomials in focal
+plane coordinates of degree \(n\), where \(n\) is supplied by the user.
+For a more precise model, we also give each pixel in our images a
+polynomial and interpolate it across the field of view. This is referred
+to in the literature as a pixel grid fit (Jarvis et al. 2020).
+
+\texttt{ShOpt.jl} takes inspiration from a number of algorithms outside
+of astronomy. Mainly, SE-Sync (Rosen et al. 2019), an algorithm that
+provides a certifiably correct solution to a robotting mapping problem
+by considering the manifold properites of the data. We borrow this idea
+to put a constraint on the solutions we obtain to \([s, g_1, g_2]\).
+(Bernstein and Jarvis 2002) outlined the manifold properties of shears
+for us, so we knew from the get go that our solution was constrained to
+the manifold \(B_2(r) \times \mathbb{R}_{+}\). While it was known that
+this constrain existed in the literature, the parameter estimation
+tasked had been framed as an unconstrained problem prior to our work
+(Jarvis et al. 2020). For a more rigorous treatment of optimization on
+manifolds see (Absil, Mahony, and Sepulchre 2008) and (Boumal 2023).
+\texttt{Julia} has lots of support for working with manifolds with
+\texttt{Manopt}, which we may leverage in future releases (Bergmann
+2022).
+
+\texttt{ShOpt.jl} provides two modes for pixel grid fits,
+\texttt{PCA\ mode} and \texttt{Autoencoder\ mode}. Each mode provides
+the end user with tunable parameters that allow for both perfect
+reconstruction of the model vignets and low dimensional representations.
+The advantage of these modes is that they provide good reconstructions
+of the lensed images while fixating on the actual star and not the
+background noise. In this way it generates a datapoint for our empirical
+point spread function to learn and denoises the image in one step.
+
+\texttt{PCA\ mode}, outlined here, reconstructs it's images using the
+first n principal components.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{function}\NormalTok{ pca\_image(image}\OperatorTok{,}\NormalTok{ ncomponents)    }
+  \CommentTok{\#Load img Matrix}
+\NormalTok{  img\_matrix }\OperatorTok{=}\NormalTok{ image}
+    
+  \CommentTok{\# Perform PCA    }
+\NormalTok{  M }\OperatorTok{=}\NormalTok{ fit(PCA}\OperatorTok{,}\NormalTok{ img\_matrix}\OperatorTok{;}\NormalTok{ maxoutdim}\OperatorTok{=}\NormalTok{ncomponents)    }
+    
+  \CommentTok{\# Transform the image into the PCA space    }
+\NormalTok{  transformed }\OperatorTok{=}\NormalTok{ MultivariateStats.transform(M}\OperatorTok{,}\NormalTok{ img\_matrix)    }
+    
+  \CommentTok{\# Reconstruct the image    }
+\NormalTok{  reconstructed }\OperatorTok{=}\NormalTok{ reconstruct(M}\OperatorTok{,}\NormalTok{ transformed)    }
+    
+  \CommentTok{\# Reshape the image back to its original shape    }
+\NormalTok{  reconstructed\_image }\OperatorTok{=}\NormalTok{ reshape(reconstructed}\OperatorTok{,}\NormalTok{ size(img\_matrix)}\OperatorTok{...}\NormalTok{)    }
+\KeywordTok{end}    
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{Autoencoder\ mode} uses a neural network to reconstruct the
+image from a lower dimensional latent space. The network code written
+with \texttt{Flux.jl} is below (Innes 2018)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Encoder    }
+\NormalTok{encoder }\OperatorTok{=}\NormalTok{ Chain(    }
+\NormalTok{                Dense(r}\OperatorTok{*}\NormalTok{c}\OperatorTok{,} \FloatTok{128}\OperatorTok{,}\NormalTok{ leakyrelu)}\OperatorTok{,}    
+\NormalTok{                Dense(}\FloatTok{128}\OperatorTok{,} \FloatTok{64}\OperatorTok{,}\NormalTok{ leakyrelu)}\OperatorTok{,}    
+\NormalTok{                Dense(}\FloatTok{64}\OperatorTok{,} \FloatTok{32}\OperatorTok{,}\NormalTok{ leakyrelu)}\OperatorTok{,}    
+\NormalTok{               )    }
+\CommentTok{\#Decoder}
+\NormalTok{decoder }\OperatorTok{=}\NormalTok{ Chain(    }
+\NormalTok{                Dense(}\FloatTok{32}\OperatorTok{,} \FloatTok{64}\OperatorTok{,}\NormalTok{ leakyrelu)}\OperatorTok{,}    
+\NormalTok{                Dense(}\FloatTok{64}\OperatorTok{,} \FloatTok{128}\OperatorTok{,}\NormalTok{ leakyrelu)}\OperatorTok{,}    
+\NormalTok{                Dense(}\FloatTok{128}\OperatorTok{,}\NormalTok{ r}\OperatorTok{*}\NormalTok{c}\OperatorTok{,}\NormalTok{ tanh)}\OperatorTok{,}    
+\NormalTok{               )    }
+\CommentTok{\#Full autoencoder}
+\NormalTok{autoencoder }\OperatorTok{=}\NormalTok{ Chain(encoder}\OperatorTok{,}\NormalTok{ decoder)    }
+                      
+\CommentTok{\#x\_hat = autoencoder(x)    }
+\NormalTok{loss(x) }\OperatorTok{=}\NormalTok{ mse(autoencoder(x)}\OperatorTok{,}\NormalTok{ x)    }
+    
+\CommentTok{\# Define the optimizer    }
+\NormalTok{optimizer }\OperatorTok{=}\NormalTok{ ADAM()    }
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{statement-of-need}{%
+\section{Statement of need}\label{statement-of-need}}
+
+While there are many existing empirical PSF fitters, they were created
+as apart of the efforts of other collaborations with their own cameras
+and science goals. Mainly, The Dark Energy Survey and DESCam (Jarvis et
+al. 2020; Flaugher et al. 2015). The recent data from the James Webb
+Space Telescope poses new challenges.
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\item
+  The James Webb PSFs are not well approximated by analytic profiles.
+  This calls for well thought out parametric free models that can
+  capture the full dynamic range of the Point Spread Function without
+  fixating on the noise in the background.
+\item
+  The NIRCam detectors measure 0.03"/pix (cite). To capture an accurate
+  description of the Point Spread Function at this scale we need images
+  that are \(131\) by \(131\) to \(261\) by \(261\) pixels across. These
+  vignet sizes are much larger in comparison to the sizes needed for
+  previous large scale surveys such as DES (Jarvis et al. 2020) and
+  SuperBIT (McCleary et al. 2023) and forces us to evaluate how well
+  existing PSF fitters scale to this size.
+\end{enumerate}
+
+\hypertarget{state-of-the-field}{%
+\section{State of the Field}\label{state-of-the-field}}
+
+There are several existing empirical PSF fitters in addition to a
+theoretical prediction of the James Webb PSFs developed by STScI (Jarvis
+et al. 2020 ; Bertin 2011; Perrin et al. 2014 , 2012). We describe them
+here and draw attention to their strenghts and weaknesses to motivate
+the development of \texttt{ShOpt.jl}. The first empirical PSF fitter
+developed was \texttt{PSFex}. It used statistical methods that were
+natural starting points for the problem at hand and prove to be
+sufficient in many cases to this day. However, as Mike Jarvis and his
+collaborators with DES noticed, \texttt{PSFex} produced a systematic
+size bias of the Point Spread Function with how it calculated spatial
+variation across the field of view (Jarvis et al. 2020)
+
+\texttt{PIFF} (Point Spread Functions in the Full Field of View)
+followed \texttt{PSFex} in the effort to correct this issue. The DES
+camera was \(2.2\) degrees across, which was large enough for the size
+bias to become noticable for their efforts. \texttt{PIFF} works in focal
+plane coordinates as opposed to sky coordinates which fixes the
+systematic size bias. Jarvis and DES also used the \texttt{Python}
+libraries of astropy (Astropy Collaboration et al. 2022) and Galsim
+(Rowe et al. 2015) to make the software more accessible than PSFex.
+PSFex was written in \texttt{C} and had been active for more than 20
+years before the systematic size bias was discovered. Due to being so
+old and written in a low level language it is much less approachable.
+One of the motivations of ShOpt was to write astrophysics specific
+software in \texttt{Julia}, because \texttt{Julia} provides a nice
+balance of readability and speed with it's high level functional
+paradigm and just in time compiler.
+
+While we do have theoretical models of the James Webb PSF, there is yet
+to be any validation of these models on real data in the literature.
+Additionally, these models are for single exposure images. The James
+Webb images have both single exposure and mosaiced images (Perrin et al.
+2014, 2012). Mosaiced images are essentially single exposure detector
+images concatenated together side by side. The PSF models for single
+exposures do not generalize to the mosaics, so empirical models are all
+we have for those images.
+
+The COMOS-Web survey is the largest extragalactic survey according to
+area and prime time allocation (Casey et al. 2023), and takes up
+\(0.54 deg^2\) (Beichman et al. 2012; Rieke et al. 2023). This is a
+large enough portion of the sky that we should prepare to see a lot of
+variation across the field of view. This gives ShOpt the oppurtunity to
+validate PIFF's correction for handeling PSF variations and underscore
+just how impactful (or not impactful) PSFex's size bias is.
+
+\hypertarget{acknowledgements}{%
+\section{Acknowledgements}\label{acknowledgements}}
+
+This project was made possible by The Northeastern Physics Department
+and Northeastern Undergraduate Research and Fellowships via the Physics
+Research Co-Op Fellowship and PEAK Ascent Award respectively.
+
+\hypertarget{references}{%
+\section*{References}\label{references}}
+\addcontentsline{toc}{section}{References}
+
+\hypertarget{refs}{}
+\begin{cslreferences}
+\leavevmode\hypertarget{ref-AbsMahSep2008}{}%
+Absil, P.-A., R. Mahony, and R. Sepulchre. 2008. \emph{Optimization
+Algorithms on Matrix Manifolds}. Princeton, NJ: Princeton University
+Press.
+
+\leavevmode\hypertarget{ref-2022ApJ}{}%
+Astropy Collaboration, Adrian M. Price-Whelan, Pey Lian Lim, Nicholas
+Earl, Nathaniel Starkman, Larry Bradley, David L. Shupe, et al. 2022.
+``The Astropy Project: Sustaining and Growing a Community-oriented
+Open-source Project and the Latest Major Release (v5.0) of the Core
+Package'' 935 (2): 167. \url{https://doi.org/10.3847/1538-4357/ac7c74}.
+
+\leavevmode\hypertarget{ref-10.1117ux2f12.925447}{}%
+Beichman, Charles A., Marcia Rieke, Daniel Eisenstein, Thomas P. Greene,
+John Krist, Don McCarthy, Michael Meyer, and John Stansberry. 2012.
+``Science opportunities with the near-IR camera (NIRCam) on the James
+Webb Space Telescope (JWST).'' In \emph{Space Telescopes and
+Instrumentation 2012: Optical, Infrared, and Millimeter Wave}, edited by
+Mark C. Clampin, Giovanni G. Fazio, Howard A. MacEwen, and Jacobus M.
+Oschmann Jr., 8442:84422N. International Society for Optics; Photonics;
+SPIE. \url{https://doi.org/10.1117/12.925447}.
+
+\leavevmode\hypertarget{ref-Bergmann2022}{}%
+Bergmann, Ronny. 2022. ``Manopt.jl: Optimization on Manifolds in
+Julia.'' \emph{Journal of Open Source Software} 7 (70): 3866.
+\url{https://doi.org/10.21105/joss.03866}.
+
+\leavevmode\hypertarget{ref-Bernstein_2002}{}%
+Bernstein, G. M., and M. Jarvis. 2002. ``Shapes and Shears, Stars and
+Smears: Optimal Measurements for Weak Lensing.'' \emph{The Astronomical
+Journal} 123 (2): 583. \url{https://doi.org/10.1086/338085}.
+
+\leavevmode\hypertarget{ref-2011ASPC}{}%
+Bertin, E. 2011. ``Automated Morphometry with SExtractor and PSFEx.'' In
+\emph{Astronomical Data Analysis Software and Systems Xx}, edited by I.
+N. Evans, A. Accomazzi, D. J. Mink, and A. H. Rots, 442:435.
+Astronomical Society of the Pacific Conference Series.
+
+\leavevmode\hypertarget{ref-boumal2023intromanifolds}{}%
+Boumal, Nicolas. 2023. \emph{An Introduction to Optimization on Smooth
+Manifolds}. Cambridge University Press.
+\url{https://doi.org/10.1017/9781009166164}.
+
+\leavevmode\hypertarget{ref-casey2023cosmosweb}{}%
+Casey, Caitlin M., Jeyhan S. Kartaltepe, Nicole E. Drakos, Maximilien
+Franco, Santosh Harish, Louise Paquereau, Olivier Ilbert, et al. 2023.
+``COSMOS-Web: An Overview of the Jwst Cosmic Origins Survey.''
+\url{http://arxiv.org/abs/2211.07865}.
+
+\leavevmode\hypertarget{ref-2015AJ}{}%
+Flaugher, B., H. T. Diehl, K. Honscheid, T. M. C. Abbott, and others.
+2015. ``The Dark Energy Camera.'' \emph{AJ} 150: 150.
+\url{https://doi.org/10.1088/0004-6256/150/5/150}.
+
+\leavevmode\hypertarget{ref-innes:2018}{}%
+Innes, Mike. 2018. ``Flux: Elegant Machine Learning with Julia.''
+\emph{Journal of Open Source Software}.
+\url{https://doi.org/10.21105/joss.00602}.
+
+\leavevmode\hypertarget{ref-Jarvis_2020}{}%
+Jarvis, M, G M Bernstein, A Amon, C Davis, P F Lé get, K Bechtol, I
+Harrison, et al. 2020. ``Dark Energy Survey Year 3 Results: Point Spread
+Function Modelling.'' \emph{Monthly Notices of the Royal Astronomical
+Society} 501 (1): 1282--99.
+\url{https://doi.org/10.1093/mnras/staa3679}.
+
+\leavevmode\hypertarget{ref-mccleary2023lensing}{}%
+McCleary, Jacqueline E, Spencer W Everett, Mohamed M Shaaban, Ajay S
+Gill, Georgios N Vassilakis, Eric M Huff, Richard J Massey, et al. 2023.
+``Lensing in the Blue Ii: Estimating the Sensitivity of Stratospheric
+Balloons to Weak Gravitational Lensing.'' \emph{arXiv Preprint
+arXiv:2307.03295}.
+
+\leavevmode\hypertarget{ref-Mogensen2018}{}%
+Mogensen, Patrick K., and Asbjørn N. Riseth. 2018. ``Optim: A
+Mathematical Optimization Package for Julia.'' \emph{Journal of Open
+Source Software} 3 (24): 615. \url{https://doi.org/10.21105/joss.00615}.
+
+\leavevmode\hypertarget{ref-2014SPIE}{}%
+Perrin, Marshall D., Anand Sivaramakrishnan, Charles-Philippe Lajoie,
+Erin Elliott, Laurent Pueyo, Swara Ravindranath, and Loı̈c. Albert. 2014.
+``Updated point spread function simulations for JWST with WebbPSF.'' In
+\emph{Space Telescopes and Instrumentation 2014: Optical, Infrared, and
+Millimeter Wave}, edited by Jr. Oschmann Jacobus M., Mark Clampin,
+Giovanni G. Fazio, and Howard A. MacEwen, 9143:91433X. Society of
+Photo-Optical Instrumentation Engineers (Spie) Conference Series.
+\url{https://doi.org/10.1117/12.2056689}.
+
+\leavevmode\hypertarget{ref-2012SPIE}{}%
+Perrin, Marshall D., Rémi Soummer, Erin M. Elliott, Matthew D. Lallo,
+and Anand Sivaramakrishnan. 2012. ``Simulating point spread functions
+for the James Webb Space Telescope with WebbPSF.'' In \emph{Space
+Telescopes and Instrumentation 2012: Optical, Infrared, and Millimeter
+Wave}, edited by Mark C. Clampin, Giovanni G. Fazio, Howard A. MacEwen,
+and Jr. Oschmann Jacobus M., 8442:84423D. Society of Photo-Optical
+Instrumentation Engineers (Spie) Conference Series.
+\url{https://doi.org/10.1117/12.925230}.
+
+\leavevmode\hypertarget{ref-RevelsLubinPapamarkou2016}{}%
+Revels, J., M. Lubin, and T. Papamarkou. 2016. ``Forward-Mode Automatic
+Differentiation in Julia.'' \emph{arXiv:1607.07892 {[}cs.MS{]}}.
+\url{https://arxiv.org/abs/1607.07892}.
+
+\leavevmode\hypertarget{ref-Rieke_2023}{}%
+Rieke, Marcia J., Douglas M. Kelly, Karl Misselt, John Stansberry,
+Martha Boyer, Thomas Beatty, Eiichi Egami, et al. 2023. ``Performance of
+Nircam on Jwst in Flight.'' \emph{Publications of the Astronomical
+Society of the Pacific} 135 (1044): 028001.
+\url{https://doi.org/10.1088/1538-3873/acac53}.
+
+\leavevmode\hypertarget{ref-doi:10.1177ux2f0278364918784361}{}%
+Rosen, David M, Luca Carlone, Afonso S Bandeira, and John J Leonard.
+2019. ``SE-Sync: A Certifiably Correct Algorithm for Synchronization
+over the Special Euclidean Group.'' \emph{The International Journal of
+Robotics Research} 38 (2-3): 95--125.
+\url{https://doi.org/10.1177/0278364918784361}.
+
+\leavevmode\hypertarget{ref-rowe2015galsim}{}%
+Rowe, Barnaby, Mike Jarvis, Rachel Mandelbaum, Gary M. Bernstein, James
+Bosch, Melanie Simet, Joshua E. Meyers, et al. 2015. ``GalSim: The
+Modular Galaxy Image Simulation Toolkit.''
+\url{http://arxiv.org/abs/1407.7676}.
+\end{cslreferences}
+
+\end{document}

@@ -1,6 +1,6 @@
-function pca_image(image_path, ncomponents)
-  # Load the image
-  img_matrix = image_path
+function pca_image(image, ncomponents)
+  #Load img Matrix
+  img_matrix = image
 
   # Perform PCA
   M = fit(PCA, img_matrix; maxoutdim=ncomponents)
