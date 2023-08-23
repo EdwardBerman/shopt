@@ -36,7 +36,7 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
-  pdftitle={ShOpt.jl \textbar{} A Julia Library for Empirical Point Spread Function Characterization of JWST Sources},
+  pdftitle={ShOpt.jl \textbar{} A Julia Library for Empirical Point Spread Function Characterization of JWST NIRCam Sources},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 \urlstyle{same} % disable monospaced font for URLs
@@ -90,7 +90,7 @@
   {\par}
 
 \title{ShOpt.jl \textbar{} A Julia Library for Empirical Point Spread
-Function Characterization of JWST Sources}
+Function Characterization of JWST NIRCam Sources}
 \author{}
 \date{23 August 2023}
 
@@ -264,9 +264,9 @@ libraries of astropy (Astropy Collaboration et al. 2022) and Galsim
 PSFex was written in \texttt{C} and had been active for more than 20
 years before the systematic size bias was discovered. Due to being so
 old and written in a low level language it is much less approachable.
-One of the motivations of ShOpt was to write astrophysics specific
-software in \texttt{Julia}, because \texttt{Julia} provides a nice
-balance of readability and speed with it's high level functional
+One of the motivations of \texttt{ShOpt} was to write astrophysics
+specific software in \texttt{Julia}, because \texttt{Julia} provides a
+nice balance of readability and speed with it's high level functional
 paradigm and just in time compiler.
 
 While we do have theoretical models of the James Webb PSF, there is yet
@@ -282,9 +282,10 @@ The COMOS-Web survey is the largest extragalactic survey according to
 area and prime time allocation (Casey et al. 2023), and takes up
 \(0.54 deg^2\) (Beichman et al. 2012; Rieke et al. 2023). This is a
 large enough portion of the sky that we should prepare to see a lot of
-variation across the field of view. This gives ShOpt the oppurtunity to
-validate PIFF's correction for handeling PSF variations and underscore
-just how impactful (or not impactful) PSFex's size bias is.
+variation across the field of view. This gives \texttt{ShOpt} the
+oppurtunity to validate PIFF's correction for handeling PSF variations
+and underscore just how impactful (or not impactful) PSFex's size bias
+is.
 
 \hypertarget{acknowledgements}{%
 \section{Acknowledgements}\label{acknowledgements}}
@@ -379,7 +380,7 @@ Source Software} 3 (24): 615. \url{https://doi.org/10.21105/joss.00615}.
 
 \leavevmode\hypertarget{ref-2014SPIE}{}%
 Perrin, Marshall D., Anand Sivaramakrishnan, Charles-Philippe Lajoie,
-Erin Elliott, Laurent Pueyo, Swara Ravindranath, and Loı̈c. Albert. 2014.
+Erin Elliott, Laurent Pueyo, Swara Ravindranath, and Loic. Albert. 2014.
 ``Updated point spread function simulations for JWST with WebbPSF.'' In
 \emph{Space Telescopes and Instrumentation 2014: Optical, Infrared, and
 Millimeter Wave}, edited by Jr. Oschmann Jacobus M., Mark Clampin,
