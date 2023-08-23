@@ -15,3 +15,4 @@ function pca_image(image, ncomponents)
   reconstructed_image = reshape(reconstructed, size(img_matrix)...)
 end
 
+
