@@ -146,7 +146,7 @@ pyimport("astropy")
 pyimport("matplotlib")
 pyimport("numpy")
 ```
-should ensure that Julia and Python are interopping correctly. 
+in the Julia REPL should ensure that Julia and Python are interopping correctly. 
 
 ## Program Architecture
 
