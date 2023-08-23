@@ -1,5 +1,5 @@
 ---
-title: 'ShOpt.jl | A Julia Library for Empirical Point Spread Function Characterization of JWST Sources'
+title: 'ShOpt.jl | A Julia Library for Empirical Point Spread Function Characterization of JWST NIRCam Sources'
 tags:
   - JWST 
   - Deep Learning

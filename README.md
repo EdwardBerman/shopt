@@ -11,6 +11,7 @@
   - [Command](#command)
   - [Dependencies](#dependencies)
   - [Set Up](#set-up)
+  - [Testing](#testing)
 - [Program Architecture](#program-architecture)
 - [How Can I Contribute?](#how-to-contribute)
 - [Config / YAML Information](#config--yaml-information)
@@ -137,6 +138,15 @@ run(`$(PyCall.python) -m pip install astropy`)
 ```
 
 After the file contents are downloaded the user can run ```julia shopt.jl [configdir] [outdir] [catalog]``` as stated above. Alternatively, they can run the shellscript that calls shopt in whatever program they are working with to create their catalog. For example, in a julia program you may use ```run(`./runshopt.sh [configdir] [outdir] [catalog]`)```
+
+### Testing
+To test that everything works, running the `dependencies.jl` should test that everything is installed correctly in addition to downloading. Running 
+```julia 
+pyimport("astropy")
+pyimport("matplotlib")
+pyimport("numpy")
+```
+should ensure that Julia and Python are interopping correctly. 
 
 ## Program Architecture
 
