@@ -32,6 +32,7 @@ polynomial_interpolation_stopping_gradient = config["polynomial_interpolation_st
 lanczos = config["lanczos"]
 truncate_summary_file = config["truncate_summary_file"]
 iterationsPolyfit = config["iterations"]
+alpha = config["alpha"]
 
 
 #=
@@ -40,6 +41,7 @@ Log these config choices
 
 println("Key Config Choices:")
 println("━ Mode: ", mode)
+println("━ α:", alpha)
 println("━ Iterations: ", iterationsPolyfit)
 println("━ Summary Name: ", summary_name)
 println("━ PCA Terms: ", PCAterms)
@@ -251,7 +253,7 @@ In [10]: len(f[2].data['DELTAWIN_J2000'])
 Out[10]: 290
 =#
 
-function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=outliers_filter)
+function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=outliers_filter, alpha=alpha)
   catalog = args[3]
 
   py"""
@@ -260,6 +262,9 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   
   python_datadir = $catalog
   print(python_datadir)
+  alpha_default = $alpha
+  print(alpha_default)
+
   f = fits.open(python_datadir)
   def find_extension_with_colname(fits_file, target_colname):
     with fits.open(fits_file) as hdulist:
@@ -272,7 +277,25 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
                     
         return matching_extensions
   idx = find_extension_with_colname(python_datadir, 'VIGNET')[0]
+  
   vignets = f[idx].data['VIGNET']
+  backgrounds = f[idx].data['BACKGROUND']
+  sigma_bs = [np.sqrt(np.var(background)) for background in backgrounds]
+  
+
+  def sigma_squared_i(pi, g, sigma_b, alpha):
+    return sigma_b + pi / g + (alpha * pi)**2
+
+  def compute_sigma_i_for_vignet(vignet, sigma_b, g=4, alpha=alpha_default, eta=1.0):
+    sigma_i_cutout = np.zeros_like(vignet, dtype=float)
+    for i in range(vignet.shape[0]):
+      for j in range(vignet.shape[1]):
+        pi = vignet[i, j]
+        sigma_i_cutout[i, j] = sigma_squared_i(pi, g, sigma_b, alpha)
+    return sigma_i_cutout
+
+  # Compute sigma_i for each vignette using its respective sigma_b
+  err_vignets = [compute_sigma_i_for_vignet(vignet, sigma_b) for vignet, sigma_b in zip(vignets, sigma_bs)]
   #err_vignets = f[idx].data['ERR_VIGNET']
   l = len(vignets)
 
@@ -284,9 +307,10 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
 
   datadir = py"python_datadir"
   v = py"vignets"
-  #err = py"err_vignets"
+  err = py"err_vignets"
+  
   catalog = py"list(map(np.array, $v))"
-  #errVignets = py"list(map(np.array, $err))"
+  errVignets = py"list(map(np.array, $err))"
   
   u_coords = convert(Array{Float64,1}, py"u")
   v_coords = convert(Array{Float64,1}, py"v")
@@ -317,9 +341,10 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
 
 
   catalogNew, outlier_indices = dout(snr, catalogNew, snrCutoff)
+  errVignets = [errVignets[i] for i in 1:length(errVignets) if i ∉ outlier_indices]
+
   println("━ Number of vignets: ", length(catalog))
   println("━ Removed $(length(catalog) - length(catalogNew)) outliers on the basis of Signal to Noise Ratio")
- 
  #= 
   for i in 1:length(catalogNew)
     catalogNew[i] = get_middle_nxn(catalogNew[i], new_img_dim)
@@ -334,12 +359,12 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
     if new_img_dim/size(catalogNew[1], 1) < 1
       for i in 1:length(catalogNew)
         catalogNew[i] = smooth(nm(get_middle_nxn(catalogNew[i], new_img_dim))/sum(nz(nm(get_middle_nxn(catalogNew[i], new_img_dim)))), lanczos)
-        #errVignets[i] = get_middle_nxn(errVignets[i], new_img_dim)
+        errVignets[i] = get_middle_nxn(errVignets[i], new_img_dim)
       end
     else
       for i in 1:length(catalogNew)
         catalogNew[i] = smooth(nm(oversample_image(catalogNew[i], new_img_dim))/sum(nz(nm(oversample_image(catalogNew[i], new_img_dim)))), lanczos)
-        #errVignets[i] = oversample_image(errVignets[i], new_img_dim)
+        errVignets[i] = oversample_image(errVignets[i], new_img_dim)
       end
     end
   end
@@ -351,8 +376,8 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   if UnicodePlotsPrint
     println(UnicodePlots.heatmap(nz(nm(get_middle_nxn(catalogNew[k],15))), colormap=:inferno, title="Sampled Vignet $k")) 
   end
-
-  return catalogNew, r, c, length(catalogNew), u_coords, v_coords, outlier_indices
+  
+  return catalogNew, r, c, length(catalogNew), u_coords, v_coords, outlier_indices, errVignets
 end
 
 

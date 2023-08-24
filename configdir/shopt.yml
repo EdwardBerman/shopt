@@ -42,4 +42,6 @@ truncate_summary_file: true # do you want to save storage by only storing essent
 
 iterations: 3
 
+alpha: 0.01
+
 CommentsOnRun: "** This is where you can leave comments or notes to self on the run! **"

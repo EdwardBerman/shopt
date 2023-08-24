@@ -84,7 +84,7 @@ end
 fancyPrint("Processing Data for Fit")
 @time begin
   
-  starCatalog, r, c, itr, u_coordinates, v_coordinates, outlier_indices = cataloging(ARGS)
+  starCatalog, r, c, itr, u_coordinates, v_coordinates, outlier_indices, errVignets = cataloging(ARGS)
   #starCatalog = starCatalog
   #errVignets = errVignets
   #u_coordinates = u_coordinates
