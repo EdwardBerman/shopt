@@ -1,6 +1,6 @@
 saveYaml: true #save this file with each run
 
-mode: "PCA" # Options: auotoencoder, PCA. Make sure mode is a string with double quotes
+mode: "PCA" # Options: auotoencoder, chisq, PCA. Make sure mode is a string with double quotes
 
 PCAterms: 50 #If PCA mode is enabled, how many moments do you want to use for your pixel grid fit
 
