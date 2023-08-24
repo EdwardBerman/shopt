@@ -1,7 +1,9 @@
 #=
 Load in Config shopt.yml
 =#
-
+nt = nthreads()
+fancyPrintTwo("Julia is using $nt threads to run ShOpt.jl. To change this, on UNIX run export JULIA_NUM_THREADS=[Integer] and on Windows set JULIA_NUM_THREADS=[Integer].") 
+fancyPrintTwo("For example: export JULIA_NUM_THREADS=4 or set JULIA_NUM_THREADS=4")
 config = YAML.load_file(joinpath(configdir, "shopt.yml"))
 epochs = config["NNparams"]["epochs"]
 degree = config["polynomialDegree"]
