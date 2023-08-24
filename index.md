@@ -141,7 +141,8 @@ run(`$(PyCall.python) -m pip install astropy`)
 After the file contents are downloaded the user can run ```julia shopt.jl [configdir] [outdir] [catalog]``` as stated above. Alternatively, they can run the shellscript that calls shopt in whatever program they are working with to create their catalog. For example, in a julia program you may use ```run(`./runshopt.sh [configdir] [outdir] [catalog]`)```
 
 ### Multithreading
-Before running, we recommend that users run `export JULIA_NUM_THREADS=4` on Unix machines `set JULIA_NUM_THREADS=4` . By default Julia will run the program on a single thread, but the polynomial interpolation step is inherently parallelizable. The program is set to use all of threads available to it.
+Before running, we recommend that users run `export JULIA_NUM_THREADS=4` on Unix machines `set JULIA_NUM_THREADS=4` . By default Julia will run the program on a single thread, but the polynomial interpolation step is inherently parallelizable. The program is set to use all of threads available to it.  You may do more than 4, just be cautious about what your system can provide and when you start getting dimminishing returns.
+
 
 
 ### Testing
@@ -152,6 +153,13 @@ pyimport("matplotlib")
 pyimport("numpy")
 ```
 in the Julia REPL should ensure that Julia and Python are interopping correctly. 
+
+Additionally, in the Julia REPL, we may 
+```julia
+using Base.Threads
+nthreads()
+```
+to make sure we are using 4 or more threads. 
 
 ## Program Architecture
 
