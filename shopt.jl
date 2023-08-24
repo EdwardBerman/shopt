@@ -85,7 +85,11 @@ end
 fancyPrint("Processing Data for Fit")
 @time begin
   
-  starCatalog, r, c, itr, u_coordinates, v_coordinates, outlier_indices, errVignets = cataloging(ARGS)
+  if mode == "chisq"
+    starCatalog, r, c, itr, u_coordinates, v_coordinates, outlier_indices, errVignets = cataloging(ARGS)
+  else
+    starCatalog, r, c, itr, u_coordinates, v_coordinates, outlier_indices = cataloging(ARGS)
+  end
   #starCatalog = starCatalog
   #errVignets = errVignets
   #u_coordinates = u_coordinates

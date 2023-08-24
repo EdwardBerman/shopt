@@ -312,9 +312,13 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
 
   datadir = py"python_datadir"
   v = py"vignets"
-  err = py"err_vignets"
+  
+  if mode == "chisq"
+    err = py"err_vignets"
+  end
   
   catalog = py"list(map(np.array, $v))"
+  
   if mode == "chisq"
     errVignets = py"list(map(np.array, $err))"
   end
@@ -391,7 +395,11 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
     println(UnicodePlots.heatmap(nz(nm(get_middle_nxn(catalogNew[k],15))), colormap=:inferno, title="Sampled Vignet $k")) 
   end
   
-  return catalogNew, r, c, length(catalogNew), u_coords, v_coords, outlier_indices, errVignets
+  if mode == "chisq"
+    return catalogNew, r, c, length(catalogNew), u_coords, v_coords, outlier_indices, errVignets
+  else 
+    return catalogNew, r, c, length(catalogNew), u_coords, v_coords, outlier_indices
+  end
 end
 
 
