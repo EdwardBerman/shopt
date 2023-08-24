@@ -31,6 +31,7 @@ lanczos = config["lanczos"]
 truncate_summary_file = config["truncate_summary_file"]
 iterationsPolyfit = config["iterations"]
 
+
 #=
 Log these config choices
 =#

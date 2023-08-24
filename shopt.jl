@@ -54,6 +54,7 @@ fancyPrint("Handling Imports")
   using CairoMakie
   using Dates
   using MultivariateStats
+  using Base.Threads
   #using Interpolations
 end
 println("━ Start Time ", Dates.now())
@@ -437,6 +438,14 @@ end
   for loop in 1:iterationsPolyfit
     #print(length(iterationsPolyfit))
     println("━ Iteration: $loop")
+    @threads for i in 1:r
+      for j in 1:c
+        z_data = [star[i, j] for star in training_stars]
+        pC = polynomial_optimizer(degree, training_u_coords, training_v_coords, z_data)
+        PolynomialMatrix[i,j,:] .= pC
+      end
+    end
+    #=
     for i in 1:r
       for j in 1:c
         z_data = [star[i, j] for star in training_stars]
@@ -444,13 +453,16 @@ end
         PolynomialMatrix[i,j,:] .= pC
       end
     end
-
+    =#
+    
+    #training_errors = Threads.@spawn [compute_mse(compute_single_star_reconstructed_value(PolynomialMatrix, training_u_coords[idx], training_v_coords[idx], degree), training_stars[idx]) for idx in 1:length(training_stars)]
+    
     training_errors = []
     for idx in 1:length(training_stars)
       reconstructed_star = compute_single_star_reconstructed_value(PolynomialMatrix, training_u_coords[idx], training_v_coords[idx], degree)
       push!(training_errors, compute_mse(reconstructed_star, training_stars[idx]))
     end
-
+    
     bad_indices = worst_10_percent(training_errors)
    
     if loop != iterationsPolyfit
