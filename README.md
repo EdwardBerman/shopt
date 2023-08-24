@@ -158,7 +158,7 @@ Additionally, in the Julia REPL, we may
 using Base.Threads
 nthreads()
 ```
-to make sure we are using 4 or more threads. 
+to make sure we are using 4 or more threads. The **TutorialNotebook.ipynb** will walk you through and test all of the functionality of the program. 
 
 ## Program Architecture
 
