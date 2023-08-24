@@ -33,7 +33,7 @@ lanczos = config["lanczos"]
 truncate_summary_file = config["truncate_summary_file"]
 iterationsPolyfit = config["iterations"]
 alpha = config["alpha"]
-
+chisq_stopping_gradient = config["chisq_stopping_gradient"]
 
 #=
 Log these config choices
@@ -42,6 +42,7 @@ Log these config choices
 println("Key Config Choices:")
 println("━ Mode: ", mode)
 println("━ α:", alpha)
+println("━ Chisq Stopping Gradient:", chisq_stopping_gradient)
 println("━ Iterations: ", iterationsPolyfit)
 println("━ Summary Name: ", summary_name)
 println("━ PCA Terms: ", PCAterms)
@@ -261,10 +262,11 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   from astropy.io import fits
   
   python_datadir = $catalog
+  mode = $mode
   print(python_datadir)
   alpha_default = $alpha
   print(alpha_default)
-
+  print("Making error cutouts...")
   f = fits.open(python_datadir)
   def find_extension_with_colname(fits_file, target_colname):
     with fits.open(fits_file) as hdulist:
@@ -279,8 +281,10 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   idx = find_extension_with_colname(python_datadir, 'VIGNET')[0]
   
   vignets = f[idx].data['VIGNET']
-  backgrounds = f[idx].data['BACKGROUND']
-  sigma_bs = [np.sqrt(np.var(background)) for background in backgrounds]
+  
+  if mode == "chisq":
+    backgrounds = f[idx].data['BACKGROUND']
+    sigma_bs = [np.sqrt(np.var(background)) for background in backgrounds]
   
 
   def sigma_squared_i(pi, g, sigma_b, alpha):
@@ -295,7 +299,8 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
     return sigma_i_cutout
 
   # Compute sigma_i for each vignette using its respective sigma_b
-  err_vignets = [compute_sigma_i_for_vignet(vignet, sigma_b) for vignet, sigma_b in zip(vignets, sigma_bs)]
+  if mode == "chisq":
+    err_vignets = [compute_sigma_i_for_vignet(vignet, sigma_b) for vignet, sigma_b in zip(vignets, sigma_bs)]
   #err_vignets = f[idx].data['ERR_VIGNET']
   l = len(vignets)
 
@@ -310,7 +315,9 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   err = py"err_vignets"
   
   catalog = py"list(map(np.array, $v))"
-  errVignets = py"list(map(np.array, $err))"
+  if mode == "chisq"
+    errVignets = py"list(map(np.array, $err))"
+  end
   
   u_coords = convert(Array{Float64,1}, py"u")
   v_coords = convert(Array{Float64,1}, py"v")
@@ -341,7 +348,10 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
 
 
   catalogNew, outlier_indices = dout(snr, catalogNew, snrCutoff)
-  errVignets = [errVignets[i] for i in 1:length(errVignets) if i ∉ outlier_indices]
+  
+  if mode == "chisq"
+    errVignets = [errVignets[i] for i in 1:length(errVignets) if i ∉ outlier_indices]
+  end
 
   println("━ Number of vignets: ", length(catalog))
   println("━ Removed $(length(catalog) - length(catalogNew)) outliers on the basis of Signal to Noise Ratio")
@@ -359,12 +369,16 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
     if new_img_dim/size(catalogNew[1], 1) < 1
       for i in 1:length(catalogNew)
         catalogNew[i] = smooth(nm(get_middle_nxn(catalogNew[i], new_img_dim))/sum(nz(nm(get_middle_nxn(catalogNew[i], new_img_dim)))), lanczos)
-        errVignets[i] = get_middle_nxn(errVignets[i], new_img_dim)
+        if mode == "chisq"
+          errVignets[i] = get_middle_nxn(errVignets[i], new_img_dim)
+        end
       end
     else
       for i in 1:length(catalogNew)
         catalogNew[i] = smooth(nm(oversample_image(catalogNew[i], new_img_dim))/sum(nz(nm(oversample_image(catalogNew[i], new_img_dim)))), lanczos)
-        errVignets[i] = oversample_image(errVignets[i], new_img_dim)
+        if mode == "chisq"
+          errVignets[i] = oversample_image(errVignets[i], new_img_dim)
+        end
       end
     end
   end

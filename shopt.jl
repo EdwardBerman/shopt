@@ -74,6 +74,7 @@ fancyPrint("Reading .jl Files")
   include("interpolate.jl")
   include("pixelGridAutoencoder.jl")
   include("pca.jl")
+  include("chisq.jl")
   include("reader.jl")
   #include("lk.jl")
 end
@@ -182,6 +183,39 @@ failedStars = []
 # ---------------------------------------------------------#
 fancyPrint("Pixel Grid Fit")
 pixelGridFits = []
+
+if mode == "chisq"
+  println("━  χ2  Mode...\n")
+  @time begin
+    pb = tqdm(1:itr)
+    for i in pb
+      set_description(pb, "Star $i/$itr Complete") 
+      global iteration = i
+      initial_guess = rand(r*c)
+      try
+        global chisq_cg = optimize(chisq_cost, 
+                                   chisq_g!, 
+                                   initial_guess, 
+                                   LBFGS())#,#ConjugateGradient()
+                                   
+                                   #Optim.Options(g_tol = chisq_stopping_gradient))#Optim.Options(callback = cb) #Optim.Options(g_tol = 1e-6))
+      catch ex
+        println(ex)
+        println("Star $i failed")
+        push!(failedStars, i)
+        push!(pixelGridFits, zeros(r,c))
+        continue
+      end
+      if unity_sum
+        pgf_current = reshape(chisq_cg.minimizer, (r, c))./sum(reshape(chisq_cg.minimizer, (r, c)))
+      else
+        pgf_current = reshape(chisq_cg.minimizer, (r, c))
+      end
+      push!(pixelGridFits, pgf_current)
+    end 
+  end 
+end
+
 
 if mode == "autoencoder"
   println("━ Autoencoder Mode...\n")
