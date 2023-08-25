@@ -80,7 +80,7 @@ While there are many existing empirical PSF fitters, they were created as apart 
 
 (1) The James Webb PSFs are not well approximated by analytic profiles. This calls for well thought out parametric free models that can capture the full dynamic range of the Point Spread Function without fixating on the noise in the background.  
 
-(2) The NIRCam detectors measure 0.03"/pix (cite). To capture an accurate description of the Point Spread Function at this scale we need images that are $131$ by $131$ to $261$ by $261$ pixels across. These vignet sizes are much larger in comparison to the sizes needed for previous large scale surveys such as DES [@Jarvis_2020] and SuperBIT [@mccleary2023lensing] and forces us to evaluate how well existing PSF fitters scale to this size.
+(2) The NIRCam detectors measure 0.03"/pix [@Gardner_2006]. To capture an accurate description of the Point Spread Function at this scale we need images that are $131$ by $131$ to $261$ by $261$ pixels across. These vignet sizes are much larger in comparison to the sizes needed for previous large scale surveys such as DES [@Jarvis_2020] and SuperBIT [@mccleary2023lensing] and forces us to evaluate how well existing PSF fitters scale to this size.
 
 
 # State of the Field

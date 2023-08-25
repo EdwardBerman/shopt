@@ -2,12 +2,12 @@ saveYaml: true #save this file with each run
 
 mode: "PCA" # Options: auotoencoder, chisq, PCA. Make sure mode is a string with double quotes
 
-PCAterms: 50 #If PCA mode is enabled, how many moments do you want to use for your pixel grid fit
+PCAterms: 100 #If PCA mode is enabled, how many moments do you want to use for your pixel grid fit
 
 lanczos: 5 #The size of the smoothing kernel
 
 NNparams: #For if Autoencoder mode is enabled
-  epochs: 100 # max number of training epochs for each pixel grid fit
+  epochs: 50 # max number of training epochs for each pixel grid fit
   minGradientPixel: 1e-5 # the stopping gradient of the loss function for the pixel grid fit 
 
 AnalyticFitParams: # for fitting analytic profile
@@ -40,7 +40,7 @@ polynomial_interpolation_stopping_gradient: 1e-8 #stopping gradient for LFBGS us
 summary_name: '' #name to prefix summary.shopt
 truncate_summary_file: true # do you want to save storage by only storing essential information, how to reconstruct the PSF and analytic models
 
-iterations: 3
+iterations: 10
 
 alpha: 0.01
 chisq_stopping_gradient: 1e-8 

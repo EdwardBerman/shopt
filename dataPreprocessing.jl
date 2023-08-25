@@ -40,7 +40,11 @@ Log these config choices
 =#
 
 println("Key Config Choices:")
-println("━ Mode: ", mode)
+if mode == "chisq"
+  println("━ Mode: χ2")
+else
+  println("━ Mode: ", mode)
+end
 println("━ α:", alpha)
 println("━ Chisq Stopping Gradient:", chisq_stopping_gradient)
 println("━ Iterations: ", iterationsPolyfit)
@@ -266,7 +270,8 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   print(python_datadir)
   alpha_default = $alpha
   print(alpha_default)
-  print("Making error cutouts...")
+  if mode == "chisq":
+    print("Making error cutouts...")
   f = fits.open(python_datadir)
   def find_extension_with_colname(fits_file, target_colname):
     with fits.open(fits_file) as hdulist:
