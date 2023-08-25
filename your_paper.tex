@@ -108,14 +108,14 @@ mathematical model that quantifies exactly how the light is being
 distorted. The point spread function takes as input a delta function and
 a position and outputs a lensed image. The goal of empirical point
 spread function characterization is to be able to point to any position
-on your camera and predict what the lensed image looks like. Once we
-have a model that can do this well, we can deconvolve our images with
-the point spread function to obtain what the image would look like in
-the absense of lensing. The empirical way to do this is to take our
-images of lensed stars and seperate them into training and validation
-set. Our point spread function will be found by interpolating the
-training stars across the field of view of the camera and validated by
-comparing the reserved stars to the point spread function's prediction.
+on your camera and predict what the lensed star looks like. Once we have
+a model that can do this well, we can deconvolve our images with the
+point spread function to obtain what the image would look like in the
+absense of lensing. The empirical way to do this is to take our images
+of lensed stars and seperate them into training and validation set. Our
+point spread function will be found by interpolating the training stars
+across the field of view of the camera and validated by comparing the
+reserved stars to the point spread function's prediction.
 
 Shear Optimization with \texttt{ShOpt.jl} introduces modern techniques
 for empirical Point Spread Function characterization across the Full
