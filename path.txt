@@ -40,4 +40,10 @@ julia shopt.jl /home/eddieberman/research/mcclearygroup/shopt/configdir /home/ed
 
 history | grep "STRING_TO_SEARCH_HERE'
 
+pandoc paper.md --template=joss-template.latex -s --citeproc --bibliography=paper.bib -o your_paper.tex
 pandoc paper.md -s --filter pandoc-citeproc --bibliography=paper.bib -o your_paper.pdf
+
+
+pandoc paper.md --template=joss-template.latex -s --filter pandoc-citeproc --bibliography=paper.bib -o your_paper.pdf
+
+
