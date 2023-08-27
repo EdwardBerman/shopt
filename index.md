@@ -36,7 +36,7 @@ We adopt the following procedure to ensure our gradient steps never take us outs
 
 ![image](READMEassets/reparameterization.png)
 
-Path to $[s, g_1, g_2]$ in $B_2(r) \times \mathbb{R}_+$
+Path to [s, g_1, g_2] subject to the cylindrical constraint
 
 ![image](READMEassets/pathToPoint.png)
 
