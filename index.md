@@ -36,6 +36,11 @@ We adopt the following procedure to ensure our gradient steps never take us outs
 
 ![image](READMEassets/reparameterization.png)
 
+Path to $[s, g_1, g_2]$ in $B_2(r) \times \mathbb{R}_+$
+
+![image](READMEassets/pathToPoint.png)
+
+
 ### Pixel Grid Fits                                                                                                        
 
 #### PCA Mode 
