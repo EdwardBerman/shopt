@@ -34,11 +34,11 @@ Shear Optimization with `ShOpt.jl` introduces modern techniques for empirical po
 
 ![image](spikey.png)
 
-Our multivariate gaussian is parameterized by three variables, $[s, g_1, g_2]$, where $s$ corresponds to size and $g_1 , g_2$ correspond to shear. A shear matrix has the form $\begin{pmatrix}
+Our multivariate gaussian is parameterized by three variables, $[s, g_1, g_2]$, where $s$ corresponds to size and $g_1 , g_2$ correspond to shear. A shear matrix has the form $$\begin{pmatrix}
 1 + g_1 & g_2 \\
 g_2 & 1 - g_1
 \end{pmatrix}
-$. Given a point $[u, v]$, we obtain coordinates $[u' , v']$ by applying a shear and then a scaling $\frac{s}{\sqrt{1 - g_1^2 - g_2^2}}$. Then, we choose $f(r) :=  Ae^{-r^2}$ to complete our fit, where $A$ makes the fit sum to unity over the cutout of our star. After we fit this function to our stars with `Optim.jl` [@Mogensen2018] and `ForwardDiff.jl` [@RevelsLubinPapamarkou2016], we interpolate the parameters across the field of view according to position. Essentially, each star is a datapoint, and the three variables are given polynomials in focal plane coordinates of degree $n$, where $n$ is supplied by the user. For a more precise model, we also give each pixel in our images a polynomial and interpolate it across the field of view. This is referred to in the literature as a pixel grid fit [@Jarvis_2020]. 
+$$. Given a point $[u, v]$, we obtain coordinates $[u' , v']$ by applying a shear and then a scaling $\frac{s}{\sqrt{1 - g_1^2 - g_2^2}}$. Then, we choose $f(r) :=  Ae^{-r^2}$ to complete our fit, where $A$ makes the fit sum to unity over the cutout of our star. After we fit this function to our stars with `Optim.jl` [@Mogensen2018] and `ForwardDiff.jl` [@RevelsLubinPapamarkou2016], we interpolate the parameters across the field of view according to position. Essentially, each star is a datapoint, and the three variables are given polynomials in focal plane coordinates of degree $n$, where $n$ is supplied by the user. For a more precise model, we also give each pixel in our images a polynomial and interpolate it across the field of view. This is referred to in the literature as a pixel grid fit [@Jarvis_2020]. 
 
 ## Notation
 
