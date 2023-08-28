@@ -43,23 +43,23 @@ $$. Given a point $[u, v]$, we obtain coordinates $[u' , v']$ by applying a shea
 ## Notation
 Sure, here's your notation formatted in markdown:
 
-1. For the set \(B_2(r)\), we have:
+1. For the set $B_2(r)$, we have:
    
-   \[
+   $$
    B_2(r) \equiv \{ [x,y] : x^2 + y^2 < 1 \} \subset \mathbb{R}^2
-   \]
+   $$
 
-2. For the set \(\mathbb{R}_+\), we have:
+2. For the set $\mathbb{R}_+$, we have:
 
-   \[
+   $$
    \mathbb{R}_+ \equiv \{ x : x > 0 \} \subset \mathbb{R}
-   \]
+   $$
 
-3. For the Cartesian product of sets \(A\) and \(B\), we have:
+3. For the Cartesian product of sets $A$ and $B$, we have:
 
-   \[
+   $$
    A \times B \equiv \{(a, b): a \in A, b \in B \}
-   \]
+   $$
 ## Methods
 `ShOpt.jl` takes inspiration from a number of algorithms outside of astronomy. Mainly, SE-Sync [@doi:10.1177/0278364918784361], an algorithm that provides a certifiably correct solution to a robotic mapping problem by considering the manifold properites of the data. SE-Sync proves that with sufficiently clean data, their algorithm will descend to a global minimum constrained to the manifold $SE(d)^n / SE(d)$. Likewise, we are able to put a constraint on the solutions we obtain to $[s, g_1, g_2]$ to a manifold. [@Bernstein_2002] outlined that the solution to $[s, g_1, g_2]$  is constrained to the manifold $B_2(r) \times \mathbb{R}_{+}$. While it was known that this constrain existed in the literature, the parameter estimation task is generally framed as an unconstrained problem  [@Jarvis_2020]. For a more rigorous treatment of optimization on manifolds see [@AbsMahSep2008] and [@boumal2023intromanifolds]. `Julia` has lots of support for working with manifolds with `Manopt`, which we may leverage in future releases [@Bergmann2022]. 
 
