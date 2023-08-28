@@ -38,16 +38,18 @@ Our multivariate gaussian is parameterized by three variables, $[s, g_1, g_2]$, 
 1 + g_1 & g_2 \\
 g_2 & 1 - g_1
 \end{pmatrix}
-$$. Given a point $[u, v]$, we obtain coordinates $[u' , v']$ by applying a shear and then a scaling by $\frac{s}{\sqrt{1 - g_1^2 - g_2^2}}$. Then, we choose $f(r) :=  Ae^{-r^2}$ to complete our fit, where $A$ makes the fit sum to unity over the cutout of our star. After we fit this function to our stars with `Optim.jl` [@Mogensen2018] and `ForwardDiff.jl` [@RevelsLubinPapamarkou2016], we interpolate the parameters across the field of view according to position. Essentially, each star is a datapoint, and the three variables are treated as polynomials in focal plane coordinates of degree $n$, where $n$ is supplied by the user. **Define focal plane** .For a more precise model, we also give each pixel in our images a polynomial and interpolate it across the field of view. This is referred to in the literature as a pixel basis [@Jarvis_2020]. 
+$$. Given a point $[u, v]$, we obtain coordinates $[u' , v']$ by applying a shear and then a scaling by $\frac{s}{\sqrt{1 - g_1^2 - g_2^2}}$. Then, we choose $f(r) :=  Ae^{-r^2}$ to complete our fit, where $A$ makes the fit sum to unity over the cutout of our star. After we fit this function to our stars with `Optim.jl` [@Mogensen2018] and `ForwardDiff.jl` [@RevelsLubinPapamarkou2016], we interpolate the parameters across the field of view according to position. Essentially, each star is a datapoint, and the three variables are treated as polynomials in focal plane coordinates of degree $n$, where $n$ is supplied by the user. The focal plain refers to the set of points where an image appears to be in perfect focus. This is instead of pixel coordinates, where one just uses (x,y) as measured on an image. For a more precise model, we also give each pixel in our images a polynomial and interpolate it across the field of view. This is referred to in the literature as a pixel basis [@Jarvis_2020]. 
 
 ## Notation
 
 ## Methods
 `ShOpt.jl` takes inspiration from a number of algorithms outside of astronomy. Mainly, SE-Sync [@doi:10.1177/0278364918784361], an algorithm that provides a certifiably correct solution to a robotic mapping problem by considering the manifold properites of the data. SE-Sync proves that with sufficiently clean data, their algorithm will descend to a global minimum constrained to the manifold $SE(d)^n / SE(d)$. Likewise, we are able to put a constraint on the solutions we obtain to $[s, g_1, g_2]$ to a manifold. [@Bernstein_2002] outlined that the solution to $[s, g_1, g_2]$  is constrained to the manifold $B_2(r) \times \mathbb{R}_{+}$. While it was known that this constrain existed in the literature, the parameter estimation task is generally framed as an unconstrained problem  [@Jarvis_2020]. For a more rigorous treatment of optimization on manifolds see [@AbsMahSep2008] and [@boumal2023intromanifolds]. `Julia` has lots of support for working with manifolds with `Manopt`, which we may leverage in future releases [@Bergmann2022]. 
 
-`ShOpt.jl` provides two modes for pixel grid fits, `PCA mode` and `Autoencoder mode`. Each mode provides the end user with tunable parameters that allow for both perfect reconstruction of the model vignets and low dimensional representations. The advantage of these modes is that they provide good reconstructions of the lensed images while fixating on the actual star and not the background noise. In this way it generates a datapoint for our empirical point spread function to learn and denoises the image in one step.
+![LFBGS algorithm used to by parameters subject to the cylindrical constraint. s is arbitrarily capped at 1 as a data cleaning method](pathToPoint.png)
 
-`PCA mode`, outlined here, reconstructs it's images using the first n principal components.
+`ShOpt.jl` provides two modes for pixel grid fits, `PCA mode` and `Autoencoder mode`. `PCA mode`, outlined below, reconstructs its images using the first $n$ principal components. `Autoencoder mode` uses a neural network to reconstruct the image from a lower dimensional latent space. The network code written with `Flux.jl` is also outlined below [@innes:2018]. Both modes provide the end user with tunable parameters that allow for both perfect reconstruction of the model vignets and low dimensional representations. The advantage of these modes is that they provide good reconstructions of the lensed images while fixating on the actual star and not the background noise. In this way it generates a datapoint for our empirical point spread function to learn and denoises the image in one step.
+
+`PCA mode`
 ```Julia
 function pca_image(image, ncomponents)    
   #Load img Matrix
@@ -66,7 +68,7 @@ function pca_image(image, ncomponents)
   reconstructed_image = reshape(reconstructed, size(img_matrix)...)    
 end    
 ```
-`Autoencoder mode` uses a neural network to reconstruct the image from a lower dimensional latent space. The network code written with `Flux.jl` is below [@innes:2018]
+`Autoencoder mode`
 ```Julia
 # Encoder    
 encoder = Chain(    
