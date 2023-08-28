@@ -93,6 +93,6 @@ While we do have theoretical models of the James Webb PSF, there is yet to be an
 The COMOS-Web survey is the largest extragalactic survey according to area and prime time allocation [@casey2023cosmosweb], and takes up $0.54 deg^2$ [@10.1117/12.925447; @Rieke_2023]. This is a large enough portion of the sky that we should prepare to see a lot of variation across the field of view. This gives `ShOpt` the oppurtunity to validate PIFF's correction for handeling PSF variations and underscore just how impactful (or not impactful) PSFex's size bias is. 
 
 # Acknowledgements
-This project was made possible by The Northeastern Physics Department and Northeastern Undergraduate Research and Fellowships via the Physics Research Co-Op Fellowship and PEAK Ascent Award respectively.
+This project was made possible by The Northeastern Physics Department and Northeastern Undergraduate Research and Fellowships via the Physics Research Co-Op Fellowship and PEAK Ascent Award respectively. Support for this work was provided by NASA through grant JWST-GO-01727 and HST-AR- 15802 awarded by the Space Telescope Science Institute, which is operated by the Association of Universities for Research in Astronomy, Inc., under NASA contract NAS 5-26555. This work was made possible by utilizing the CANDIDE cluster at the Institut d’Astrophysique de Paris. Finally, we would like to thank Northeastern Research Computing for access to their servers.
 
 # References
