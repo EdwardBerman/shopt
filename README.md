@@ -287,6 +287,7 @@ If you would like to report an issue or problem please raise an issue on this re
 ## Contributors
 + Edward Berman
 + Jacqueline McCleary
+With help from collaborators at COSMOS-Web: The JWST Cosmic Origins Survey
 
 ## Further Acknowledgements                                                                                                             
 + The Northeastern Cosmology Group for Their Continued Support and Guidance                                                           
