@@ -128,7 +128,7 @@ While we do have forwards models of the JWST PSF, these models are for single ex
 The COMOS-Web survey is the largest JWST extragalactic survey according to area and prime time allocation [@casey2023cosmosweb], and takes up $0.54 ~deg^2$ [@10.1117/12.925447; @Rieke_2023]. This is a large enough portion of the sky that we should prepare to see a lot of variation across the field of view. This gives `ShOpt` the oppurtunity to validate PIFF's correction for handling PSF variations and test how impactful (or not impactful) PSFex's size bias is. 
 
 # Future Work
-We speculate that petal diagrams may be able to approximate the spikey natures of JWST PSFS. Consider $r = A \cos(k\theta + \gamma)$, shown below in figure 2 for different $[A, k]$ values where $\gamma = 0$. In practice, $[A, k, \gamma]$ could be learnable parameters. We could then choose some $f(r) \propto \frac{1}{r}$ such that the gray fades from black to white. We would define $f(r)$ piece wise such that it is $0$ outside of the petal and decreases radially with $r$ inside the petal.
+We speculate that petal diagrams may be able to approximate the spikey natures of JWST PSFS. Consider $r = A \cos(k\theta + \gamma)$, shown below in figure 3 for different $[A, k]$ values where $\gamma = 0$. In practice, $[A, k, \gamma]$ could be learnable parameters. We could then choose some $f(r) \propto \frac{1}{r}$ such that the gray fades from black to white. We would define $f(r)$ piece wise such that it is $0$ outside of the petal and decreases radially with $r$ inside the petal.
 
 ![Petal Diagram](petals.png)
 
