@@ -111,7 +111,7 @@ The dependencies can be installed in the Julia REPL. For example:
 import Pkg; Pkg.add("PyCall")
 ```
 
-We also provide dependencies.jl, which you can run to download all of the Julia libraries automatically by reading in the imports.txt file. Simply run ` julia dependencies.jl ` in the command line. For the three python requirements, you can similarly run `python dependenciesPy.py`. 
+We also provide dependencies.jl, which you can run to download all of the Julia libraries automatically by reading in the imports.txt file. Simply run `julia dependencies.jl` in the command line. For the three python requirements, you can similarly run `python dependenciesPy.py`. 
 
 For some functionality we need to use wrappers for Python code, such as reading in fits files or converting (x,y) -> (u,v). Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. There are a number of ways to get Julia and Python to interopt nicely. If the Python snippets throw an error, run the following in the Julia REPL for each Python library:
 
