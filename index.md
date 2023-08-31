@@ -159,7 +159,7 @@ pyimport("numpy")
 ```
 in the Julia REPL should ensure that Julia and Python are interopping correctly. 
 
-Additionally, in the Julia REPL, we may 
+Additionally, in the Julia REPL, we may write 
 ```julia
 using Base.Threads
 nthreads()
