@@ -458,8 +458,8 @@ function compute_single_star_reconstructed_value(PolynomialMatrix, x, y, degree)
     return reconstructed_star
 end
 
-function compute_mse(reconstructed_matrix, true_matrix)
-    return mean((reconstructed_matrix .- true_matrix) .^ 2)
+function compute_mse(reconstructed_matrix, true_matrix, err_map)
+  return mean((reconstructed_matrix .- true_matrix) .^ 2 ./(err_map.^2))
 end
 
 function worst_10_percent(errors)
@@ -498,7 +498,7 @@ end
     training_errors = []
     for idx in 1:length(training_stars)
       reconstructed_star = compute_single_star_reconstructed_value(PolynomialMatrix, training_u_coords[idx], training_v_coords[idx], degree)
-      push!(training_errors, compute_mse(reconstructed_star, training_stars[idx]))
+      push!(training_errors, compute_mse(reconstructed_star, training_stars[idx], errVignets[idx]))
     end
     
     bad_indices = worst_10_percent(training_errors)
@@ -516,11 +516,74 @@ end
       end
       
       global training_stars = new_training_stars
+      println("$(length(new_training_stars)) training stars")
       global training_u_coords = new_training_u_coords
       global training_v_coords = new_training_v_coords
     end
   end
 end
+
+#= Future Work for iterative refinement
+global itr_count = 1
+
+@time begin    
+    global training_stars, training_u_coords, training_v_coords    
+    
+    # Initialize a flag for the while loop
+    global outliers_exist = true    
+    while outliers_exist  # Keep iterating as long as there are outliers
+        #println("here")
+        current_itr = itr_count
+        println("━ Iteration $current_itr")
+        global itr_count += 1
+        @threads for i in 1:r    
+            for j in 1:c    
+                z_data = [star[i, j] for star in training_stars]    
+                pC = polynomial_optimizer(degree, training_u_coords, training_v_coords, z_data)    
+                PolynomialMatrix[i,j,:] .= pC    
+            end    
+        end    
+            
+        training_errors = []    
+        for idx in 1:length(training_stars)    
+            reconstructed_star = compute_single_star_reconstructed_value(PolynomialMatrix, training_u_coords[idx], training_v_coords[idx], degree)
+            push!(training_errors, compute_mse(reconstructed_star, training_stars[idx]))    
+        end    
+        
+        # Calculate standard deviation of training_errors
+        error_std_dev = std(training_errors)    
+        
+        # Find indices of outliers which have an error greater than 2 times the std deviation
+        bad_indices = findall(x -> x > 3 * error_std_dev, training_errors)    
+        
+        if isempty(bad_indices)  # If no outliers found, set the flag to false
+            #println("here")
+            global outliers_exist = false
+        else
+            new_training_stars = []    
+            new_training_u_coords = []    
+            new_training_v_coords = []    
+            for i in 1:length(training_stars)    
+                if i ∉ bad_indices    
+                    push!(new_training_stars, training_stars[i])    
+                    push!(new_training_u_coords, training_u_coords[i])    
+                    push!(new_training_v_coords, training_v_coords[i])    
+                end    
+            end    
+            
+            global training_stars = new_training_stars 
+            println("Number of training stars after iteration $current_itr: ", length(new_training_stars))
+            if length(new_training_stars) < 30
+              global outliers_exist = false
+              println("Training Stars < 30, terminating...")
+            end
+            
+            global training_u_coords = new_training_u_coords    
+            global training_v_coords = new_training_v_coords    
+        end    
+    end    
+end  
+=#
 
 GC.gc()
 
@@ -560,10 +623,17 @@ fancyPrint("Plotting")
   cmx = maximum([maximum(a), maximum(b)])
   cmn = minimum([minimum(a), minimum(b)])
   
+  function symlog(x, linthresh)
+    sign_x = sign(x)
+    abs_x = abs(x)
+    scaled = linthresh * log10(abs_x / linthresh + 1)
+    return sign_x * scaled
+  end
+
   if UnicodePlotsPrint
-    println(UnicodePlots.heatmap(get_middle_nxn(a,15), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of star $starSample"))
-    println(UnicodePlots.heatmap(get_middle_nxn(b,15), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
-    println(UnicodePlots.heatmap(get_middle_nxn(a - b, 15), colormap=:inferno, title="Heatmap of Residuals"))
+    println(UnicodePlots.heatmap(symlog.(get_middle_nxn(a,75),0.0001), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of star $starSample"))
+    println(UnicodePlots.heatmap(symlog.(get_middle_nxn(b,75),0.0001), cmax = cmx, cmin = cmn, colormap=:inferno, title="Heatmap of Pixel Grid Fit $starSample"))
+    println(UnicodePlots.heatmap(get_middle_nxn(a - b, 75), colormap=:inferno, title="Heatmap of Residuals"))
   end
 
   if cairomakiePlots
