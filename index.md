@@ -1,24 +1,24 @@
 ## Table of Contents
-- [About](#about)
-  - [Who Should Use ShOpt](#who-should-use)
-  - [Analytic Profile Fits](#analytic-profile-fits)
-  - [Pixel Grid Fits](#pixel-grid-fits)
-  - [Interpolation Across the Field of View](#interpolation-across-the-field-of-view)
-- [Inputs and Outputs](#inputs-and-outputs)
-  - [Inputs](#inputs)
-  - [Outputs](#outputs)
-- [Running](#running)
-  - [Command](#command)
-  - [Dependencies](#dependencies)
-  - [Set Up](#set-up)
-  - [Multi-Threading](#multithreading)
-  - [Testing](#testing)
-- [Program Architecture](#program-architecture)
-- [How Can I Contribute?](#how-to-contribute)
-- [Config / YAML Information](#config--yaml-information)
-- [Known Issues](#known-issues-and-enhancements)
-- [Contributors](#contributors)
-- [Further Acknowledgements](#further-acknowledgements)
+- **[About](#about)**
+  - **[Who Should Use ShOpt](#who-should-use)**
+  - **[Analytic Profile Fits](#analytic-profile-fits)**
+  - **[Pixel Grid Fits](#pixel-grid-fits)**
+  - **[Interpolation Across the Field of View](#interpolation-across-the-field-of-view)**
+- **[Inputs and Outputs](#inputs-and-outputs)**
+  - **[Inputs](#inputs)**
+  - **[Outputs](#outputs)**
+- **[Running](#running)**
+  - **[Command](#command)**
+  - **[Dependencies](#dependencies)**
+  - **[Set Up](#set-up)**
+  - **[Multi-Threading](#multithreading)**
+  - **[Testing](#testing)**
+- **[Program Architecture](#program-architecture)**
+- **[How Can I Contribute?](#how-to-contribute)**
+- **[Config / YAML Information](#config--yaml-information)**
+- **[Known Issues](#known-issues-and-enhancements)**
+- **[Contributors](#contributors)**
+- **[Further Acknowledgements](#further-acknowledgements)**
 
 
 ## About
