@@ -1,4 +1,4 @@
-## Table of Contents
+## **Table of Contents**
 - **[About](#about)**
   - **[Who Should Use ShOpt](#who-should-use)**
   - **[Analytic Profile Fits](#analytic-profile-fits)**
