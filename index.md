@@ -277,10 +277,10 @@ CommentsOnRun
 
 ## How to Contribute
 Do one of the following:
-+ Contact berman.ed@northeastern.edu
++ Contact **berman.ed@northeastern.edu**
 + Fork this repository or submit a pull request
 
-If you would like to report an issue or problem please raise an issue on this repository. If you would like to seek support, again see berman.ed@northeastern.edu . 
+If you would like to report an issue or problem please raise an issue on this repository. If you would like to seek support, again see **berman.ed@northeastern.edu** . 
 ## Known Issues and Enhancements
 + We are working on more configurability in the YAML for a smoother user experience, however, everything in this repository is functional and ready to work out of the box
 + We are working on a chisq pixel grid fit mode. Right now the gain value g is hardcoded for chi square pixel grid fits
