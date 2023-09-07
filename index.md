@@ -286,7 +286,7 @@ If you would like to report an issue or problem please raise an issue on this re
 + We are working on a chisq pixel grid fit mode. Right now the gain value g is hardcoded for chi square pixel grid fits
 
 ## Contributors
-+ Edward Berman
++ [Edward Berman](https://edwardberman.github.io/EdwardBerman/)
 + Jacqueline McCleary
 
 With help from collaborators at COSMOS-Web: The JWST Cosmic Origins Survey
