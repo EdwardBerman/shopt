@@ -1,6 +1,6 @@
 ## Table of Contents
-- [About](#about)
-  - [Who Should Use ShOpt](#who-should-use)
+- **[About](#about)**
+  - **[Who Should Use ShOpt](#who-should-use)**
   - [Analytic Profile Fits](#analytic-profile-fits)
   - [Pixel Grid Fits](#pixel-grid-fits)
   - [Interpolation Across the Field of View](#interpolation-across-the-field-of-view)
