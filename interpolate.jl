@@ -104,11 +104,18 @@ end
 
 function polynomial_optimizer(degree, x_data, y_data, z_data)
   num_coefficients = (degree + 1) * (degree + 2) ÷ 2
-  initial_guess = ones(num_coefficients)  # Initial guess for the coefficients
+  initial_guess = rand(num_coefficients)  # Initial guess for the coefficients
+  initial_guess[1] = mean(z_data)
+  
   function objective(p)
+    #if abs(mean(z_data)) < 1e-4
+    #  return 0.0
+    #end
+    
     loss = sum((objective_function(p, x_val, y_val, degree) - z_actual)^2  for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
     return loss
-  end 
+  end
+
   result = optimize(objective, initial_guess, autodiff=:forward, LBFGS(), Optim.Options(g_tol = polynomial_interpolation_stopping_gradient, f_tol=1e-40)) #autodiff=:forward 
   return Optim.minimizer(result)
 end

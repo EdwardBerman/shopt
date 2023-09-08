@@ -1,14 +1,14 @@
 saveYaml: true #save this file with each run
 
-mode: "PCA" # Options: auotoencoder, chisq, PCA. Make sure mode is a string with double quotes
+mode: "PCA" # Options: autoencoder, chisq, PCA. Make sure mode is a string with double quotes
 
 PCAterms: 100 #If PCA mode is enabled, how many moments do you want to use for your pixel grid fit
 
-lanczos: 5 #The size of the smoothing kernel
+lanczos: 3 #The size of the smoothing kernel
 
 NNparams: #For if Autoencoder mode is enabled
   epochs: 50 # max number of training epochs for each pixel grid fit
-  minGradientPixel: 1e-5 # the stopping gradient of the loss function for the pixel grid fit 
+  minGradientPixel: 1e-3 # the stopping gradient of the loss function for the pixel grid fit 
 
 AnalyticFitParams: # for fitting analytic profile
   minGradientAnalyticModel: 1e-6 #stopping gradient for LFBGS (nonlinear algorithm for parameter estimation) on vignets
@@ -33,16 +33,18 @@ polynomialDegree: 1 #degree of polynomial for interpolation
 stampSize: 131 #how many pixels should the pixel grid PSF model
 
 training_ratio: 0.9 #how many stars are you using the train versus to validate the PSF fit
-sum_pixel_grid_and_inputs_to_unity: false #Sum flux to unity true or false
+sum_pixel_grid_and_inputs_to_unity: true #Sum flux to unity true or false
 
 polynomial_interpolation_stopping_gradient: 1e-8 #stopping gradient for LFBGS used for polynomial interpolation
 
 summary_name: '' #name to prefix summary.shopt
 truncate_summary_file: true # do you want to save storage by only storing essential information, how to reconstruct the PSF and analytic models
 
-iterations: 10
+iterations: 3
 
 alpha: 0.01
 chisq_stopping_gradient: 1e-8 
+
+sampling: 0.0
 
 CommentsOnRun: "** This is where you can leave comments or notes to self on the run! **"

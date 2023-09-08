@@ -285,7 +285,7 @@ if mode == "PCA"
       data = nanToZero(starCatalog[i])
       try
         if unity_sum
-          push!(pixelGridFits, smooth(pca_image(data,PCAterms), lanczos)./sum(smooth(pca_image(data,PCAterms), lanczos)))
+          push!(pixelGridFits, smooth(pca_image(data,PCAterms), lanczos)./sum(smooth(pca_image(data,PCAterms)), lanczos))
         else
           push!(pixelGridFits, smooth(pca_image(data,PCAterms), lanczos))
         end
@@ -458,8 +458,8 @@ function compute_single_star_reconstructed_value(PolynomialMatrix, x, y, degree)
     return reconstructed_star
 end
 
-function compute_mse(reconstructed_matrix, true_matrix, err_map)
-  return mean((reconstructed_matrix .- true_matrix) .^ 2 ./(err_map.^2))
+function compute_mse(reconstructed_matrix, true_matrix) #err_map
+  return mean((reconstructed_matrix .- true_matrix) .^ 2 ) #./(err_map.^2)
 end
 
 function worst_10_percent(errors)
@@ -475,7 +475,11 @@ end
   global training_stars, training_u_coords, training_v_coords
   for loop in 1:iterationsPolyfit
     #print(length(iterationsPolyfit))
+    if loop == 1 
+      println("$(length(training_stars)) training stars")
+    end 
     println("━ Iteration: $loop")
+
     @threads for i in 1:r
       for j in 1:c
         z_data = [star[i, j] for star in training_stars]
@@ -498,7 +502,7 @@ end
     training_errors = []
     for idx in 1:length(training_stars)
       reconstructed_star = compute_single_star_reconstructed_value(PolynomialMatrix, training_u_coords[idx], training_v_coords[idx], degree)
-      push!(training_errors, compute_mse(reconstructed_star, training_stars[idx], errVignets[idx]))
+      push!(training_errors, compute_mse(reconstructed_star, training_stars[idx])) #errVignets[idx]
     end
     
     bad_indices = worst_10_percent(training_errors)
