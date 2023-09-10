@@ -39,7 +39,7 @@ Shear Optimization with `ShOpt.jl` introduces modern techniques for empirical PS
 ## Analytic profile mode
 A rough idea of the size and shape of the PSF can be obtained by fitting stars with analytic profiles. We adopt a multivariate Gaussian profile because it is computationally cheap to fit to an image. That is, it is easy to differentiate and doesn't involve any numeric integration or other costly steps to calculate. Fitting other common models, such as a Kolmogorov profile, involves numeric integration and thus take much longer to fit. Moreover, the JWST point spread function is very "spikey" (cf. Figure 1). As a result, analytic profiles are limited in their ability to model the point spread function anyway, making the usual advantages of a more expensive analytic profile moot.   
 
-![The plot on the left shows the average cutout of all of the stars in a supplied catalog. Likewise, plot in the middle shows the average point spread function model. The plot on the right represents the average normalized error between the observed star cutouts and the point spread function model.](spikey.png)
+![The plot on the left shows the average cutout of all of the stars in a supplied catalog. Likewise, plot in the middle shows the average point spread function model. The plot on the right shows the average normalized error between the observed star cutouts and the point spread function model.](spikey.png)
 
 Our multivariate gaussian is parameterized by three variables, $[s, g_1, g_2]$, where $s$ corresponds to size and $g_1 , g_2$ correspond to shear. A shear matrix has the form $$\begin{pmatrix}
 1 + g_1 & g_2 \\
