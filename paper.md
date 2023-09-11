@@ -13,6 +13,7 @@ authors:
     affiliation: 1
   - name: Jacqueline McCleary
     orcid: 0000-0002-9883-7460
+    corresponding: true
     affiliation: 1
 affiliations:
  - name: Northeastern University, USA
