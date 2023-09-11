@@ -122,7 +122,7 @@ optimizer = ADAM()
 ```
 
 # Statement of need
-Empirical PSF characterization tools like PSFEx [@2011ASPC] and PIFF [@Jarvis_2020 are widely popular in astrophysics. However, the quality of PIFF and PSFEx models tends to be quite sensitive to the parameter values used to run the software, with optimization sometimes relying on brute-force guess-and-check runs. PIFF is also notably inefficient for large, well-sampled images, taking hours in the worst cases. Imaging from the James Webb Space Telescope's (JWST) Near Infrared Camera (NIRCam) offers vast scientific opportunities, but also presents new challenges for PSF fitting.
+Empirical PSF characterization tools like PSFEx [@2011ASPC] and PIFF [@Jarvis_2020] are widely popular in astrophysics. However, the quality of PIFF and PSFEx models tends to be quite sensitive to the parameter values used to run the software, with optimization sometimes relying on brute-force guess-and-check runs. PIFF is also notably inefficient for large, well-sampled images, taking hours in the worst cases. Imaging from the James Webb Space Telescope's (JWST) Near Infrared Camera (NIRCam) offers vast scientific opportunities, but also presents new challenges for PSF fitting.
 
 (1) NIRCam PSFs are not well approximated by analytic profiles as seen in Figure 1. This calls for well-thought-out, non-parametric modeling tools and PSF diagnostics that can capture the full dynamic range of the PSF. `ShOpt` provides models and diagnostics that meet the challenges of JWST imaging out of the box.
 
