@@ -1,5 +1,6 @@
 #=
 Making Log Statements Look Nicer, fancyPrints signify stepping stones in the program
+
 =#
 
 function fancyPrint(printStatement)
