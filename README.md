@@ -51,6 +51,49 @@ We used the first n weights of a Principal Component Analysis and use that to co
 
 #### Autoencoder Mode
 For doing Pixel Grid Fits we use an autoencoder model to reconstruct the Star                                              
+`PCA mode`
+```Julia
+function pca_image(image, ncomponents)    
+  #Load img Matrix
+  img_matrix = image
+
+  # Perform PCA    
+  M = fit(PCA, img_matrix; maxoutdim=ncomponents)    
+
+  # Transform the image into the PCA space    
+  transformed = MultivariateStats.transform(M, img_matrix)    
+
+  # Reconstruct the image    
+  reconstructed = reconstruct(M, transformed)    
+
+  # Reshape the image back to its original shape    
+  reconstructed_image = reshape(reconstructed, size(img_matrix)...)    
+end    
+```
+`Autoencoder mode`
+```Julia
+# Encoder    
+encoder = Chain(    
+                Dense(r*c, 128, leakyrelu),    
+                Dense(128, 64, leakyrelu),    
+                Dense(64, 32, leakyrelu),    
+               )    
+#Decoder
+decoder = Chain(    
+                Dense(32, 64, leakyrelu),    
+                Dense(64, 128, leakyrelu),    
+                Dense(128, r*c, tanh),    
+               )    
+#Full autoencoder
+autoencoder = Chain(encoder, decoder)    
+
+#x_hat = autoencoder(x)    
+loss(x) = mse(autoencoder(x), x)    
+
+# Define the optimizer    
+optimizer = ADAM()    
+
+```
 ![image](READMEassets/nn.png) 
 
 ### Interpolation Across the Field of View
