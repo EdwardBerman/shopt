@@ -32,23 +32,67 @@ Start by **Cloning This Repository**. Then see **TutorialNotebook.ipynb** or fol
 Users looking for empirical point spread function characterization software tailored for the data coming from the James Webb Space Telescope, or on a dataset with the similar characteristics. For example, the point spread function spans 100s of pixels because of the pixel scale of your camera, the point spread function is not well approximated by an analytic profile, or the point spread function varies alot across the field of view. For any of these reasons, you should consider using ShOpt.jl. ShOpt.jl is not a single function package, and we would encourage the user to explore the full functionality of ShOpt.jl in the sample config to tailor the software to their needs. 
 
 ### Analytic Profile Fits 
-We adopt the following procedure to ensure our gradient steps never take us outside of our constraints
+![Picture](spikey.png)
+The plot on the left shows the average cutout of all stars in a supplied catalog. The plot     in the middle shows the average point spread function model for each star. The plot on the right show    s the average normalized error between the observed star cutouts and the point spread function model.
 
-![image](READMEassets/reparameterization.png)
+`ShOpt.jl`'s analytic profile fitting takes inspiration from a number of algorithms outside of astronomy, notably SE-Sync, an algorithm that solves the robotic mapping problem by considering the manifold properties of the data. With sufficiently clean data, the SE-Sync algorithm will descend to a global minimum constrained to the manifold $SE(d)^n / SE(d)$. Following suit, we are able to put a constraint on the solutions we obtain to $[s, g_1, g_2]$ to a manifold. The solution space to $[s, g_1, g_2]$  is constrained to the manifold $$B_2(r) \times \mathbb{R}_{+}$$. The existence of the constraint on shear is well known; nevertheless, the parameter estimation task is usually framed as an unconstrained problem. 
 
-Path to [s, g_1, g_2] subject to the cylindrical constraint
+Path to $[s, g_1, g_2]$ in $B_2(r) \times \mathbb{R}_+$
 
 ![image](READMEassets/pathToPoint.png)
-
+![image](READMEassets/reparameterization.png)
 
 ### Pixel Grid Fits                                                                                                        
 
 #### PCA Mode 
-We used the first n weights of a Principal Component Analysis and use that to construct our PSF in addition to a smoothing kernel to account for aliasing 
+We used the first n weights of a Principal Component Analysis and use that to construct our PSF in addition to a smoothing kernel to account for aliasing
 
 #### Autoencoder Mode
-For doing Pixel Grid Fits we use an autoencoder model to reconstruct the Star                                              
-![image](READMEassets/nn.png) 
+For doing Pixel Grid Fits we use an autoencoder model to reconstruct the Star
+`PCA mode`
+```Julia
+function pca_image(image, ncomponents)    
+  #Load img Matrix
+  img_matrix = image
+
+  # Perform PCA    
+  M = fit(PCA, img_matrix; maxoutdim=ncomponents)    
+
+  # Transform the image into the PCA space    
+  transformed = MultivariateStats.transform(M, img_matrix)    
+
+  # Reconstruct the image    
+  reconstructed = reconstruct(M, transformed)    
+
+  # Reshape the image back to its original shape    
+  reconstructed_image = reshape(reconstructed, size(img_matrix)...)    
+end    
+```
+`Autoencoder mode`
+```Julia
+# Encoder    
+encoder = Chain(    
+                Dense(r*c, 128, leakyrelu),    
+                Dense(128, 64, leakyrelu),    
+                Dense(64, 32, leakyrelu),    
+               )    
+#Decoder
+decoder = Chain(    
+                Dense(32, 64, leakyrelu),    
+                Dense(64, 128, leakyrelu),    
+                Dense(128, r*c, tanh),    
+               )    
+#Full autoencoder
+autoencoder = Chain(encoder, decoder)    
+
+#x_hat = autoencoder(x)    
+loss(x) = mse(autoencoder(x), x)    
+
+# Define the optimizer    
+optimizer = ADAM()    
+
+```
+![image](READMEassets/nn.png)
 
 ### Interpolation Across the Field of View
 [s, g1, g2] are all interpolated across the field of view. Each Pixel is also given an interpolation across the field of view for an nth degree polynomial in (u,v), where n is supplied by the user
