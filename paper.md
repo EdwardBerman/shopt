@@ -1,5 +1,5 @@
 ---
-title: 'ShOpt.jl | A Julia Package for Empirical Point Spread Function Characterization of JWST NIRCam Data'
+title: 'ShOpt.jl: A Julia Package for Empirical Point Spread Function Characterization of JWST NIRCam Data'
 tags:
   - JWST
   - Deep Learning
@@ -36,10 +36,12 @@ The PSF characterization methods used by astronomers fall into two main classes:
 Shear Optimization with `ShOpt.jl` introduces modern techniques, tailored to James Webb Space Telescope (JWST) imaging, for empirical PSF characterization across the field of view. ShOpt has two modes of operation: approximating stars with analytic profiles, and a more realistic pixel-level representation. Both modes take as input a catalog with image cutouts -- or "vignettes" -- of the stars targeted for analysis.
 
 
+![ShOpt Workflow](flowchart.png)
+
 # Statement of need
 Empirical PSF characterization tools like PSFEx [@2011ASPC] and PIFF [@Jarvis_2020] are widely popular in astrophysics. However, the quality of PIFF and PSFEx models tends to be quite sensitive to the parameter values used to run the software, with optimization sometimes relying on brute-force guess-and-check runs. PIFF is also notably inefficient for large, well-sampled images, taking hours in the worst cases. The James Webb Space Telescope's (JWST) Near Infrared Camera (NIRCam) offers vast scientific opportunities [@casey2023cosmosweb]; at the same time, this unprecendented data brings new challenges for PSF modeling:
 
-(1) Analytic functions like Gaussians are incomplete descriptions of the NIRCam PSF, as evident from Figure 1.  This calls for well-thought-out, non-parametric modeling and diagnostic tools that can capture the full dynamic range of the NIRCam PSF. `ShOpt` provides these models and diagnostics out of the box.
+(1) Analytic functions like Gaussians are incomplete descriptions of the NIRCam PSF, as evident from Figure 2.  This calls for well-thought-out, non-parametric modeling and diagnostic tools that can capture the full dynamic range of the NIRCam PSF. `ShOpt` provides these models and diagnostics out of the box.
 
 (2) The NIRCam detectors have pixel scales of 0.03 (short wavelength channel) and 0.06 (long wavelength channel) arcseconds per pixel [@10.1117/12.489103; @BSPIE; @20052005SPIE]. At these pixel scales, star vignettes need to be at least $131$ by $131$ pixels across to fully capture the wings of the PSFs (4-5 arcseconds). These vignette sizes are 3-5 times larger than the ones used in surveys such as DES [@Jarvis_2020] and SuperBIT [@mccleary2023lensing] and force us to evaluate how well existing PSF fitters scale to this size. `ShOpt` has been designed for computational efficiency and aims to meet the requirements of detectors like NIRCam.  
 
@@ -58,7 +60,7 @@ While WebbPSF provides highly precise forward models of the JWST PSF, these mode
 
 As outlined in the state of the field, `ShOpt` is a tool built with the user experience in mind that attempts to bridge the strengths of existing PSF fitters. `ShOpt`'s combination of speed, user friendliness, and accuracy enable the science goals of the COSMOS-Web survey, detailed below.
 
-The COMOS-Web survey is the largest JWST extragalactic survey according to area and prime time allocation [@casey2023cosmosweb], and takes up $0.54 ~deg^2$ [@10.1117/12.925447; @Rieke_2023]. Additionally, the COMOS-Web survey hopes to use the JWST to detect of thousands of galaxies in the Epoch of Reionization $(6 ∼ z ∼ 11)$ to create one of the highest resolution large scale structure maps of the early universe [@casey2023cosmosweb]. JWST data has also been used to pick out active galactic nuclei from host galaxies [@zhuang2023characterization] and indentify $15$ candidate galxies whose luminosities push the limits of our $\Lambda$CDM galaxy formation models [@franco2023cosmosweb]. These science cases rely upon good PSF modeling and underscore the importance of `ShOpt`.
+The COMOS-Web survey is the largest JWST extragalactic survey according to area and prime time allocation [@casey2023cosmosweb], and takes up $0.54 ~deg^2$ [@10.1117/12.925447; @Rieke_2023]. Additionally, the COMOS-Web survey hopes to use the JWST to detect of thousands of galaxies in the Epoch of Reionization $(6 ∼ z ∼ 11)$ to create one of the highest resolution large scale structure maps of the early universe [@casey2023cosmosweb]. JWST data has also been used to pick out active galactic nuclei from host galaxies [@zhuang2023characterization] and indentify $15$ candidate galaxies whose luminosities push the limits of our $\Lambda$CDM galaxy formation models [@franco2023cosmosweb]. These science cases rely upon good PSF modeling and underscore the importance of `ShOpt`.
 
 # Acknowledgements
 This material is based upon work supported by a Northeastern University Undergraduate Research and Fellowships PEAK Experiences Award. E.B. was also supported by a Northeastern University Physics Department Co-op Research Fellowship. Support for COSMOS-Web was provided by NASA through grant JWST-GO-01727 and HST-AR-15802 awarded by the Space Telescope Science Institute, which is operated by the Association of Universities for Research in Astronomy, Inc., under NASA contract NAS 5-26555. This work was made possible by utilizing the CANDIDE cluster at the Institut d’Astrophysique de Paris. Further support was provided by Research Computers at Northeastern University. Additionally, E.B. thanks Professor David Rosen for giving some valuable insights during the early stages of this work. The authors gratefully acknowledge the use of simulated and real data from the COSMOS-Web survey in developing ShOpt, as well as many conversations with COSMOS-Web scientists. 
