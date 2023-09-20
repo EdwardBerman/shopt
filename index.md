@@ -34,8 +34,6 @@ Users looking for empirical point spread function characterization software tail
 **JWST Data is now publicly available at: [https://cosmos.astro.caltech.edu/page/cosmosweb-dr](https://cosmos.astro.caltech.edu/page/cosmosweb-dr)**
 
 ### Analytic Profile Fits 
-![Picture](spikey.png)
-The plot on the left shows the average cutout of all stars in a supplied catalog. The plot     in the middle shows the average point spread function model for each star. The plot on the right show    s the average normalized error between the observed star cutouts and the point spread function model.
 
 `ShOpt.jl`'s analytic profile fitting takes inspiration from a number of algorithms outside of astronomy, notably SE-Sync, an algorithm that solves the robotic mapping problem by considering the manifold properties of the data. With sufficiently clean data, the SE-Sync algorithm will descend to a global minimum constrained to the manifold $$SE(d)^n / SE(d)$$. Following suit, we are able to put a constraint on the solutions we obtain to $$[s, g_1, g_2]$$ to a manifold. The solution space to $$[s, g_1, g_2]$$  is constrained to the manifold $$B_2(r) \times \mathbb{R}_{+}$$. The existence of the constraint on shear is well known; nevertheless, the parameter estimation task is usually framed as an unconstrained problem. 
 
@@ -43,6 +41,9 @@ Path to [s, g_1, g_2] through cylindrical constraint.
 
 ![image](READMEassets/pathToPoint.png)
 ![image](READMEassets/reparameterization.png)
+
+![Picture](spikey.png)
+The plot on the left shows the average cutout of all stars in a supplied catalog. The plot     in the middle shows the average point spread function model for each star. The plot on the right show    s the average normalized error between the observed star cutouts and the point spread function model.
 
 ### Pixel Grid Fits                                                                                                        
 
