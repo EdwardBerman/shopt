@@ -44,9 +44,6 @@ Path to $[s, g_1, g_2]$ in $B_2(r) \times \mathbb{R}_+$
 ![image](READMEassets/pathToPoint.png)
 ![image](READMEassets/reparameterization.png)
 
-![Picture](spikey.png)
-The plot on the left shows the average cutout of all stars in a supplied catalog. The plot     in the middle shows the average point spread function model for each star. The plot on the right show    s the average normalized error between the observed star cutouts and the point spread function model.
-
 ### Pixel Grid Fits                                                                                                        
 
 #### PCA Mode 
@@ -101,6 +98,9 @@ optimizer = ADAM()
 
 ### Interpolation Across the Field of View
 [s, g1, g2] are all interpolated across the field of view. Each Pixel is also given an interpolation across the field of view for an nth degree polynomial in (u,v), where n is supplied by the user
+
+![Picture](spikey.png)
+The plot on the left shows the average cutout of all stars in a supplied catalog. The plot in the middle shows the average point spread function model for each star. The plot on the right shows the average normalized error between the observed star cutouts and the point spread function model.
 
 ## Inputs and Outputs
 Currently, the inputs are JWST Point Spread Functions source catalogs. The current outputs are images of these Point Spread Functions, Learned Analytic Fits, Learned Pixel Grid Fits, Residual Maps, Loss versus iteration charts, and p-value statisitcs. Not all functionality is working in its current state. Planned functionality for more Shear checkplots.
