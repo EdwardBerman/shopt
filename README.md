@@ -33,7 +33,7 @@ Start by **Cloning This Repository**. Then see **TutorialNotebook.ipynb** or fol
 ### Who Should Use  
 Users looking for empirical point spread function characterization software tailored for the data coming from the James Webb Space Telescope, or on a dataset with the similar characteristics. For example, the point spread function spans 100s of pixels because of the pixel scale of your camera, the point spread function is not well approximated by an analytic profile, or the point spread function varies alot across the field of view. For any of these reasons, you should consider using ShOpt.jl. ShOpt.jl is not a single function package, and we would encourage the user to explore the full functionality of ShOpt.jl in the sample config to tailor the software to their needs. 
 
-**JWST Data is now publicly available at: [https://cosmos.astro.caltech.edu/page/cosmosweb-dr](https://cosmos.astro.caltech.edu/page/cosmosweb-dr) **
+**JWST Data is now publicly available at: [https://cosmos.astro.caltech.edu/page/cosmosweb-dr](https://cosmos.astro.caltech.edu/page/cosmosweb-dr)**
 
 ### Analytic Profile Fits 
 ![Picture](spikey.png)
