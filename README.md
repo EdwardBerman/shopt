@@ -347,7 +347,7 @@ With help from collaborators at COSMOS-Web: The JWST Cosmic Origins Survey
 + The **[COSMOS Web Collaboration](https://www.stsci.edu/jwst/science-execution/program-information?id=1727)** for providing data from the James Webb Space Telescope and internal feedback
 
 ## Cite
-
+Citation for the current preprint:
 ```
 @misc{berman2023shoptjl,
       title={ShOpt.jl: A Julia Package for Empirical Point Spread Function Characterization of JWST NIRCam Data}, 
