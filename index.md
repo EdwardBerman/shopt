@@ -343,3 +343,16 @@ With help from collaborators at COSMOS-Web: The JWST Cosmic Origins Survey
 + The **[Northeastern Physics Department](https://cos.northeastern.edu/physics/)** and **[Northeastern Undergraduate Research and Fellowships](https://undergraduate.northeastern.edu/research/)**, for making this project possible with funding from the Northeastern Physics Research Co-Op Fellowship and PEAK Ascent Award respectively   
 + **[David Rosen](https://github.com/david-m-rosen)**, who gave valuable input in the early stages of this project and during his course Math 7223, Riemannian Optimization
 + The **[COSMOS Web Collaboration](https://www.stsci.edu/jwst/science-execution/program-information?id=1727)** for providing data from the James Webb Space Telescope and internal feedback
+
+## Cite 
+Citation for the current preprint:
+```
+@misc{berman2023shoptjl,
+      title={ShOpt.jl: A Julia Package for Empirical Point Spread Function Characterization of JWST NIRCam Data}, 
+      author={Edward Berman and Jacqueline McCleary},
+      year={2023},
+      eprint={2310.00071},
+      archivePrefix={arXiv},
+      primaryClass={astro-ph.IM}
+}
+```
