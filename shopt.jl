@@ -285,9 +285,19 @@ if mode == "PCA"
       data = nanToZero(starCatalog[i])
       try
         if unity_sum
-          push!(pixelGridFits, smooth(pca_image(data,PCAterms), lanczos)./sum(smooth(pca_image(data,PCAterms)), lanczos))
+          try
+            push!(pixelGridFits, smooth(pca_image(data,PCAterms), lanczos)./sum(smooth(pca_image(data,PCAterms)), lanczos))
+          catch
+            #println("Smoothing failed")
+            push!(pixelGridFits, pca_image(data,PCAterms)./sum(pca_image(data,PCAterms)))
+          end
         else
-          push!(pixelGridFits, smooth(pca_image(data,PCAterms), lanczos))
+          try
+            push!(pixelGridFits, smooth(pca_image(data,PCAterms), lanczos))
+          catch
+            #println("Smoothing failed")
+            push!(pixelGridFits, pca_image(data,PCAterms))
+          end
         end
       catch
         println("Star $i failed")
