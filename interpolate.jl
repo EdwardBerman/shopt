@@ -104,7 +104,7 @@ end
 
 function polynomial_optimizer(degree, x_data, y_data, z_data)
   num_coefficients = (degree + 1) * (degree + 2) ÷ 2
-  initial_guess = rand(num_coefficients)  # Initial guess for the coefficients
+  initial_guess = zeros(num_coefficients)  # Initial guess for the coefficients
   initial_guess[1] = mean(z_data)
   
   function objective(p)
