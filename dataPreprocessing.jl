@@ -286,7 +286,6 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   idx = find_extension_with_colname(python_datadir, 'VIGNET')[0]
   
   vignets = f[idx].data['VIGNET']
-  
   if mode == "chisq":
     backgrounds = f[idx].data['BACKGROUND']
     sigma_bs = [np.sqrt(np.var(background)) for background in backgrounds]
@@ -312,7 +311,7 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   u = f[idx].data['ALPHAWIN_J2000'] 
   v = f[idx].data['DELTAWIN_J2000']
 
-  snr = f[2].data['SNR_WIN']
+  snr = f[idx].data['SNR_WIN']
   """
 
   datadir = py"python_datadir"
@@ -321,7 +320,7 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   if mode == "chisq"
     err = py"err_vignets"
   end
-  
+#  print("━ Number of vignets: ", length(v))  
   catalog = py"list(map(np.array, $v))"
   
   if mode == "chisq"
