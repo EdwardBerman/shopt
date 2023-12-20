@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software in your work, please cite it using these metadata."
+title: "ShOpt.jl: A Julia Package for Empirical Point Spread Function Characterization of JWST NIRCam Data"
+authors:
+  - family-names: Berman
+    given-names: Edward
+  - family-names: McCleary
+    given-names: Jacqueline
+year: 2023
+version: 1.0.0
+doi: 10.5281/zenodo.1234567  # Replace with the actual DOI if available
+repository-code: "https://github.com/EdwardBerman/shopt"  # Replace with your repository URL
