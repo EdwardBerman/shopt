@@ -13,7 +13,7 @@ NNparams: #For if Autoencoder mode is enabled
 AnalyticFitParams: # for fitting analytic profile
   minGradientAnalyticModel: 1e-6 #stopping gradient for LBFGS (nonlinear algorithm for parameter estimation) on vignets
   minGradientAnalyticLearned: 1e-6 #stopping gradient for LBFGS on pixel grid models
-  analyticFitStampSize: 64 #the subset of pixels you wish to fit the analytic profile to 
+  analyticFitStampSize: 30 #the subset of pixels you wish to fit the analytic profile to 
 
 dataProcessing:
   SnRPercentile: 0.33 #Filter this % of stars based off of signal to noise
@@ -30,7 +30,7 @@ plots: #What plots do you want?
   pythonPlots: false
 
 polynomialDegree: 1 #degree of polynomial for interpolation
-stampSize: 131 #how many pixels should the pixel grid PSF model
+stampSize: 100 #how many pixels should the pixel grid PSF model
 sampling: 0.0
 
 training_ratio: 0.9 #how many stars are you using the train versus to validate the PSF fit
