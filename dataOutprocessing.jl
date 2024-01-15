@@ -177,13 +177,16 @@ function writeFitsData(truncate_summary_file = truncate_summary_file, g2C = g2C,
     run(command2)
 
     current_time = now()
-    command3 = `mv $outdir/shopt.yml $outdir/$(Dates.format(Time(current_time), "HH:MM:SS")*"_shopt.yml")`
+    command3 = `mv $outdir/shopt.yml $outdir/$(replace(Dates.format(Dates.now(), "YY:mm:dd:HH:MM:SS"), ":" => "_")*"_shopt.yml")`
+
+    #command3 = `mv $outdir/shopt.yml $outdir/$(Dates.format(Time(current_time), "HH:MM:SS")*"_shopt.yml")`
     run(command3)
   end
 
   #command4 = `python $outdir/diagnostics.py`
   #run(command4)
-  py_outdir = outdir*"/$(now())"
+  py_outdir = outdir * "/" * replace(Dates.format(Dates.now(), "YY:mm:dd:HH:MM:SS"), ":" => "_")
+  #py_outdir = outdir*"/$(now())"
   if pythonPlots
     fancyPrint("Producing Additional Python Plots")
   else
@@ -381,10 +384,10 @@ function writeFitsData(truncate_summary_file = truncate_summary_file, g2C = g2C,
 
     """
   end 
-
-  command4 = `mv $outdir/$(Dates.format(Time(current_time), "HH:MM:SS")*"_shopt.yml")  $py_outdir`
+ 
+  command4 = `mv $outdir/$(replace(Dates.format(Dates.now(), "YY:mm:dd:HH:MM:SS"), ":" => "_")*"_shopt.yml")  $py_outdir`
   run(command4)
-  
+
   command5 = `cp $outdir/$summary_name  $py_outdir`
   run(command5)
   
