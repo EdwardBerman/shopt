@@ -164,9 +164,9 @@ We also provide dependencies.jl, which you can run to download all of the Julia 
 
 For some functionality we need to use wrappers for Python code, such as reading in fits files or converting (x,y) -> (u,v). Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. 
 
-There are four different ways to get Julia and Python to interopt nicely. We provide all of them as some of these methods play better with different systems.
+There are four different methods to get Julia and Python to interopt nicely. We provide all of them as some of these methods play better with different systems.
 
-Method one is to first install the required Python libraries via pip (which is what `dependenciesPy.py` does) and then invoke the following in the julia REPL:
+First install the required Python libraries via pip (which is what `dependenciesPy.py` does). Now, for method 1, invoke the following in the julia REPL:
 
 ```julia
 using PyCall
