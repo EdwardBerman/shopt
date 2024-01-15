@@ -74,6 +74,14 @@ function analytic_profile(u,v, s_matrix, g1_matrix, g2_matrix, radial_function)
   return radial_function(s,g1,g2)
 end
 
-function export_bibtext()
-  return ""
+function export_bibtex()
+  println("@misc{berman2023shoptjl,\n 
+      title={ShOpt.jl: A Julia Package for Empirical Point Spread Function Characterization of JWST NIRCam Data},\n 
+      author={Edward Berman and Jacqueline McCleary},\n
+      year={2023},\n
+      eprint={2310.00071},\n
+      archivePrefix={arXiv},\n
+      primaryClass={astro-ph.IM}\n
+}
+")
 end
