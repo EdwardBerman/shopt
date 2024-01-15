@@ -28,7 +28,7 @@
 
 **Shear Optimization** with **ShOpt.jl**, a julia library for empirical point spread function characterizations. We aim to improve upon the current state of Point Spread Function Modeling by using Julia to leverage performance gains, use a different mathematical formulation than the literature to provide more robust analytic and pixel grid fits, improve the diagnostic plots, and add features such as wavelets and shapelets. At this projects conclusion we will compare to existing software such as PIFF and PSFex. Work done under **[McCleary's Group](https://github.com/mcclearyj)**.
 
-Start by **Cloning This Repository**. Then see **TutorialNotebook.ipynb** or follow along the rest of this **README.md** to get started!
+Start by **Cloning This Repository**. Then see **TutorialNotebook.ipynb** or follow along the rest of this **README.md** to get started! Note that the commands in the tutorial notebook are meant to give a sense of procedure and can be executed with the Julia REPL itself.
 
 ### Who Should Use  
 Users looking for empirical point spread function characterization software tailored for the data coming from the James Webb Space Telescope, or on a dataset with the similar characteristics. For example, the point spread function spans 100s of pixels because of the pixel scale of your camera, the point spread function is not well approximated by an analytic profile, or the point spread function varies alot across the field of view. For any of these reasons, you should consider using ShOpt.jl. ShOpt.jl is not a single function package, and we would encourage the user to explore the full functionality of ShOpt.jl in the sample config to tailor the software to their needs. 
