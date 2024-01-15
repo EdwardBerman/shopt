@@ -173,6 +173,7 @@ using PyCall
 ENV["PYTHON"] = "/path_desired_python_directory/python_executable"; import Pkg; Pkg.build("PyCall")
 pyimport("astropy")
 ```
+It is important that the command pyimport("astropy") should be run after re-loading the Julia REPL.
 
 Method 2. If you have a Conda Enviornment setup, you may find it easier to run 
 ```julia
