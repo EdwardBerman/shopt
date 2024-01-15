@@ -160,35 +160,39 @@ import Pkg; Pkg.add("PyCall")
 
 We also provide dependencies.jl, which you can run to download all of the Julia libraries automatically by reading in the imports.txt file. Simply run `julia dependencies.jl` in the command line. For the three python requirements, you can similarly run `python dependenciesPy.py`. We also have a project enviornment for the Julia packages in the folder shopt\_env. It would be straightforward to add the line activate("shopt\_env") to the first line of shopt.jl to read in this environment. Note that Pycall would have to be built within this environment in some of the next steps.
 
-For some functionality we need to use wrappers for Python code, such as reading in fits files or converting (x,y) -> (u,v). Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. There are a number of ways to get Julia and Python to interopt nicely. One method is to first install the required Python libraries via pip (which is what `dependenciesPy.py` does) and then invoke the following in the julia REPL:
-    
-```julia    
-using PyCall    
-ENV["PYTHON"] = "/path_desired_python_directory/python_executable"; import Pkg; Pkg.build("PyCall")    
-pyimport("astropy")    
-```    
-    
-If you have a Conda Enviornment setup, you may find it easier to run     
-```julia    
-using PyCall    
-pyimport_conda("astropy", "ap") #ap is my choice of name and astropy is what I am importing from my conda Enviornment    
-```    
-    
-julia also has a way of working with conda directly. Note that julia will create its own conda enviornment to read from.    
-    
-```julia    
-using Conda    
-Conda.add("astropy", :my_env) #my conda enviornment is named my_env    
-```    
-    
-You may also do `using Conda; Conda.add("astropy", "/path/to/directory")` or `using Conda; Conda.add("astropy", "/path/to/directory"; channel="anaconda")`    
-    
-On the off chance that none of these works, a final method may look like the following     
-```julia    
-using PyCall    
-run(`$(PyCall.python) -m pip install --upgrade cython`)    
-run(`$(PyCall.python) -m pip install astropy`)     
-```    
+For some functionality we need to use wrappers for Python code, such as reading in fits files or converting (x,y) -> (u,v). Thus, we need to use certain Python libraries. Thankfully, the setup for this is still pretty straightfoward. We use PyCall to run these snippets. 
+
+There are four different ways to get Julia and Python to interopt nicely. We provide all of them as some of these methods play better with different systems.
+
+Method one is to first install the required Python libraries via pip (which is what `dependenciesPy.py` does) and then invoke the following in the julia REPL:
+
+```julia
+using PyCall
+ENV["PYTHON"] = "/path_desired_python_directory/python_executable"; import Pkg; Pkg.build("PyCall")
+pyimport("astropy")
+```
+
+Method 2. If you have a Conda Enviornment setup, you may find it easier to run 
+```julia
+using PyCall
+pyimport_conda("astropy", "ap") #ap is my choice of name and astropy is what I am importing from my conda Enviornment
+```
+
+Method 3. julia also has a way of working with conda directly. Note that julia will create its own conda enviornment to read from.
+
+```julia
+using Conda
+Conda.add("astropy", :my_env) #my conda enviornment is named my_env
+```
+
+You may also do `using Conda; Conda.add("astropy", "/path/to/directory")` or `using Conda; Conda.add("astropy", "/path/to/directory"; channel="anaconda")`
+
+Method 4. On the off chance that none of these works, a final method may look like the following 
+```julia
+using PyCall
+run(`$(PyCall.python) -m pip install --upgrade cython`)
+run(`$(PyCall.python) -m pip install astropy`) 
+```
 
 After the file contents are downloaded the user can run ```julia shopt.jl [configdir] [outdir] [catalog]``` as stated above. Alternatively, they can run the shellscript that calls shopt in whatever program they are working with to create their catalog. For example, in a julia program you may use ```run(`./runshopt.sh [configdir] [outdir] [catalog]`)```
 
