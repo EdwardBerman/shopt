@@ -657,8 +657,8 @@ fancyPrint("Plotting")
 
     s_map = [s(u,v) for u in u, v in v]
      
-    fig1 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
-    ax1 = fig1[1, 1] = CairoMakie.Axis(fig1, xlabel = L"u", ylabel = L"v",xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
+    fig1 = Figure(resolution = (1920, 1080), fontsize = 60, fonts = (;regular="CMU Serif"))
+    ax1 = fig1[1, 1] = CairoMakie.Axis(fig1, xlabel = L"u", ylabel = L"v",xticklabelsize = 80, yticklabelsize = 80, xlabelsize = 80, ylabelsize = 80)
     fs1 = CairoMakie.heatmap!(ax1, u, v, s_map, colormap = Reverse(:plasma))
     CairoMakie.streamplot!(ax1,
                 testField,
@@ -673,8 +673,8 @@ fancyPrint("Plotting")
                         fs1,
                         label = L"s(u,v)",
                         width = 20,
-                        labelsize = 50,
-                        ticklabelsize = 14)
+                        labelsize = 100,
+                        ticklabelsize = 40)
      
     CairoMakie.colgap!(fig1.layout, 5)
      
@@ -686,8 +686,8 @@ fancyPrint("Plotting")
 
     g1_map = [g1(u,v) for u in u, v in v]
      
-    fig2 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
-    ax2 = fig2[1, 1] = CairoMakie.Axis(fig2, xlabel = L"u", ylabel = L"v",xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
+    fig2 = Figure(resolution = (1920, 1080), fontsize = 60, fonts = (;regular="CMU Serif"))
+    ax2 = fig2[1, 1] = CairoMakie.Axis(fig2, xlabel = L"u", ylabel = L"v",xticklabelsize = 80, yticklabelsize = 80, xlabelsize = 80, ylabelsize = 80)
     fs2 = CairoMakie.heatmap!(ax2, u, v, g1_map, colormap = Reverse(:plasma))
     CairoMakie.streamplot!(ax2,
                 testField,
@@ -702,8 +702,8 @@ fancyPrint("Plotting")
                         fs2,
                         label = L"g1(u,v)",
                         width = 20,
-                        labelsize = 50,
-                        ticklabelsize = 14)
+                        labelsize = 100,
+                        ticklabelsize = 40)
      
     CairoMakie.colgap!(fig2.layout, 5)
      
@@ -715,8 +715,8 @@ fancyPrint("Plotting")
 
     g2_map = [g2(u,v) for u in u, v in v]
 
-    fig3 = Figure(resolution = (1920, 1080), fontsize = 30, fonts = (;regular="CMU Serif"))
-    ax3 = fig3[1, 1] = CairoMakie.Axis(fig3, xlabel = L"u", ylabel = L"v", xticklabelsize = 40, yticklabelsize = 40, xlabelsize = 40, ylabelsize = 40)
+    fig3 = Figure(resolution = (1920, 1080), fontsize = 60, fonts = (;regular="CMU Serif"))
+    ax3 = fig3[1, 1] = CairoMakie.Axis(fig3, xlabel = L"u", ylabel = L"v", xticklabelsize = 80, yticklabelsize = 80, xlabelsize = 80, ylabelsize = 80)
     fs3 = CairoMakie.heatmap!(ax3, u, v, g2_map, colormap = Reverse(:plasma))
     CairoMakie.streamplot!(ax3,
                 testField,
@@ -731,8 +731,8 @@ fancyPrint("Plotting")
                         fs3,
                         label = L"g2(u,v)",
                         width = 20,
-                        labelsize = 50,
-                        ticklabelsize = 14)
+                        labelsize = 100,
+                        ticklabelsize = 40)
      
     CairoMakie.colgap!(fig3.layout, 5)
      
