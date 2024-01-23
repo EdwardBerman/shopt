@@ -352,6 +352,19 @@ With help from collaborators at COSMOS-Web: The JWST Cosmic Origins Survey
 + The **[COSMOS Web Collaboration](https://www.stsci.edu/jwst/science-execution/program-information?id=1727)** for providing data from the James Webb Space Telescope and internal feedback
 
 ## Cite
+
+Citation for the current **Astronomical Journal (AJ)** preprint:
+```
+@misc{berman2024efficient,
+      title={Efficient PSF Modeling with ShOpt.jl: A PSF Benchmarking Study with JWST NIRCam Imaging}, 
+      author={Edward Berman and Jacqueline McCleary and Anton M. Koekemoer and Maximilien Franco and Nicole E. Drakos and Daizhong Liu and James W. Nightingale and Marko Shuntov and Diana Scognamiglio and Richard Massey and Guillaume Mahler and Henry Joy McCracken and Brant E. Robertson and Andreas L. Faisst Caitlin M. Casey and Jeyhan S. Kartaltepe},
+      year={2024},
+      eprint={2401.11625},
+      archivePrefix={arXiv},
+      primaryClass={astro-ph.IM}
+}
+```
+
 Citation for the current **Journal of Open Source Software (JOSS)** preprint:
 ```
 @misc{berman2023shoptjl,
