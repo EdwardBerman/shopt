@@ -4,6 +4,23 @@
 # Ignore specific languages
 *.py linguist-detectable=false
 *.html linguist-detectable=false
-*.tex linguist-detectable=false
 *.css linguist-detectable=false
 *.sh linguist-detectable=false
+
+# Ignore LaTeX related files
+*.tex linguist-detectable=false
+*.bib linguist-detectable=false
+*.bbl linguist-detectable=false
+*.bcf linguist-detectable=false
+*.blg linguist-detectable=false
+*.cls linguist-detectable=false
+*.sty linguist-detectable=false
+*.aux linguist-detectable=false
+*.log linguist-detectable=false
+*.out linguist-detectable=false
+*.fls linguist-detectable=false
+
+# Additional file types
+*.cff linguist-detectable=false
+*.bst linguist-detectable=false
+*.xml linguist-detectable=false
