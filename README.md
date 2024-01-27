@@ -28,6 +28,8 @@
 
 **Shear Optimization** with **ShOpt.jl**, a julia library for empirical point spread function characterizations. We aim to improve upon the current state of Point Spread Function Modeling by using Julia to leverage performance gains, use a different mathematical formulation than the literature to provide more robust analytic and pixel grid fits, improve the diagnostic plots, and add features such as wavelets and shapelets. At this projects conclusion we will compare to existing software such as PIFF and PSFex. Work done under **[McCleary's Group](https://github.com/mcclearyj)**.
 
+We release the related benchmarking code at **[https://github.com/mcclearyj/cweb_psf](https://github.com/mcclearyj/cweb_psf)**
+
 Start by **Cloning This Repository**. Then see **TutorialNotebook.ipynb** or follow along the rest of this **README.md** to get started! Note that the commands in the tutorial notebook are meant to give a sense of procedure and can be executed with the Julia REPL itself.
 
 ### Who Should Use  
