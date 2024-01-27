@@ -1,2 +1,9 @@
 # Jupyter notebook
 *.ipynb linguist-documentation
+
+# Ignore specific languages
+*.py linguist-detectable=false
+*.html linguist-detectable=false
+*.tex linguist-detectable=false
+*.css linguist-detectable=false
+*.sh linguist-detectable=false
