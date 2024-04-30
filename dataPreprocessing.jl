@@ -34,7 +34,7 @@ truncate_summary_file = config["truncate_summary_file"]
 iterationsPolyfit = config["iterations"]
 alpha = config["alpha"]
 chisq_stopping_gradient = config["chisq_stopping_gradient"]
-
+median_constraint = config["median_constraint"] 
 #=
 Log these config choices
 =#
@@ -48,6 +48,7 @@ end
 println("━ α:", alpha)
 println("━ Chisq Stopping Gradient:", chisq_stopping_gradient)
 println("━ Iterations: ", iterationsPolyfit)
+println("━ Median Constraint: ", median_constraint)
 println("━ Summary Name: ", summary_name)
 println("━ PCA Terms: ", PCAterms)
 println("━ Lanczos n: ", lanczos)
@@ -312,10 +313,12 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   v = f[idx].data['DELTAWIN_J2000']
 
   snr = f[idx].data['SNR_WIN']
+  median_img = np.nanmedian(f[idx].data['VIGNET'], axis=0)
   """
 
   datadir = py"python_datadir"
   v = py"vignets"
+  median_img = py"median_img"
   
   if mode == "chisq"
     err = py"err_vignets"
@@ -400,9 +403,9 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
   end
   
   if mode == "chisq"
-    return catalogNew, r, c, length(catalogNew), u_coords, v_coords, outlier_indices, errVignets
+    return catalogNew, r, c, length(catalogNew), u_coords, v_coords, outlier_indices, median_img, errVignets
   else 
-    return catalogNew, r, c, length(catalogNew), u_coords, v_coords, outlier_indices
+    return catalogNew, r, c, length(catalogNew), u_coords, v_coords, outlier_indices, median_img
   end
 end
 
