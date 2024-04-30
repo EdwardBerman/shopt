@@ -94,7 +94,7 @@ function objective_function(p, x, y, degree)
     for j in 1:(degree + 1)
       if (i - 1) + (j - 1) <= degree
         counter += 1
-        value += p[counter] * x^(i - 1) * y^(j - 1) #Make p 2-D then flatten
+        value += p[counter] * x^(i - 1) * y^(j - 1) 
       end
     end
   end 
@@ -103,20 +103,67 @@ end
 
 
 function polynomial_optimizer(degree, x_data, y_data, z_data)
-  num_coefficients = (degree + 1) * (degree + 2) ÷ 2
-  initial_guess = zeros(num_coefficients)  # Initial guess for the coefficients
-  initial_guess[1] = mean(z_data)
-  
-  function objective(p)
-    #if abs(mean(z_data)) < 1e-4
-    #  return 0.0
-    #end
-    
-    loss = sum((objective_function(p, x_val, y_val, degree) - z_actual)^2  for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
-    return loss
-  end
+    function generate_polynomial_terms(n)
+        terms = []
+        for i in 0:n
+            for j in 0:(n-i)
+                push!(terms, (i, j))
+            end
+        end
+        terms
+    end
+    polynomial_terms = generate_polynomial_terms(degree)
+    A = zeros(length(z_data), length(polynomial_terms))
+    #replace nans with median 
+    for i in 1:length(z_data)
+        if isnan(z_data[i])
+            z_data[i] = median(filter(!isnan, z_data))
+        end
+    end
+    for i in 1:length(z_data)
+        for (index, (p, q)) in enumerate(polynomial_terms)
+            A[i, index] = x_data[i]^p * y_data[i]^q
+        end
+    end
+    coefficients = A \ z_data
+    return coefficients
+end
 
-  result = optimize(objective, initial_guess, autodiff=:forward, LBFGS(), Optim.Options(g_tol = polynomial_interpolation_stopping_gradient, f_tol=1e-40)) #autodiff=:forward 
-  return Optim.minimizer(result)
+# if statement that makes a new polynomial_optimizer function that has a median constraint. Objective function will only be a function of p-1 terms, will add median(z_data) for constant term
+if median_constraint == true
+    function objective_function(p, x, y, degree; median_z=median_z)
+        num_coefficients = ((degree + 1) * (degree + 2) ÷ 2 ) - 1
+        value = 0
+        counter = 0
+        for i in 1:(degree + 1)  
+            for j in 1:(degree + 1)
+                if (i - 1) + (j - 1) <= degree
+                    if i == 1 && j == 1
+                        #print(size(z_data))
+                        value += median_z 
+                    else
+                        counter += 1
+                        value += p[counter] * x^(i - 1) * y^(j - 1) 
+                    end
+                end
+            end
+        end
+        return value
+    end
+    function polynomial_optimizer(degree, x_data, y_data, z_data, median_z)
+        #println("Median constraint")
+        num_coefficients = ((degree + 1) * (degree + 2) ÷ 2) - 1
+        initial_guess = zeros(num_coefficients)  
+        initial_guess[1] = mean(z_data) 
+        median_z = median_z
+        function objective(p)
+            loss = sum((objective_function(p, x_val, y_val, degree, median_z=median_z ) - z_actual)^2  for ((x_val, y_val), z_actual) in zip(zip(x_data, y_data), z_data) if !isnan(z_actual))
+            loss += 1e-4*sum(p.^2) #L2 regularization
+            return loss
+        end
+        result = optimize(objective, initial_guess, autodiff=:forward, LBFGS())
+        #prepend median(z_data) to the coefficients
+        return Optim.minimizer(result)
+    end
 end
 
