@@ -505,22 +505,6 @@ function compute_single_star_reconstructed_value(PolynomialMatrix, x, y, degree)
     return reconstructed_star
 end
 
-if median_constraint == true
-    function compute_single_star_reconstructed_value(PolynomialMatrix, x, y, degree, ppgf=median_img)
-        #println("Found pre Pixel Grid Fits")
-        r, c, _ = size(PolynomialMatrix)
-        reconstructed_star = zeros(r, c)
-        for i in 1:r
-            for j in 1:c
-                p = PolynomialMatrix[i, j, :]
-                z_data = median_img[i, j]
-                reconstructed_star[i, j] = objective_function(p, x, y, degree, median_z=z_data)
-            end
-        end
-        return reconstructed_star
-    end
-end
-    
 
 function compute_mse(reconstructed_matrix, true_matrix) #err_map
   return mean((reconstructed_matrix .- true_matrix) .^ 2 ) #./(err_map.^2)
@@ -547,13 +531,8 @@ end
     @threads for i in 1:r
       for j in 1:c
         z_data = [star[i, j] for star in training_stars]
-        if median_constraint == true
-            pC = polynomial_optimizer(degree, training_u_coords, training_v_coords, z_data, median_img[i,j])
-            PolynomialMatrix[i,j,:] = vcat(median_img[i,j], pC)
-        else
-            pC = polynomial_optimizer(degree, training_u_coords, training_v_coords, z_data)
-            PolynomialMatrix[i,j,:] .= pC
-        end
+        pC = polynomial_optimizer(degree, training_u_coords, training_v_coords, z_data)
+        PolynomialMatrix[i,j,:] .= pC
       end
     end
     #println("Here")    

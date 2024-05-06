@@ -394,7 +394,7 @@ function cataloging(args; nm=nanMask, nz=nanToZero, snr=signal_to_noise, dout=ou
     end
   end
   
-  println("━ Sampled all vignets to $(size(catalogNew[1], 1)) x $(size(catalogNew[1], 2)) from $(r) x $(c) via over/under sampling")
+  println("━ Sampled all vignets to $(size(catalogNew[1], 1)) x $(size(catalogNew[1], 2)) from $(r) x $(c) via cropping")
   r = size(catalogNew[1], 1)
   c = size(catalogNew[1], 2)
   k = rand(1:length(catalogNew))
