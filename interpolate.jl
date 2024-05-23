@@ -139,6 +139,10 @@ function polynomial_optimizer(degree, x_data, y_data, z_data; median_constraint=
     if median_constraint == true
         coefficients[1] = median(filter(!isnan, z_data))
     end
+    if length(z_data) < 5
+        coefficients = zeros(length(coefficients))
+        coefficients[1] = median(filter(!isnan, z_data))
+    end
     return coefficients
 end
 
