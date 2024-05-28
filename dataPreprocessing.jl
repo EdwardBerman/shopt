@@ -35,6 +35,7 @@ iterationsPolyfit = config["iterations"]
 alpha = config["alpha"]
 chisq_stopping_gradient = config["chisq_stopping_gradient"]
 median_constraint = config["median_constraint"] 
+outlier_sigma_clipping = config["outlier_sigma_clipping"]
 #=
 Log these config choices
 =#
@@ -72,6 +73,7 @@ println("━ s Upper Bound: ", sUpperBound)
 println("━ Training Ratio: ", training_ratio)
 println("━ Sum Pixel Grid and Inputs to Unity: ", unity_sum)
 println("━ Truncate Summary File: ", truncate_summary_file)
+println("━ Outlier Sigma Clipping: ", outlier_sigma_clipping)
 println("━ Comments: ", comments)
 
 #=
