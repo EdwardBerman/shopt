@@ -519,6 +519,18 @@ function worst_10_percent(errors)
     return [star[1] for star in worst_stars]
 end
 
+if outlier_sigma_clipping:
+    function worst_10_percent(errors)
+        n = length(errors)
+        mean_error = mean(errors)
+        std_error = std(errors)
+        threshold = mean_error + 3 * std_error
+        star_errors = [(i, errors[i]) for i in 1:n]
+        outliers = filter(x -> x[2] > threshold, star_errors)
+        return [outlier[1] for outlier in outliers]
+    end
+end
+
 @time begin
   global training_stars, training_u_coords, training_v_coords
   for loop in 1:iterationsPolyfit
