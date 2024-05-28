@@ -1,6 +1,6 @@
 saveYaml: true #save this file with each run
 
-mode: "PCA" # Options: autoencoder, chisq, PCA. Make sure mode is a string with double quotes
+mode: "smooth" # Options: smooth, autoencoder, chisq, PCA. Make sure mode is a string with double quotes
 
 PCAterms: 50 #If PCA mode is enabled, how many moments do you want to use for your pixel grid fit
 
@@ -26,15 +26,15 @@ plots: #What plots do you want?
     parametersHistogram: false
     parametersScatterplot: false
   cairomakiePlots:
-    streamplots: true
+    streamplots: false
   pythonPlots: false
 
 polynomialDegree: 1 #degree of polynomial for interpolation
-stampSize: 100 #how many pixels should the pixel grid PSF model
+stampSize: 99 #how many pixels should the pixel grid PSF model
 sampling: 0.0
 
 training_ratio: 0.9 #how many stars are you using the train versus to validate the PSF fit
-sum_pixel_grid_and_inputs_to_unity: true #Sum flux to unity true or false
+sum_pixel_grid_and_inputs_to_unity: false #Sum flux to unity true or false
 
 polynomial_interpolation_stopping_gradient: 1e-8 #stopping gradient for LFBGS used for polynomial interpolation
 
@@ -42,6 +42,10 @@ summary_name: '' #name to prefix summary.shopt
 truncate_summary_file: true # do you want to save storage by only storing essential information, how to reconstruct the PSF and analytic models
 
 iterations: 3
+n_sigma: 3
+
+median_constraint: false
+outlier_sigma_clipping: false
 
 alpha: 0.01
 chisq_stopping_gradient: 1e-8 
