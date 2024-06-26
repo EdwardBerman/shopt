@@ -355,13 +355,14 @@ With help from collaborators at COSMOS-Web: The JWST Cosmic Origins Survey
 
 Citation for the current **Astronomical Journal (AJ)** preprint:
 ```
-@misc{berman2024efficient,
+@misc{berman2024efficientpsfmodelingshoptjl,
       title={Efficient PSF Modeling with ShOpt.jl: A PSF Benchmarking Study with JWST NIRCam Imaging}, 
-      author={Edward Berman and Jacqueline McCleary and Anton M. Koekemoer and Maximilien Franco and Nicole E. Drakos and Daizhong Liu and James W. Nightingale and Marko Shuntov and Diana Scognamiglio and Richard Massey and Guillaume Mahler and Henry Joy McCracken and Brant E. Robertson and Andreas L. Faisst Caitlin M. Casey and Jeyhan S. Kartaltepe},
+      author={Edward Berman and Jacqueline McCleary and Anton M. Koekemoer and Maximilien Franco and Nicole E. Drakos and Daizhong Liu and James W. Nightingale and Marko Shuntov and Diana Scognamiglio and Richard Massey and Guillaume Mahler and Henry Joy McCracken and Brant E. Robertson and Andreas L. Faisst and Caitlin M. Casey and Jeyhan S. Kartaltepe},
       year={2024},
       eprint={2401.11625},
       archivePrefix={arXiv},
       primaryClass={astro-ph.IM}
+      url={https://arxiv.org/abs/2401.11625}, 
 }
 ```
 
