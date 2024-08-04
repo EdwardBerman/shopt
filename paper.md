@@ -23,7 +23,7 @@ bibliography: paper.bib
 
 # Optional fields if submitting to a AAS journal too, see this blog post:
 # https://blog.joss.theoj.org/2018/12/a-new-collaboration-with-aas-publishing
-aas-doi: 10.3847/xxxxx
+aas-doi: 10.3847/1538-3881/ad6a0f
 aas-journal: Astronomical Journal
 ---
 
