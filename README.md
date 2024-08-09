@@ -368,14 +368,7 @@ Citation for the current **Astronomical Journal (AJ)** preprint:
 }
 ```
 
-Citation for the current **Journal of Open Source Software (JOSS)** preprint:
+Citation for the **Journal of Open Source Software (JOSS)** paper:
 ```
-@misc{berman2023shoptjl,
-      title={ShOpt.jl: A Julia Package for Empirical Point Spread Function Characterization of JWST NIRCam Data}, 
-      author={Edward Berman and Jacqueline McCleary},
-      year={2023},
-      eprint={2310.00071},
-      archivePrefix={arXiv},
-      primaryClass={astro-ph.IM}
-}
+@article{Berman2024, doi = {10.21105/joss.06144}, url = {https://doi.org/10.21105/joss.06144}, year = {2024}, publisher = {The Open Journal}, volume = {9}, number = {100}, pages = {6144}, author = {Edward Berman and Jacqueline McCleary}, title = {ShOpt.jl: A Julia Package for Empirical Point Spread Function Characterization of JWST NIRCam Data}, journal = {Journal of Open Source Software} }
 ```
