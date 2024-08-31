@@ -361,7 +361,7 @@ Citation for the current **Astronomical Journal (AJ)** preprint:
       year={2024},
       eprint={2401.11625},
       archivePrefix={arXiv},
-      primaryClass={astro-ph.IM}
+      primaryClass={astro-ph.IM},
       url={https://arxiv.org/abs/2401.11625}, 
 }
 ```
