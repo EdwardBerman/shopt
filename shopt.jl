@@ -519,7 +519,7 @@ function worst_10_percent(errors)
     return [star[1] for star in worst_stars]
 end
 
-if outlier_sigma_clipping:
+if outlier_sigma_clipping
     function worst_10_percent(errors)
         n = length(errors)
         mean_error = mean(errors)
